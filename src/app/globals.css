@@ -3,11 +3,93 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
+  /* Base Colors */
+  --primary-purple: 108, 99, 255;    /* #6C63FF */
+  --primary-blue: 77, 159, 255;      /* #4D9FFF */
+  --dark-navy: 28, 31, 38;          /* #1C1F26 */
+  --midnight-teal: 36, 60, 84;      /* #243C54 */
+  --electric-pink: 255, 77, 136;    /* #FF4D88 */
+  --vibrant-orange: 255, 144, 82;   /* #FF9052 */
+  --gunmetal: 42, 46, 53;          /* #2A2E35 */
+  --smoke-gray: 62, 68, 77;        /* #3E444D */
+  --background-dark: 15, 23, 42;      /* #0F172A - slate-900 */
+  --surface-dark: 30, 41, 59;         /* #1E293B - slate-800 */
+  --surface-dark-hover: 51, 65, 85;   /* #334155 - slate-700 */
+  --text-primary: 226, 232, 240;      /* #E2E8F0 - slate-200 */
+  --text-secondary: 148, 163, 184;    /* #94A3B8 - slate-400 */
+  --accent-primary: 108, 99, 255;     /* #6C63FF */
+  --accent-secondary: 77, 159, 255;   /* #4D9FFF */
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+@layer base {
+  body {
+    @apply bg-[#0F172A] text-[#E2E8F0];
+  }
+}
+
+@layer components {
+  .gradient-primary {
+    @apply bg-gradient-to-r from-primary-purple to-primary-blue;
+  }
+  
+  .gradient-accent {
+    @apply bg-gradient-to-r from-electric-pink to-vibrant-orange;
+  }
+  
+  .gradient-card {
+    @apply bg-gradient-to-br from-gunmetal to-smoke-gray;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-[#6C63FF] to-[#4D9FFF] 
+           px-6 py-3 rounded-lg font-medium text-[#E2E8F0]
+           transform transition-all duration-200
+           hover:scale-105 hover:shadow-lg hover:shadow-[#6C63FF]/20;
+  }
+
+  .btn-accent {
+    @apply gradient-accent px-6 py-3 rounded-lg font-medium text-white 
+           shadow-lg hover:opacity-90 transition-all duration-200
+           hover:shadow-electric-pink/20 hover:shadow-xl;
+  }
+
+  .card {
+    @apply bg-[#1E293B] rounded-xl p-6
+           border border-[#334155] hover:border-[#475569]
+           transform transition-all duration-200
+           hover:shadow-lg hover:shadow-black/20;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .nav-link {
+    @apply text-[#94A3B8] hover:text-[#E2E8F0] transition-colors duration-200;
+  }
+
+  .input-field {
+    @apply bg-[#1E293B] border border-[#334155] rounded-lg px-4 py-3
+           text-[#E2E8F0] placeholder-[#94A3B8] focus:outline-none
+           focus:border-[#6C63FF]/30 transition-all duration-200;
+  }
+
+  .btn-primary-dark {
+    @apply bg-gradient-to-r from-[#6C63FF] to-[#4D9FFF] 
+           px-6 py-3 rounded-lg font-medium text-white
+           transform transition-all duration-200
+           hover:scale-105 hover:shadow-lg hover:shadow-[#6C63FF]/20;
+  }
+
+  .card-dark {
+    @apply bg-[#1E1E1E] rounded-xl p-6
+           border border-white/5 hover:border-white/10
+           transform transition-all duration-200
+           hover:shadow-lg hover:shadow-white/5;
+  }
+
+  .heading-gradient {
+    @apply bg-gradient-to-r from-[#6C63FF] to-[#4D9FFF]
+           bg-clip-text text-transparent;
+  }
 }
