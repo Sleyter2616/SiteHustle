@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { Database } from '@/lib/supabase'
+import { Database } from '../../lib/supabase'
 
 type Pillar = Database['public']['Tables']['pillars']['Row']
 type Progress = Database['public']['Tables']['user_progress']['Row']

@@ -1,11 +1,23 @@
 'use client'
 
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FiMenu, FiX } from 'react-icons/fi'
+import UserMenu from '../auth/UserMenu'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [email, setEmail] = useState<string | null>(null)
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      setEmail(session?.user?.email ?? null)
+    }
+    getUser()
+  }, [supabase.auth])
 
   return (
     <header className="fixed w-full top-0 z-50 bg-[#0F172A]/90 backdrop-blur-lg border-b border-[#334155]">
@@ -21,9 +33,13 @@ export default function Header() {
             <Link href="/features" className="nav-link">Features</Link>
             <Link href="/pricing" className="nav-link">Pricing</Link>
             <Link href="/about" className="nav-link">About</Link>
-            <Link href="/login" className="btn-primary">
-              Get Started
-            </Link>
+            {email ? (
+              <UserMenu email={email} />
+            ) : (
+              <Link href="/login" className="btn-primary">
+                Get Started
+              </Link>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -42,9 +58,13 @@ export default function Header() {
               <Link href="/features" className="nav-link px-2">Features</Link>
               <Link href="/pricing" className="nav-link px-2">Pricing</Link>
               <Link href="/about" className="nav-link px-2">About</Link>
-              <Link href="/login" className="btn-primary text-center">
-                Get Started
-              </Link>
+              {email ? (
+                <UserMenu email={email} />
+              ) : (
+                <Link href="/login" className="btn-primary text-center">
+                  Get Started
+                </Link>
+              )}
             </div>
           </nav>
         )}

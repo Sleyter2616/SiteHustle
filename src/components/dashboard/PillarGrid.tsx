@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { FiLock, FiCheck } from 'react-icons/fi'
-import { Database } from '@/lib/supabase'
+import { Database } from '../../lib/supabase'
 
 type Pillar = Database['public']['Tables']['pillars']['Row']
 type Progress = Database['public']['Tables']['user_progress']['Row']

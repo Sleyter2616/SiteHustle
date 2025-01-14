@@ -1,7 +1,7 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import PillarContent from '@/components/pillars/PillarContent'
+import PillarContent from '../../../../components/pillars/PillarContent'
 
 export default async function PillarPage({
   params: { id },
