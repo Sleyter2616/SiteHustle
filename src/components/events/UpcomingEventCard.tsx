@@ -10,6 +10,7 @@ interface UpcomingEventProps {
   time: string
   description: string
   joinUrl: string
+  calendarUrl: string
   pillar?: number
   attendeeCount?: number
   onRsvp?: (attending: boolean) => void
@@ -21,6 +22,7 @@ export default function UpcomingEventCard({
   time,
   description,
   joinUrl,
+  calendarUrl,
   pillar,
   attendeeCount = 0,
   onRsvp
@@ -92,6 +94,7 @@ export default function UpcomingEventCard({
               description={description}
               startDate={date}
               startTime={time}
+              calendarUrl={calendarUrl}
             />
           </div>
         ) : (
