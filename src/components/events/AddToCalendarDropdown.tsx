@@ -13,6 +13,7 @@ interface AddToCalendarProps {
   startTime: string
   duration?: number
   location?: string
+  calendarUrl?: string
 }
 
 export default function AddToCalendarDropdown({
@@ -21,7 +22,8 @@ export default function AddToCalendarDropdown({
   startDate,
   startTime,
   duration = 60,
-  location = 'Online via Zoom'
+  location,
+  calendarUrl
 }: AddToCalendarProps) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -37,20 +39,40 @@ export default function AddToCalendarDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const eventData = {
-    title,
-    description,
-    startDate,
-    startTime,
-    duration,
-    location
+  const handleAddToCalendar = (type: 'google' | 'outlook' | 'ics') => {
+    if (calendarUrl) {
+      window.open(calendarUrl, '_blank')
+      return
+    }
+
+    const eventData = {
+      title,
+      description,
+      startDate,
+      startTime,
+      duration,
+      location: location || 'Online via Zoom'
+    }
+
+    switch (type) {
+      case 'google':
+        window.open(formatGoogleCalendarUrl(eventData), '_blank')
+        break
+      case 'outlook':
+        window.open(formatOutlookCalendarUrl(eventData), '_blank')
+        break
+      case 'ics':
+        downloadICSFile(eventData, `${title.toLowerCase().replace(/\s+/g, '-')}.ics`)
+        break
+    }
+    setIsOpen(false)
   }
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center gap-2 px-4 py-2 border border-[#6C63FF] text-[#6C63FF] hover:bg-[#6C63FF] hover:text-white rounded-lg transition-colors duration-200"
+        className="flex items-center gap-2 px-4 py-2 bg-[#2D3748] text-[#E2E8F0] rounded-lg hover:bg-[#374151] transition-colors"
       >
         <FiCalendar className="w-4 h-4" />
         <span>Add to Calendar</span>
@@ -58,39 +80,28 @@ export default function AddToCalendarDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 rounded-lg bg-[#1E293B] shadow-lg border border-[#2D3748] z-10">
-          <div className="py-2">
-            <a
-              href={formatGoogleCalendarUrl(eventData)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 px-4 py-2 text-[#E2E8F0] hover:bg-[#2D3748] transition-colors duration-200"
-              onClick={() => setIsOpen(false)}
-            >
-              <SiGooglecalendar className="w-4 h-4" />
-              <span>Google Calendar</span>
-            </a>
-            <a
-              href={formatOutlookCalendarUrl(eventData)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 px-4 py-2 text-[#E2E8F0] hover:bg-[#2D3748] transition-colors duration-200"
-              onClick={() => setIsOpen(false)}
-            >
-              <BsMicrosoft className="w-4 h-4" />
-              <span>Outlook Calendar</span>
-            </a>
-            <button
-              onClick={() => {
-                downloadICSFile(eventData, `${title.toLowerCase().replace(/\s+/g, '-')}.ics`)
-                setIsOpen(false)
-              }}
-              className="flex items-center gap-3 px-4 py-2 text-[#E2E8F0] hover:bg-[#2D3748] transition-colors duration-200 w-full text-left"
-            >
-              <FiCalendar className="w-4 h-4" />
-              <span>Download .ics</span>
-            </button>
-          </div>
+        <div className="absolute right-0 mt-2 w-48 bg-[#1E293B] rounded-lg shadow-lg overflow-hidden z-50">
+          <button
+            onClick={() => handleAddToCalendar('google')}
+            className="flex items-center gap-3 w-full px-4 py-2 text-[#E2E8F0] hover:bg-[#2D3748] transition-colors"
+          >
+            <SiGooglecalendar className="w-4 h-4" />
+            <span>Google Calendar</span>
+          </button>
+          <button
+            onClick={() => handleAddToCalendar('outlook')}
+            className="flex items-center gap-3 w-full px-4 py-2 text-[#E2E8F0] hover:bg-[#2D3748] transition-colors"
+          >
+            <BsMicrosoft className="w-4 h-4" />
+            <span>Outlook</span>
+          </button>
+          <button
+            onClick={() => handleAddToCalendar('ics')}
+            className="flex items-center gap-3 w-full px-4 py-2 text-[#E2E8F0] hover:bg-[#2D3748] transition-colors"
+          >
+            <FiCalendar className="w-4 h-4" />
+            <span>Download .ics</span>
+          </button>
         </div>
       )}
     </div>
