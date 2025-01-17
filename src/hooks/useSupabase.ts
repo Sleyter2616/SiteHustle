@@ -1,6 +1,6 @@
 import { createClient, User, Session } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
-import { Database } from '@/types/database'
+import { Database } from '@/lib/supabase'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
