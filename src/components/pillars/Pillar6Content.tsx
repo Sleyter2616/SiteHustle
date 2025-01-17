@@ -11,7 +11,7 @@ import { tutorialCategories, tutorialLibrary, supportPlans, validatePillar6Data 
 type Phase = 'tutorials' | 'coaching' | 'support' | 'completion'
 
 const initialData: Pillar6Data = {
-  userId: '',
+  user_id: '',
   progress: {
     completedTasks: 0,
     totalTasks: tutorialLibrary.length + 3,
@@ -22,15 +22,10 @@ const initialData: Pillar6Data = {
     graduated: false
   },
   tutorials: {
-    library: tutorialLibrary.map(tutorial => ({
-      ...tutorial,
-      url: '', // Add actual URLs
-      watched: false,
-      notes: ''
-    })),
+    library: [],
     watchHistory: [],
     preferences: {
-      autoplay: false,
+      autoplay: true,
       playbackSpeed: 1,
       closedCaptions: false
     }
@@ -40,23 +35,13 @@ const initialData: Pillar6Data = {
     preferences: {
       preferredDay: '',
       preferredTime: '',
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timezone: '',
       format: 'video'
     },
     notes: ''
   },
   support: {
-    currentPlan: {
-      type: 'monthly',
-      active: false,
-      startDate: '',
-      features: [],
-      pricing: {
-        amount: 0,
-        interval: 'month',
-        currency: 'USD'
-      }
-    },
+    currentPlan: null,
     history: [],
     knowledgeBase: {
       articles: [],
@@ -72,9 +57,9 @@ const initialData: Pillar6Data = {
     nps: null,
     suggestions: []
   },
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
-}
+  created_at: '',
+  updated_at: ''
+};
 
 const videoTutorials: VideoTutorial[] = [
   {
@@ -114,106 +99,140 @@ const videoTutorials: VideoTutorial[] = [
 
 // Convert DB data to UI data
 const toUIData = (dbData: Pillar6DataDB): Pillar6Data => ({
-  userId: dbData.user_id,
-  progress: { ...dbData.progress },
+  user_id: dbData.user_id,
+  progress: {
+    ...dbData.progress,
+    currentPhase: dbData.progress.currentPhase as 'tutorials' | 'coaching' | 'support' | 'completion'
+  },
   tutorials: {
     ...dbData.tutorials,
     library: dbData.tutorials.library.map(tutorial => ({
       ...tutorial,
-      tags: tutorial.tags as readonly string[] // Convert to readonly
+      tags: tutorial.tags as readonly string[]
+    })),
+    watchHistory: dbData.tutorials.watchHistory.map(item => ({
+      tutorialId: item.tutorialId,
+      watchedDate: item.watchedDate,
+      completed: item.completed
     }))
   },
   coaching: {
     ...dbData.coaching,
     sessions: dbData.coaching.sessions.map(session => ({
       ...session,
-      topics: [...session.topics],
-      actionItems: [...session.actionItems]
+      scheduledDate: session.scheduledDate,
+      actionItems: session.actionItems.map(item => ({
+        task: item.task,
+        completed: item.completed,
+        dueDate: item.dueDate
+      }))
     }))
   },
   support: {
     ...dbData.support,
-    currentPlan: {
+    currentPlan: dbData.support.currentPlan ? {
       ...dbData.support.currentPlan,
-      features: dbData.support.currentPlan.features.map(feature => ({ ...feature }))
-    },
+      startDate: dbData.support.currentPlan.startDate,
+      features: dbData.support.currentPlan.features.map(f => ({ ...f }))
+    } : null,
     history: dbData.support.history.map(item => ({ ...item })),
     knowledgeBase: {
       ...dbData.support.knowledgeBase,
       articles: dbData.support.knowledgeBase.articles.map(article => ({
         ...article,
+        lastUpdated: article.lastUpdated,
         tags: [...article.tags]
-      })),
-      favorites: [...dbData.support.knowledgeBase.favorites]
+      }))
     }
   },
   milestones: {
     ...dbData.milestones,
-    achieved: dbData.milestones.achieved.map(milestone => ({
-      ...milestone,
-      metrics: milestone.metrics?.map(metric => ({ ...metric }))
+    achieved: dbData.milestones.achieved.map(m => ({
+      ...m,
+      achievedDate: m.achievedDate,
+      targetDate: m.targetDate,
+      metrics: m.metrics?.map(metric => ({ ...metric }))
     })),
-    upcoming: dbData.milestones.upcoming.map(item => ({ ...item }))
+    upcoming: dbData.milestones.upcoming.map(m => ({
+      ...m,
+      targetDate: m.targetDate
+    }))
   },
   feedback: {
     ...dbData.feedback,
-    testimonial: dbData.feedback.testimonial ? { ...dbData.feedback.testimonial } : null,
-    suggestions: [...dbData.feedback.suggestions]
+    testimonial: dbData.feedback.testimonial ? { ...dbData.feedback.testimonial } : null
   },
-  createdAt: dbData.created_at,
-  updatedAt: dbData.updated_at
+  created_at: dbData.created_at,
+  updated_at: dbData.updated_at
 });
 
 // Convert UI data to DB data
 const toDBData = (uiData: Pillar6Data): Pillar6DataDB => ({
-  user_id: uiData.userId,
-  progress: { ...uiData.progress },
+  user_id: uiData.user_id,
+  progress: {
+    ...uiData.progress,
+    currentPhase: uiData.progress.currentPhase
+  },
   tutorials: {
     ...uiData.tutorials,
     library: uiData.tutorials.library.map(tutorial => ({
       ...tutorial,
-      tags: [...tutorial.tags] // Convert back to mutable
+      tags: [...tutorial.tags]
+    })),
+    watchHistory: uiData.tutorials.watchHistory.map(item => ({
+      tutorialId: item.tutorialId,
+      watchedDate: item.watchedDate,
+      completed: item.completed
     }))
   },
   coaching: {
     ...uiData.coaching,
     sessions: uiData.coaching.sessions.map(session => ({
       ...session,
-      topics: [...session.topics],
-      actionItems: [...session.actionItems]
+      scheduled_date: session.scheduledDate,
+      action_items: session.actionItems.map(item => ({
+        task: item.task,
+        completed: item.completed,
+        due_date: item.dueDate
+      }))
     }))
   },
   support: {
     ...uiData.support,
-    currentPlan: {
+    currentPlan: uiData.support.currentPlan ? {
       ...uiData.support.currentPlan,
-      features: uiData.support.currentPlan.features.map(feature => ({ ...feature }))
-    },
+      startDate: uiData.support.currentPlan.startDate,
+      features: uiData.support.currentPlan.features.map(f => ({ ...f }))
+    } : null,
     history: uiData.support.history.map(item => ({ ...item })),
     knowledgeBase: {
       ...uiData.support.knowledgeBase,
       articles: uiData.support.knowledgeBase.articles.map(article => ({
         ...article,
+        last_updated: article.lastUpdated,
         tags: [...article.tags]
-      })),
-      favorites: [...uiData.support.knowledgeBase.favorites]
+      }))
     }
   },
   milestones: {
     ...uiData.milestones,
-    achieved: uiData.milestones.achieved.map(milestone => ({
-      ...milestone,
-      metrics: milestone.metrics?.map(metric => ({ ...metric }))
+    achieved: uiData.milestones.achieved.map(m => ({
+      ...m,
+      achieved_date: m.achievedDate,
+      target_date: m.targetDate,
+      metrics: m.metrics?.map(metric => ({ ...metric }))
     })),
-    upcoming: uiData.milestones.upcoming.map(item => ({ ...item }))
+    upcoming: uiData.milestones.upcoming.map(m => ({
+      ...m,
+      target_date: m.targetDate
+    }))
   },
   feedback: {
     ...uiData.feedback,
-    testimonial: uiData.feedback.testimonial ? { ...uiData.feedback.testimonial } : null,
-    suggestions: [...uiData.feedback.suggestions]
+    testimonial: uiData.feedback.testimonial ? { ...uiData.feedback.testimonial } : null
   },
-  created_at: uiData.createdAt,
-  updated_at: uiData.updatedAt
+  created_at: uiData.created_at,
+  updated_at: uiData.updated_at
 });
 
 export const Pillar6Content = () => {
@@ -269,7 +288,7 @@ export const Pillar6Content = () => {
         // Initialize with default data
         const newData = {
           ...initialData,
-          userId: user.id
+          user_id: user.id
         }
         
         console.log('Converting to DB format...')
@@ -1148,7 +1167,7 @@ export const Pillar6Content = () => {
                 <div
                   key={plan.type}
                   className={`bg-[#2D3748] p-6 rounded-lg border-2 ${
-                    data.support.currentPlan.type === plan.type
+                    data.support.currentPlan?.type === plan.type
                       ? 'border-[#5865F2]'
                       : 'border-transparent'
                   }`}
@@ -1177,12 +1196,12 @@ export const Pillar6Content = () => {
                   <button
                     onClick={() => handleSelectPlan(plan)}
                     className={`w-full py-2 rounded-lg ${
-                      data.support.currentPlan.type === plan.type
+                      data.support.currentPlan?.type === plan.type
                         ? 'bg-[#5865F2] text-white hover:bg-[#4752C4]'
                         : 'bg-[#1A1F2E] text-[#94A3B8] hover:bg-[#374151]'
                     }`}
                   >
-                    {data.support.currentPlan.type === plan.type ? 'Selected' : 'Select Plan'}
+                    {data.support.currentPlan?.type === plan.type ? 'Selected' : 'Select Plan'}
                   </button>
                 </div>
               ))}
@@ -1420,7 +1439,7 @@ export const Pillar6Content = () => {
                       }
                     } : null)}
                     className={`w-10 h-10 rounded-full ${
-                      data.feedback.testimonial.rating >= rating
+                      data.feedback.testimonial?.rating >= rating
                         ? 'bg-[#5865F2] text-white'
                         : 'bg-[#1A1F2E] text-[#94A3B8]'
                     }`}
@@ -1431,7 +1450,7 @@ export const Pillar6Content = () => {
               </div>
 
               <textarea
-                value={data.feedback.testimonial.content}
+                value={data.feedback.testimonial?.content}
                 onChange={(e) => setData(prev => prev ? {
                   ...prev,
                   feedback: {
@@ -1451,7 +1470,7 @@ export const Pillar6Content = () => {
                 <label className="flex items-center space-x-2 text-sm text-[#94A3B8]">
                   <input
                     type="checkbox"
-                    checked={data.feedback.testimonial.permission}
+                    checked={data.feedback.testimonial?.permission}
                     onChange={(e) => setData(prev => prev ? {
                       ...prev,
                       feedback: {
@@ -1470,7 +1489,7 @@ export const Pillar6Content = () => {
                 <label className="flex items-center space-x-2 text-sm text-[#94A3B8]">
                   <input
                     type="checkbox"
-                    checked={data.feedback.testimonial.public}
+                    checked={data.feedback.testimonial?.public}
                     onChange={(e) => setData(prev => prev ? {
                       ...prev,
                       feedback: {

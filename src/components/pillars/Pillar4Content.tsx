@@ -160,7 +160,7 @@ export default function Pillar4Content() {
       const { data: pillar4Data, error } = await supabase
         .from('pillar_4_data')
         .select('*')
-        .eq('userId', user.id)
+        .eq('user_id', user.id)
         .single()
 
       if (error) throw error
