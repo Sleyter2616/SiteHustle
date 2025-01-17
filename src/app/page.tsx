@@ -1,3 +1,6 @@
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { FiArrowRight, FiLayers, FiTarget, FiTrendingUp, FiDollarSign, FiZap, FiBook } from 'react-icons/fi'
 import Header from '../components/layout/Header'
@@ -19,8 +22,8 @@ const FEATURES = [
     description: "Monitor your journey with detailed progress tracking.",
     icon: "FiTarget",
     bulletPoints: [
-      "Visual progress indicators for each pillar",
-      "Achievement system to celebrate milestones"
+      "Visual progress indicators",
+      "Achievement milestones"
     ]
   },
   {
@@ -34,7 +37,14 @@ const FEATURES = [
   }
 ]
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = createServerComponentClient({ cookies })
+  const { data: { session } } = await supabase.auth.getSession()
+
+  if (session) {
+    redirect('/dashboard')
+  }
+
   return (
     <div className="min-h-screen bg-[#0F172A]">
       <Header />

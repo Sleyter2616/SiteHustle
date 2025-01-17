@@ -10,7 +10,7 @@ interface UpcomingEventProps {
   time: string
   description: string
   joinUrl: string
-  calendarUrl: string
+  calendarUrl?: string
   pillar?: number
   attendeeCount?: number
   onRsvp?: (attending: boolean) => void
@@ -24,97 +24,120 @@ export default function UpcomingEventCard({
   joinUrl,
   calendarUrl,
   pillar,
-  attendeeCount = 0,
+  attendeeCount,
   onRsvp
 }: UpcomingEventProps) {
-  const [rsvpStatus, setRsvpStatus] = useState<'attending' | 'not-attending' | null>(null)
+  const [isRsvpOpen, setIsRsvpOpen] = useState(false)
+  const [hasResponded, setHasResponded] = useState(false)
+  const [isAttending, setIsAttending] = useState(false)
 
   const handleRsvp = (attending: boolean) => {
-    setRsvpStatus(attending ? 'attending' : 'not-attending')
+    setIsAttending(attending)
+    setHasResponded(true)
     onRsvp?.(attending)
-  }
-
-  const getButtonStyles = (isAttending: boolean) => {
-    if (isAttending) {
-      return rsvpStatus === 'attending'
-        ? 'bg-green-500 text-white'
-        : 'bg-[#6C63FF]/10 text-[#6C63FF] hover:bg-[#6C63FF]/20'
-    } else {
-      return rsvpStatus === 'not-attending'
-        ? 'bg-red-500 text-white'
-        : 'bg-[#1E293B] text-[#94A3B8] hover:text-[#E2E8F0]'
-    }
+    setIsRsvpOpen(false)
   }
 
   return (
-    <div className="bg-[#1E293B] rounded-xl p-6 hover:scale-[1.02] transition-transform duration-200">
-      <div className="flex items-start justify-between mb-4">
+    <div className="bg-[#1E293B] rounded-lg p-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+        <h3 className="text-xl font-semibold text-[#E2E8F0]">{title}</h3>
+        
         {pillar && (
-          <div className="inline-block px-3 py-1 text-sm bg-[#6C63FF]/10 text-[#6C63FF] rounded-full">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#6C63FF]/10 text-[#6C63FF]">
             Pillar {pillar}
-          </div>
-        )}
-        {attendeeCount > 0 && (
-          <div className="flex items-center gap-2 text-sm text-[#94A3B8]">
-            <FiUsers className="w-4 h-4" />
-            <span>{attendeeCount} attending</span>
-          </div>
+          </span>
         )}
       </div>
 
-      <h3 className="text-xl font-semibold text-[#E2E8F0] mb-3">{title}</h3>
-      
-      <div className="flex flex-wrap gap-4 mb-4 text-sm text-[#94A3B8]">
-        <div className="flex items-center gap-2">
-          <FiCalendar className="w-4 h-4" />
-          <span>{date}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <FiClock className="w-4 h-4" />
-          <span>{time}</span>
-        </div>
-      </div>
-
-      <p className="text-[#94A3B8] mb-6">{description}</p>
-
-      <div className="flex flex-wrap gap-3">
-        {rsvpStatus === 'attending' ? (
-          <div className="flex flex-wrap gap-3">
-            <a
-              href={joinUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#6C63FF] hover:bg-[#5753D8] text-white rounded-lg transition-colors duration-200"
-            >
-              <FiVideo className="w-4 h-4" />
-              <span>Join Call</span>
-            </a>
-            <AddToCalendarDropdown
-              title={title}
-              description={description}
-              startDate={date}
-              startTime={time}
-              calendarUrl={calendarUrl}
-            />
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex items-center gap-2 text-[#94A3B8]">
+            <FiCalendar className="w-5 h-5" />
+            <span>{date}</span>
           </div>
-        ) : (
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleRsvp(true)}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 ${getButtonStyles(true)}`}
-            >
-              <FiCheck className="w-4 h-4" />
-              <span>I'll Attend</span>
-            </button>
-            <button
-              onClick={() => handleRsvp(false)}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 ${getButtonStyles(false)}`}
-            >
-              <FiX className="w-4 h-4" />
-              <span>Can't Make It</span>
-            </button>
+          <div className="flex items-center gap-2 text-[#94A3B8]">
+            <FiClock className="w-5 h-5" />
+            <span>{time}</span>
           </div>
-        )}
+          {attendeeCount !== undefined && (
+            <div className="flex items-center gap-2 text-[#94A3B8]">
+              <FiUsers className="w-5 h-5" />
+              <span>{attendeeCount} attending</span>
+            </div>
+          )}
+        </div>
+
+        <p className="text-[#94A3B8]">{description}</p>
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          {!hasResponded ? (
+            <>
+              <button
+                onClick={() => setIsRsvpOpen(!isRsvpOpen)}
+                className="px-4 py-2 bg-[#6C63FF] text-white rounded-lg hover:bg-[#5753D8] transition-colors"
+              >
+                RSVP
+              </button>
+              {isRsvpOpen && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleRsvp(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-[#059669] text-white rounded-lg hover:bg-[#047857] transition-colors"
+                  >
+                    <FiCheck className="w-4 h-4" />
+                    <span>Yes</span>
+                  </button>
+                  <button
+                    onClick={() => handleRsvp(false)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-[#DC2626] text-white rounded-lg hover:bg-[#B91C1C] transition-colors"
+                  >
+                    <FiX className="w-4 h-4" />
+                    <span>No</span>
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${
+              isAttending ? 'bg-[#059669]/10 text-[#059669]' : 'bg-[#DC2626]/10 text-[#DC2626]'
+            }`}>
+              {isAttending ? (
+                <>
+                  <FiCheck className="w-4 h-4" />
+                  <span>You're attending</span>
+                </>
+              ) : (
+                <>
+                  <FiX className="w-4 h-4" />
+                  <span>Not attending</span>
+                </>
+              )}
+            </div>
+          )}
+
+          {isAttending && (
+            <>
+              <a
+                href={joinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-[#2D3748] text-[#E2E8F0] rounded-lg hover:bg-[#374151] transition-colors"
+              >
+                <FiVideo className="w-4 h-4" />
+                <span>Join Call</span>
+              </a>
+              <AddToCalendarDropdown 
+                title={title}
+                description={description}
+                startDate={date}
+                startTime={time}
+                location={joinUrl}
+                calendarUrl={calendarUrl}
+              />
+            </>
+          )}
+        </div>
       </div>
     </div>
   )

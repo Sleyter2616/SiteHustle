@@ -1,0 +1,22 @@
+Tool Name,Cost (1-5),Ease of Use (1-5),AI Integration (1-5),Design Flexibility (1-5),Community Support (1-5),Learning Resources (1-5),Total Score,Notes
+Webflow,,,,,,,=SUM(B2:G2),
+Bubble,,,,,,,=SUM(B3:G3),
+Framer,,,,,,,=SUM(B4:G4),
+Wix,,,,,,,=SUM(B5:G5),
+WordPress,,,,,,,=SUM(B6:G6),
+Custom Solution,,,,,,,=SUM(B7:G7),
+
+Scoring Guide
+1 = Poor/Expensive
+2 = Below Average
+3 = Average
+4 = Above Average
+5 = Excellent/Affordable
+
+Factors to Consider:
+Cost: Monthly subscription cost and any additional fees
+Ease of Use: Learning curve and interface intuitiveness
+AI Integration: Built-in AI features and third-party integration options
+Design Flexibility: Customization options and template variety
+Community Support: Size and activity of user community
+Learning Resources: Quality and quantity of tutorials/documentation

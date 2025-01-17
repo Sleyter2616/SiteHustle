@@ -60,7 +60,7 @@ export default async function DashboardPage() {
             <div className="lg:col-span-2 space-y-8">
               {/* Progress Bar */}
               <div className="card">
-                <ProgressBar completed={completedPillars} total={totalPillars} />
+                <ProgressBar completed={completedPillars} total={totalPillars} type='pillars' />
               </div>
 
               {/* Pillars Grid */}
