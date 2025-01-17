@@ -7,6 +7,7 @@ import { FaCheck, FaBook, FaTrophy, FaCalendar, FaClock } from 'react-icons/fa'
 import { VideoTutorial, VideoTutorialDB, Pillar6Data, Pillar6DataDB } from '@/types/pillar6'
 import { tooltips } from '@/utils/tooltips'
 import { tutorialCategories, tutorialLibrary, supportPlans, validatePillar6Data } from '@/utils/pillar6Validation'
+import { mockPillar6Data } from '@/mocks/pillar6Mock'
 
 type Phase = 'tutorials' | 'coaching' | 'support' | 'completion'
 
@@ -237,88 +238,11 @@ const toDBData = (uiData: Pillar6Data): Pillar6DataDB => ({
 
 export const Pillar6Content = () => {
   const { supabase, user } = useSupabase()
-  const [data, setData] = useState<Pillar6Data | null>(null)
-  const [activePhase, setActivePhase] = useState<Phase>('tutorials')
+  const [data, setData] = useState<Pillar6Data>(mockPillar6Data);
+  const [activePhase, setActivePhase] = useState<Phase>(mockPillar6Data.progress.currentPhase);
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    if (user) {
-      loadData()
-    }
-  }, [user])
-
-  const loadData = async () => {
-    if (!user) return
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      console.log('Loading data for user:', user.id)
-      const { data: pillarData, error } = await supabase
-        .from('pillar_6_data')
-        .select('*')
-        .eq('user_id', user.id)
-        .single()
-
-      console.log('Received data:', pillarData)
-      console.log('Error:', error)
-
-      if (error && error.code !== 'PGRST116') { // Not found error
-        throw error
-      }
-
-      if (pillarData) {
-        console.log('Validating data...')
-        const validationResult = validatePillar6Data(pillarData)
-        console.log('Validation result:', validationResult)
-        
-        if (validationResult.success) {
-          console.log('Converting to UI data...')
-          const uiData = toUIData(pillarData)
-          console.log('UI data:', uiData)
-          setData(uiData)
-        } else {
-          console.error('Invalid data:', validationResult.errors)
-          setError('Invalid data format')
-        }
-      } else {
-        console.log('Creating new data...')
-        // Initialize with default data
-        const newData = {
-          ...initialData,
-          user_id: user.id
-        }
-        
-        console.log('Converting to DB format...')
-        const dbData = toDBData(newData)
-        console.log('DB data:', dbData)
-        
-        const { error: insertError } = await supabase
-          .from('pillar_6_data')
-          .insert([{
-            ...dbData,
-            user_id: user.id,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }])
-
-        if (insertError) {
-          console.error('Insert error:', insertError)
-          throw insertError
-        }
-
-        console.log('Setting UI data...')
-        setData(newData)
-      }
-    } catch (error) {
-      console.error('Error loading data:', error)
-      setError('Failed to load data')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSave = async () => {
     if (!user || !data) return;
@@ -417,19 +341,10 @@ export const Pillar6Content = () => {
     }));
   };
 
-  if (!user) {
-    return (
-      <div className="bg-yellow-500/10 border border-yellow-500 rounded-lg p-4 text-yellow-500">
-        <p className="font-medium">Not Authenticated</p>
-        <p className="text-sm">Please sign in to access this content.</p>
-      </div>
-    )
-  }
-
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#5865F2]"></div>
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -437,14 +352,7 @@ export const Pillar6Content = () => {
   if (error) {
     return (
       <div className="bg-red-500/10 text-red-500 p-4 rounded-lg">
-        <p className="font-medium">Error</p>
-        <p className="text-sm">{error}</p>
-        <button
-          onClick={loadData}
-          className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-        >
-          Try Again
-        </button>
+        {error}
       </div>
     )
   }

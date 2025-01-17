@@ -41,15 +41,32 @@ export interface PerformanceTest {
   recommendations: string[]
 }
 
+export type ScalabilityFeatureName = 
+  | "Blog Integration"
+  | "E-commerce Setup"
+  | "Membership Area"
+  | "Multilingual Support"
+  | string;
+
+export type ScalabilityFeatureCategory = 
+  | 'blog'
+  | 'ecommerce'
+  | 'membership'
+  | 'multilingual'
+  | 'other';
+
+export type Priority = 'high' | 'medium' | 'low';
+export type Timeline = 'short' | 'medium' | 'long';
+
 export interface ScalabilityFeature {
-  name: string
-  category: 'blog' | 'ecommerce' | 'membership' | 'multilingual' | 'other'
-  priority: 'high' | 'medium' | 'low'
-  timeline: 'short' | 'medium' | 'long'
-  requirements: string[]
-  estimatedCost: string
-  implemented: boolean
-  notes: string
+  name: ScalabilityFeatureName;
+  category: ScalabilityFeatureCategory;
+  priority: Priority;
+  timeline: Timeline;
+  requirements: readonly string[];
+  estimatedCost: string;
+  implemented: boolean;
+  notes: string;
 }
 
 export interface MaintenanceLog {

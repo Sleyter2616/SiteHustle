@@ -8,7 +8,7 @@ import { HiOutlineSparkles } from 'react-icons/hi'
 import ProgressBar from '../dashboard/ProgressBar'
 import Alert from '../common/Alert'
 import Tooltip from '../common/Tooltip'
-import type { Pillar5Data } from '@/types/pillar5'
+import type { Pillar5Data, ScalabilityFeature, ScalabilityFeatureCategory, ScalabilityFeatureName, Priority, Timeline } from '@/types/pillar5'
 import {
   domainProviders,
   analyticsTools,
@@ -258,6 +258,179 @@ export default function Pillar5Content() {
       }
     }))
   }
+
+  // Helper function to ensure type safety when updating features
+  const updateFeatureInList = (
+    features: ScalabilityFeature[],
+    index: number,
+    updates: Partial<ScalabilityFeature>
+  ): ScalabilityFeature[] => {
+    return features.map((feature, idx) =>
+      idx === index
+        ? { ...feature, ...updates } as ScalabilityFeature
+        : feature
+    );
+  };
+
+  // Helper function to create a new feature with proper types
+  const createTypedFeature = (
+    name: ScalabilityFeatureName,
+    category: ScalabilityFeatureCategory,
+    requirements: readonly string[],
+    priority: Priority = 'low',
+    timeline: Timeline = 'short',
+    estimatedCost: string = '',
+    notes: string = ''
+  ): ScalabilityFeature => ({
+    name,
+    category,
+    priority,
+    timeline,
+    requirements,
+    estimatedCost,
+    implemented: false,
+    notes
+  });
+
+  type FeatureInput = {
+    name: ScalabilityFeatureName;
+    category: ScalabilityFeatureCategory;
+    requirements: readonly string[];
+  };
+
+  const handleAddFeature = (
+    feature: FeatureInput
+  ) => {
+    const newFeature = createTypedFeature(
+      feature.name,
+      feature.category,
+      feature.requirements
+    );
+    
+    setData((prev: Pillar5Data): Pillar5Data => ({
+      ...prev,
+      scalability: {
+        ...prev.scalability,
+        features: [...prev.scalability.features, newFeature]
+      }
+    }));
+  };
+
+  const handleEstimatedCostChange = (e: React.ChangeEvent<HTMLInputElement>, feature: FeatureInput) => {
+    const existingFeature = data.scalability.features.find(f => f.name === feature.name);
+    const newFeatures = existingFeature
+      ? data.scalability.features.map(f =>
+          f.name === feature.name
+            ? { ...f, estimatedCost: e.target.value }
+            : f
+        ) as ScalabilityFeature[]
+      : [
+          ...data.scalability.features,
+          createTypedFeature(
+            feature.name,
+            feature.category,
+            feature.requirements,
+            'low' as Priority,
+            'short' as Timeline,
+            e.target.value
+          )
+        ];
+
+    setData((prev: Pillar5Data): Pillar5Data => ({
+      ...prev,
+      scalability: {
+        ...prev.scalability,
+        features: newFeatures
+      }
+    }));
+  };
+
+  const handleNotesChange = (e: React.ChangeEvent<HTMLInputElement>, feature: FeatureInput) => {
+    const existingFeature = data.scalability.features.find(f => f.name === feature.name);
+    const newFeatures = existingFeature
+      ? data.scalability.features.map(f =>
+          f.name === feature.name
+            ? { ...f, notes: e.target.value }
+            : f
+        ) as ScalabilityFeature[]
+      : [
+          ...data.scalability.features,
+          createTypedFeature(
+            feature.name,
+            feature.category,
+            feature.requirements,
+            'low' as Priority,
+            'short' as Timeline,
+            '',
+            e.target.value
+          )
+        ];
+
+    setData((prev: Pillar5Data): Pillar5Data => ({
+      ...prev,
+      scalability: {
+        ...prev.scalability,
+        features: newFeatures
+      }
+    }));
+  };
+
+  const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>, feature: FeatureInput) => {
+    const priority = e.target.value as Priority;
+    const existingFeature = data.scalability.features.find(f => f.name === feature.name);
+    const newFeatures = existingFeature
+      ? data.scalability.features.map(f =>
+          f.name === feature.name
+            ? { ...f, priority }
+            : f
+        ) as ScalabilityFeature[]
+      : [
+          ...data.scalability.features,
+          createTypedFeature(
+            feature.name,
+            feature.category,
+            feature.requirements,
+            priority
+          )
+        ];
+
+    setData((prev: Pillar5Data): Pillar5Data => ({
+      ...prev,
+      scalability: {
+        ...prev.scalability,
+        features: newFeatures
+      }
+    }));
+  };
+
+  const handleTimelineChange = (e: React.ChangeEvent<HTMLSelectElement>, feature: FeatureInput) => {
+    const timeline = e.target.value as Timeline;
+    const existingFeature = data.scalability.features.find(f => f.name === feature.name);
+    const newFeatures = existingFeature
+      ? data.scalability.features.map(f =>
+          f.name === feature.name
+            ? { ...f, timeline }
+            : f
+        ) as ScalabilityFeature[]
+      : [
+          ...data.scalability.features,
+          createTypedFeature(
+            feature.name,
+            feature.category,
+            feature.requirements,
+            'low' as Priority,
+            timeline
+          )
+        ];
+
+    setData((prev: Pillar5Data): Pillar5Data => ({
+      ...prev,
+      scalability: {
+        ...prev.scalability,
+        features: newFeatures
+      }
+    }));
+  };
 
   return (
     <div className="space-y-8">
@@ -560,7 +733,7 @@ export default function Pillar5Content() {
                 </div>
                 <div className="space-y-2">
                   {data.analytics.goals.map((goal, index) => (
-                    <div key={index} className="flex items-center space-x-2 bg-[#2D3748] p-4 rounded-lg">
+                    <div key={index} className="flex items-center justify-between bg-[#2D3748] p-4 rounded-lg">
                       <input
                         type="text"
                         value={goal.name}
@@ -843,7 +1016,7 @@ export default function Pillar5Content() {
             </div>
 
             <div className="space-y-4">
-              {scalabilityFeatures.map((feature) => (
+              {scalabilityFeatures.map((feature, index) => (
                 <div key={feature.name} className="bg-[#2D3748] p-4 rounded-lg space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -853,38 +1026,14 @@ export default function Pillar5Content() {
                     <div className="flex items-center space-x-4">
                       <select
                         value={data.scalability.features.find(f => f.name === feature.name)?.priority || 'low'}
-                        onChange={(e) => {
-                          const existingFeature = data.scalability.features.find(f => f.name === feature.name)
-                          const newFeatures = existingFeature
-                            ? data.scalability.features.map(f =>
-                                f.name === feature.name
-                                  ? { ...f, priority: e.target.value as 'high' | 'medium' | 'low' }
-                                  : f
-                              )
-                            : [
-                                ...data.scalability.features,
-                                {
-                                  name: feature.name,
-                                  category: feature.category,
-                                  priority: e.target.value as 'high' | 'medium' | 'low',
-                                  timeline: 'short',
-                                  requirements: feature.requirements,
-                                  estimatedCost: '',
-                                  implemented: false,
-                                  notes: ''
-                                }
-                              ]
-                          setData(prev => ({
-                            ...prev,
-                            scalability: {
-                              ...prev.scalability,
-                              features: newFeatures
-                            }
-                          }))
-                        }}
+                        onChange={(e) => handlePriorityChange(e, {
+                          name: feature.name as ScalabilityFeatureName,
+                          category: feature.category as ScalabilityFeatureCategory,
+                          requirements: feature.requirements
+                        })}
                         className="bg-[#1A1F2E] text-[#E2E8F0] rounded px-2 py-1"
                       >
-                        {['high', 'medium', 'low'].map((priority) => (
+                        {(['high', 'medium', 'low'] as const).map((priority) => (
                           <option key={priority} value={priority}>
                             {priority.charAt(0).toUpperCase() + priority.slice(1)} Priority
                           </option>
@@ -892,40 +1041,19 @@ export default function Pillar5Content() {
                       </select>
                       <select
                         value={data.scalability.features.find(f => f.name === feature.name)?.timeline || 'short'}
-                        onChange={(e) => {
-                          const existingFeature = data.scalability.features.find(f => f.name === feature.name)
-                          const newFeatures = existingFeature
-                            ? data.scalability.features.map(f =>
-                                f.name === feature.name
-                                  ? { ...f, timeline: e.target.value as 'short' | 'medium' | 'long' }
-                                  : f
-                              )
-                            : [
-                                ...data.scalability.features,
-                                {
-                                  name: feature.name,
-                                  category: feature.category,
-                                  priority: 'low',
-                                  timeline: e.target.value as 'short' | 'medium' | 'long',
-                                  requirements: feature.requirements,
-                                  estimatedCost: '',
-                                  implemented: false,
-                                  notes: ''
-                                }
-                              ]
-                          setData(prev => ({
-                            ...prev,
-                            scalability: {
-                              ...prev.scalability,
-                              features: newFeatures
-                            }
-                          }))
-                        }}
+                        onChange={(e) => handleTimelineChange(e, {
+                          name: feature.name as ScalabilityFeatureName,
+                          category: feature.category as ScalabilityFeatureCategory,
+                          requirements: feature.requirements
+                        })}
                         className="bg-[#1A1F2E] text-[#E2E8F0] rounded px-2 py-1"
                       >
-                        <option value="short">1-3 Months</option>
-                        <option value="medium">3-6 Months</option>
-                        <option value="long">6+ Months</option>
+                        {(['short', 'medium', 'long'] as const).map((timeline) => (
+                          <option key={timeline} value={timeline}>
+                            {timeline === 'short' ? '1-3 Months' :
+                             timeline === 'medium' ? '3-6 Months' : '6+ Months'}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -949,35 +1077,11 @@ export default function Pillar5Content() {
                       <input
                         type="text"
                         value={data.scalability.features.find(f => f.name === feature.name)?.estimatedCost || ''}
-                        onChange={(e) => {
-                          const existingFeature = data.scalability.features.find(f => f.name === feature.name)
-                          const newFeatures = existingFeature
-                            ? data.scalability.features.map(f =>
-                                f.name === feature.name
-                                  ? { ...f, estimatedCost: e.target.value }
-                                  : f
-                              )
-                            : [
-                                ...data.scalability.features,
-                                {
-                                  name: feature.name,
-                                  category: feature.category,
-                                  priority: 'low',
-                                  timeline: 'short',
-                                  requirements: feature.requirements,
-                                  estimatedCost: e.target.value,
-                                  implemented: false,
-                                  notes: ''
-                                }
-                              ]
-                          setData(prev => ({
-                            ...prev,
-                            scalability: {
-                              ...prev.scalability,
-                              features: newFeatures
-                            }
-                          }))
-                        }}
+                        onChange={(e) => handleEstimatedCostChange(e, {
+                          name: feature.name as ScalabilityFeatureName,
+                          category: feature.category as ScalabilityFeatureCategory,
+                          requirements: feature.requirements
+                        })}
                         placeholder="e.g., $100/month"
                         className="w-full bg-[#1A1F2E] text-[#E2E8F0] rounded px-2 py-1"
                       />
@@ -989,35 +1093,11 @@ export default function Pillar5Content() {
                       <input
                         type="text"
                         value={data.scalability.features.find(f => f.name === feature.name)?.notes || ''}
-                        onChange={(e) => {
-                          const existingFeature = data.scalability.features.find(f => f.name === feature.name)
-                          const newFeatures = existingFeature
-                            ? data.scalability.features.map(f =>
-                                f.name === feature.name
-                                  ? { ...f, notes: e.target.value }
-                                  : f
-                              )
-                            : [
-                                ...data.scalability.features,
-                                {
-                                  name: feature.name,
-                                  category: feature.category,
-                                  priority: 'low',
-                                  timeline: 'short',
-                                  requirements: feature.requirements,
-                                  estimatedCost: '',
-                                  implemented: false,
-                                  notes: e.target.value
-                                }
-                              ]
-                          setData(prev => ({
-                            ...prev,
-                            scalability: {
-                              ...prev.scalability,
-                              features: newFeatures
-                            }
-                          }))
-                        }}
+                        onChange={(e) => handleNotesChange(e, {
+                          name: feature.name as ScalabilityFeatureName,
+                          category: feature.category as ScalabilityFeatureCategory,
+                          requirements: feature.requirements
+                        })}
                         placeholder="Additional notes..."
                         className="w-full bg-[#1A1F2E] text-[#E2E8F0] rounded px-2 py-1"
                       />
