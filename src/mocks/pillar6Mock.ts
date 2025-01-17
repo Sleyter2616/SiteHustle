@@ -128,17 +128,17 @@ export const mockPillar6Data: Pillar6Data = {
           details: '60-minute consultation with expert'
         }
       ],
-      name: 'Professional Plan',
-      included: true,
-      details: 'Full access to all features',
+      // name: 'Professional Plan',
+      // included: true,
+      // details: 'Full access to all features',
       pricing: {
         amount: 99,
         interval: 'month',
         currency: 'USD'
       },
-      amount: 99,
-      interval: 'month',
-      currency: 'USD'
+      // amount: 99,
+      // interval: 'month',
+      // currency: 'USD'
     },
     history: [
       {
