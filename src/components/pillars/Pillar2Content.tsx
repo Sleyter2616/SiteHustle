@@ -6,6 +6,8 @@ import ProgressBar from '../dashboard/ProgressBar'
 import Alert from '../common/Alert'
 import { FiDownload, FiCheckCircle, FiPlay, FiExternalLink } from 'react-icons/fi'
 import type { Pillar2Data, AIModuleProgress } from '@/types/pillar2'
+import { websiteBuilders, appBuilders, automationTools, databaseTools, aiTools, lowCodeTools, integrationTools } from '@/types/tools'
+import { ToolSection } from '@/components/tools/ToolSection'
 
 interface Tool {
   id: string
@@ -397,6 +399,17 @@ export default function Pillar2Content() {
     )
   }
 
+  const handleToolSelect = (toolId: string) => {
+    const updatedData = {
+      ...data,
+      selectedTools: {
+        ...data.selectedTools,
+        secondary: [...data.selectedTools.secondary, toolId]
+      }
+    }
+    setData(updatedData)
+  }
+
   return (
     <div className="space-y-8">
       {/* Progress Section */}
@@ -505,6 +518,102 @@ export default function Pillar2Content() {
                 <FiDownload className="mr-2" />
                 Download Matrix Template
               </button>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'tools' && (
+          <div className="space-y-12">
+            <ToolSection
+              title="Website & Landing Page Builders"
+              description="Choose from a variety of no-code platforms to build your website or landing page quickly and professionally."
+              tools={websiteBuilders}
+              selectedTools={data?.selectedTools?.secondary || []}
+              onToolSelect={handleToolSelect}
+            />
+
+            <ToolSection
+              title="App Builders"
+              description="Create mobile and web applications without coding using these powerful app development platforms."
+              tools={appBuilders}
+              selectedTools={data?.selectedTools?.secondary || []}
+              onToolSelect={handleToolSelect}
+            />
+
+            <ToolSection
+              title="Automation & Workflow Tools"
+              description="Streamline your processes and connect your apps with these powerful automation platforms."
+              tools={automationTools}
+              selectedTools={data?.selectedTools?.secondary || []}
+              onToolSelect={handleToolSelect}
+            />
+
+            <ToolSection
+              title="Databases & Backend Tools"
+              description="Choose the right database and backend solution to power your applications."
+              tools={databaseTools}
+              selectedTools={data?.selectedTools?.secondary || []}
+              onToolSelect={handleToolSelect}
+            />
+
+            <ToolSection
+              title="AI-Powered Tools"
+              description="Leverage artificial intelligence for content creation, image generation, and productivity enhancement."
+              tools={aiTools}
+              selectedTools={data?.selectedTools?.secondary || []}
+              onToolSelect={handleToolSelect}
+            />
+
+            <ToolSection
+              title="Low-Code Solutions"
+              description="Build powerful internal tools and business applications with minimal coding required."
+              tools={lowCodeTools}
+              selectedTools={data?.selectedTools?.secondary || []}
+              onToolSelect={handleToolSelect}
+            />
+
+            <ToolSection
+              title="Specialized Tools & Integrations"
+              description="Essential integrations for payments, analytics, and user engagement."
+              tools={integrationTools}
+              selectedTools={data?.selectedTools?.secondary || []}
+              onToolSelect={handleToolSelect}
+            />
+
+            <div className="bg-[#1A1F2E] p-6 rounded-lg space-y-6">
+              <h2 className="text-2xl font-bold text-white">Putting It All Together</h2>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#5865F2] mb-2">Tech Stack Synergy</h3>
+                  <p className="text-gray-400">
+                    Create powerful solutions by combining tools strategically. For example:
+                  </p>
+                  <ul className="list-disc list-inside text-gray-400 mt-2">
+                    <li>Website builder for your frontend</li>
+                    <li>Automation tool for workflows</li>
+                    <li>AI tools for content and support</li>
+                    <li>Specialized integrations as needed</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-[#5865F2] mb-2">Selection Tips</h3>
+                  <ul className="list-disc list-inside text-gray-400">
+                    <li>Match tools to your specific goals and use cases</li>
+                    <li>Consider your budget and avoid tool sprawl</li>
+                    <li>Evaluate learning curves against your timeline</li>
+                    <li>Look for strong community support and documentation</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-[#5865F2] mb-2">Scalability</h3>
+                  <p className="text-gray-400">
+                    Start with essential tools and add more as your needs grow. Regular evaluation
+                    of your tech stack ensures you're getting value from each tool.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}
