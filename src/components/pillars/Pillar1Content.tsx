@@ -27,7 +27,7 @@ export default function Pillar1Content() {
       businessName: '',
       tagline: '',
       missionStatement: '',
-      coreValues:[],
+      coreValues: [],
       businessGoals: {
         shortTerm: '',
         midTerm: '',
@@ -36,7 +36,17 @@ export default function Pillar1Content() {
       targetAudience: {
         primaryProfile: '',
         secondaryAudiences: [],
-        painPoints: []
+        painPoints: [],
+        idealCustomerProfile: {
+          problem: '',
+          journey: '',
+          desires: [],
+          desiredState: '',
+          gap: '',
+          uniqueSellingPoint: '',
+          benefits: [],
+          objections: []
+        }
       },
       visionStatement: '',
       swot: {
@@ -46,10 +56,10 @@ export default function Pillar1Content() {
         threats: []
       },
       customerJourney: {
-        awareness: ['Awareness', 'Awareness'],
-        consideration: ['Consideration', 'Consideration'],
-        decision: 'Decision',
-        retention: ['Retention', 'Retention']
+        awareness: [],
+        consideration: [],
+        decision: '',
+        retention: []
       }
     },
     persona: {

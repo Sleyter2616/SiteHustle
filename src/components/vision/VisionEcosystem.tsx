@@ -2,41 +2,80 @@ import React, { useState } from 'react'
 import { FiArrowRight, FiInfo, FiDownload } from 'react-icons/fi'
 import FormField, { ArrayInput } from '../common/FormField'
 import Tooltip from '../common/Tooltip'
-import { tooltips, type Worksheet } from '@/utils/pillar1Validation'
-import { generateVisionWorksheetPDF } from '../../utils/pdfUtils';
+import { tooltips } from '@/utils/pillar1Validation'
+import { generateVisionWorksheetPDF } from '../../utils/pdfUtils'
+import { Pillar1Data } from '../../types/pillar1Types'
 
 interface VisionEcosystemProps {
-  data: {
-    worksheet: Worksheet
-  }
-  onChange: (data: { worksheet: Worksheet }) => void
-  errors: Record<string, any>
+  data: Pillar1Data;
+  onChange: (data: Pillar1Data) => void;
+  errors?: {
+    worksheet?: {
+      businessName?: string[];
+      tagline?: string[];
+      missionStatement?: string[];
+      coreValues?: string[];
+      businessGoals?: {
+        shortTerm?: string[];
+        midTerm?: string[];
+        longTerm?: string[];
+      };
+      targetAudience?: {
+        primaryProfile?: string[];
+        secondaryAudiences?: string[];
+        painPoints?: string[];
+        idealCustomerProfile?: {
+          problem?: string[];
+          journey?: string[];
+          desires?: string[];
+          desiredState?: string[];
+          gap?: string[];
+          uniqueSellingPoint?: string[];
+          benefits?: string[];
+          objections?: string[];
+        };
+      };
+      visionStatement?: string[];
+      swot?: {
+        strengths?: string[];
+        weaknesses?: string[];
+        opportunities?: string[];
+        threats?: string[];
+      };
+      customerJourney?: {
+        awareness?: string[];
+        consideration?: string[];
+        decision?: string[];
+        retention?: string[];
+      };
+    };
+  };
 }
 
-interface SectionProps {
-  title: string
-  subtitle?: string
-  children: React.ReactNode
-}
+const Section: React.FC<{
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}> = ({ title, subtitle, children }) => (
+  <div className="space-y-6">
+    <div>
+      <h2 className="text-2xl font-semibold text-[#F7FAFC]">{title}</h2>
+      {subtitle && <p className="mt-2 text-[#A0AEC0]">{subtitle}</p>}
+    </div>
+    {children}
+  </div>
+);
 
-const Quote = ({ children }: { children: React.ReactNode }) => (
-  <blockquote className="border-l-4 border-[#5865F2] pl-4 my-6 italic text-[#A0AEC0]">
+const Quote: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <blockquote className="border-l-4 border-[#5865F2] pl-4 my-4 text-[#A0AEC0] italic">
     {children}
   </blockquote>
-)
+);
 
-const ExampleBox = ({ title, children }: { title: string; children: React.ReactNode }) => (
+const ExampleBox: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <div className="bg-[#2D3748] rounded-lg p-6 my-4 border border-[#4A5568]">
     <h4 className="text-[#E2E8F0] font-medium mb-3">{title}</h4>
     <div className="text-[#A0AEC0]">{children}</div>
-  </div>
-)
-
-const Section = ({ title, subtitle, children }: SectionProps) => (
-  <div className="bg-[#1E293B] rounded-lg p-6 space-y-4 my-6">
-    <h3 className="text-xl font-semibold text-[#E2E8F0]">{title}</h3>
-    {subtitle && <p className="text-[#94A3B8] text-sm">{subtitle}</p>}
-    {children}
   </div>
 )
 
@@ -325,7 +364,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
           <FormField
             label="Who is your primary target audience?"
             required
-            error={errors?.worksheet?.targetAudience?.primaryProfile}
+            error={errors?.worksheet?.targetAudience?.primaryProfile[0]}
             helper="Describe the specific group of people who will benefit most from your solution"
           >
             <div className="relative">
@@ -377,7 +416,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
           <FormField
             label="What's the main problem your ideal customer faces?"
             required
-            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.problem}
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.problem[0]}
             helper="Describe the core challenge that drives them to seek a solution"
           >
             <div className="relative">
@@ -434,7 +473,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
           <FormField
             label="What transformation are they seeking?"
             required
-            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.journey}
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.journey[0]}
             helper="Describe the journey they want to take and their end goal"
           >
             <div className="relative">
@@ -494,7 +533,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
           <FormField
             label="What's their desired end state?"
             required
-            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.desiredState}
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.desiredState[0]}
             helper="Paint a picture of their ideal situation after using your solution"
           >
             <div className="relative">
@@ -526,7 +565,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
           <FormField
             label="What's the gap between their current and desired state?"
             required
-            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.gap}
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.gap[0]}
             helper="Identify what's holding them back from achieving their goals"
           >
             <div className="relative">
@@ -558,7 +597,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
           <FormField
             label="What's your unique selling point?"
             required
-            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.uniqueSellingPoint}
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.uniqueSellingPoint[0]}
             helper="How does your solution uniquely address their needs?"
           >
             <div className="relative">
@@ -656,7 +695,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
             <FormField
               label="Primary Awareness Channels"
               required
-              error={errors?.worksheet?.customerJourney?.awarenessChannels?.[0]}
+              error={errors?.worksheet?.customerJourney?.awareness?.[0]}
               helper="List 2-3 main channels where your ideal customers will discover you"
             >
               <ArrayInput
@@ -687,7 +726,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
             <FormField
               label="Trust-Building Elements"
               required
-              error={errors?.worksheet?.customerJourney?.considerationElements?.[0]}
+              error={errors?.worksheet?.customerJourney?.consideration?.[0]}
               helper="List 2-3 elements that build credibility and trust"
             >
               <ArrayInput
@@ -718,7 +757,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
             <FormField
               label="Purchase/Signup Process"
               required
-              error={errors?.worksheet?.customerJourney?.decisionProcess}
+              error={errors?.worksheet?.customerJourney?.decision[0]}
               helper="Detail your ideal purchase or signup process"
             >
               <div className="relative">
@@ -753,7 +792,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
             <FormField
               label="Engagement Strategies"
               required
-              error={errors?.worksheet?.customerJourney?.retentionStrategies?.[0]}
+              error={errors?.worksheet?.customerJourney?.retention?.[0]}
               helper="List your strategies for ongoing engagement and referrals"
             >
               <ArrayInput
