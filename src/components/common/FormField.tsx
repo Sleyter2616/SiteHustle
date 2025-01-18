@@ -89,7 +89,7 @@ export function ArrayInput({
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
         {tooltip && (
-          <Tooltip text={tooltip} />
+          <Tooltip content={tooltip} />
         )}
       </div>
       <div className="flex space-x-2">
