@@ -1,8 +1,9 @@
-import React from 'react'
-import { FiArrowRight, FiInfo } from 'react-icons/fi'
+import React, { useState } from 'react'
+import { FiArrowRight, FiInfo, FiDownload } from 'react-icons/fi'
 import FormField, { ArrayInput } from '../common/FormField'
 import Tooltip from '../common/Tooltip'
 import { tooltips, type Worksheet } from '@/utils/pillar1Validation'
+import { generateVisionWorksheetPDF } from '../../utils/pdfUtils';
 
 interface VisionEcosystemProps {
   data: {
@@ -40,35 +41,20 @@ const Section = ({ title, subtitle, children }: SectionProps) => (
 )
 
 export default function VisionEcosystem({ data, onChange, errors }: VisionEcosystemProps) {
+  const [generatingPDF, setGeneratingPDF] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    setGeneratingPDF(true);
+    try {
+      await generateVisionWorksheetPDF(data);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+    setGeneratingPDF(false);
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      {/* Introduction */}
-      <Section 
-        title="Your Vision & Goals Foundation" 
-        subtitle="Welcome to the first step in building your digital business"
-      >
-        <div className="prose prose-invert max-w-none">
-          <p>
-            The business landscape is undergoing a fundamental shift. As social media evolves and 
-            traditional marketing loses its edge, people have grown increasingly skeptical of who 
-            they do business with. Years of aggressive sales tactics and manipulative marketing have 
-            created a world where trust is not just important—it's everything.
-          </p>
-          
-          <Quote>
-            "In this new reality, having a large following means very little if your audience doesn't 
-            trust you or is not interested in what you sell."
-          </Quote>
-          
-          <p>
-            That's why we start with Vision & Goals. Your vision isn't just a statement—it's the 
-            foundation that will guide every decision you make, from choosing tools to crafting your 
-            content strategy. When your vision is clear and authentic, it naturally attracts the right 
-            audience and builds the trust essential for long-term success.
-          </p>
-        </div>
-      </Section>
-
       {/* The Value of Clarity */}
       <Section title="The Value of Clarity">
         <div className="prose prose-invert max-w-none">
@@ -968,29 +954,33 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
         </div>
       </Section>
 
-      {/* Next Steps */}
-      <Section title="Where to Next?">
-        <div className="prose prose-invert max-w-none">
-          <p>
-            Congratulations! You've now laid a solid foundation for your business by defining your:
-          </p>
-          <ul className="list-disc list-inside space-y-2 text-[#A0AEC0]">
-            <li>Clear business identity and mission</li>
-            <li>Core values that will guide your decisions</li>
-            <li>SMART goals for different time horizons</li>
-            <li>Strategic position through SWOT analysis</li>
-          </ul>
-          <p className="mt-4">
-            With this foundation in place, you're ready to move on to defining your target audience 
-            and creating your website wireframe. These next steps will build directly on the vision 
-            and goals you've just established.
-          </p>
-          <div className="flex items-center gap-2 text-[#5865F2] mt-4">
-            <FiArrowRight className="w-5 h-5" />
-            <span>Continue to "Target Audience Persona"</span>
-          </div>
-        </div>
-      </Section>
+      {/* Complete Worksheet Button */}
+      <div className="flex justify-end mt-8">
+        <button
+          onClick={handleDownloadPDF}
+          disabled={!data.worksheet.businessName || generatingPDF}
+          className={`
+            flex items-center gap-2 px-6 py-3 rounded-lg text-lg font-medium
+            transition-all duration-200
+            ${!data.worksheet.businessName || generatingPDF
+              ? 'bg-gray-600 cursor-not-allowed'
+              : 'bg-[#5865F2] hover:bg-[#4752C4] cursor-pointer'
+            }
+          `}
+        >
+          {generatingPDF ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span>Generating PDF...</span>
+            </>
+          ) : (
+            <>
+              <FiDownload className="w-5 h-5" />
+              <span>Download Worksheet</span>
+            </>
+          )}
+        </button>
+      </div>
     </div>
-  )
+  );
 }
