@@ -98,11 +98,22 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
       <Section title="The Value of Clarity">
         <div className="prose prose-invert max-w-none">
           <p>
-            In today's digital landscape, clarity is your competitive advantage. When you're crystal 
-            clear about who you are and where you're going, you build authentic connections with your 
-            audience—even before they become customers.
+            The business landscape is undergoing a fundamental shift. As social media evolves and 
+            traditional marketing loses its edge, people have grown increasingly skeptical of who 
+            they do business with.
+            <Tooltip
+              content={
+                <div className="max-w-xs">
+                  <p className="font-medium mb-1">Why Trust Matters</p>
+                  <p className="text-[#A0AEC0]">
+                    In today's digital age, customers are more discerning than ever. They're looking for authentic connections and real value before making decisions.
+                  </p>
+                </div>
+              }
+            >
+              <span className="text-[#5865F2] cursor-help"> Learn why →</span>
+            </Tooltip>
           </p>
-          
           <div className="bg-[#2D3748] rounded-lg p-4 my-4">
             <h4 className="text-[#E2E8F0] font-medium mb-2">Why Clarity Matters:</h4>
             <ul className="list-disc list-inside text-[#A0AEC0] space-y-2">
@@ -159,7 +170,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                   placeholder="Your Business Name"
                 />
                 <div className="absolute right-2 top-2">
-                  <Tooltip text={tooltips.worksheet.businessName} />
+                  <Tooltip content={tooltips.worksheet.businessName} />
                 </div>
               </div>
             </FormField>
@@ -184,7 +195,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                   placeholder="Your Tagline"
                 />
                 <div className="absolute right-2 top-2">
-                  <Tooltip text={tooltips.worksheet.tagline} />
+                  <Tooltip content={tooltips.worksheet.tagline} />
                 </div>
               </div>
             </FormField>
@@ -209,7 +220,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                   placeholder="We exist to... for... so they can..."
                 />
                 <div className="absolute right-2 top-2">
-                  <Tooltip text={tooltips.worksheet.missionStatement} />
+                  <Tooltip content={tooltips.worksheet.missionStatement} />
                 </div>
               </div>
             </FormField>
@@ -384,7 +395,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                 placeholder="Describe your ideal customer's demographics, challenges, and desires..."
               />
               <div className="absolute right-2 top-2">
-                <Tooltip text={tooltips.worksheet.targetAudience.primaryProfile} />
+                <Tooltip content={tooltips.worksheet.targetAudience.primaryProfile} />
               </div>
             </div>
           </FormField>
@@ -439,7 +450,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                 placeholder="Example: Non-technical entrepreneurs struggling to build and maintain their website..."
               />
               <div className="absolute right-2 top-2">
-                <Tooltip text={tooltips.worksheet.targetAudience.idealCustomerProfile.problem} />
+                <Tooltip content={tooltips.worksheet.targetAudience.idealCustomerProfile.problem} />
               </div>
             </div>
           </FormField>
@@ -496,7 +507,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                 placeholder="Example: Want to go from struggling with technical details to having a professional, easy-to-maintain website..."
               />
               <div className="absolute right-2 top-2">
-                <Tooltip text={tooltips.worksheet.targetAudience.idealCustomerProfile.journey} />
+                <Tooltip content={tooltips.worksheet.targetAudience.idealCustomerProfile.journey} />
               </div>
             </div>
           </FormField>
@@ -556,7 +567,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                 placeholder="Example: Having a professional website they can easily update without technical knowledge..."
               />
               <div className="absolute right-2 top-2">
-                <Tooltip text={tooltips.worksheet.targetAudience.idealCustomerProfile.desiredState} />
+                <Tooltip content={tooltips.worksheet.targetAudience.idealCustomerProfile.desiredState} />
               </div>
             </div>
           </FormField>
@@ -588,7 +599,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                 placeholder="Example: Lack of technical skills and time to learn complex web development..."
               />
               <div className="absolute right-2 top-2">
-                <Tooltip text={tooltips.worksheet.targetAudience.idealCustomerProfile.gap} />
+                <Tooltip content={tooltips.worksheet.targetAudience.idealCustomerProfile.gap} />
               </div>
             </div>
           </FormField>
@@ -620,7 +631,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                 placeholder="Example: Our no-code website builder specifically designed for non-technical entrepreneurs..."
               />
               <div className="absolute right-2 top-2">
-                <Tooltip text={tooltips.worksheet.targetAudience.idealCustomerProfile.uniqueSellingPoint} />
+                <Tooltip content={tooltips.worksheet.targetAudience.idealCustomerProfile.uniqueSellingPoint} />
               </div>
             </div>
           </FormField>
@@ -777,7 +788,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                   placeholder="Example: Simple checkout page with clear pricing tiers and FAQ section..."
                 />
                 <div className="absolute right-2 top-2">
-                  <Tooltip text={tooltips.worksheet.customerJourney.decisionProcess} />
+                  <Tooltip content={tooltips.worksheet.customerJourney.decisionProcess} />
                 </div>
               </div>
             </FormField>
@@ -848,7 +859,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                   placeholder="What specific milestones do you want to achieve in the next 6-12 months?"
                 />
                 <div className="absolute right-2 top-2">
-                  <Tooltip text={tooltips.worksheet.businessGoals.shortTerm} />
+                  <Tooltip content={tooltips.worksheet.businessGoals.shortTerm} />
                 </div>
               </div>
             </FormField>
@@ -875,7 +886,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                   placeholder="How do you want your business to grow in the next 1-2 years?"
                 />
                 <div className="absolute right-2 top-2">
-                  <Tooltip text={tooltips.worksheet.businessGoals.midTerm} />
+                  <Tooltip content={tooltips.worksheet.businessGoals.midTerm} />
                 </div>
               </div>
             </FormField>
@@ -902,7 +913,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                   placeholder="What's the ultimate vision for your business in 2-3 years?"
                 />
                 <div className="absolute right-2 top-2">
-                  <Tooltip text={tooltips.worksheet.businessGoals.longTerm} />
+                  <Tooltip content={tooltips.worksheet.businessGoals.longTerm} />
                 </div>
               </div>
             </FormField>

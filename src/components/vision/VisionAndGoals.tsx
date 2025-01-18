@@ -126,7 +126,8 @@ export default function VisionAndGoals({ data, onChange, errors }: VisionAndGoal
             helper="Add 3-5 values that guide your business decisions"
           >
             <ArrayInput
-              value={data.coreValues}
+              label="Core values"
+              values={data.coreValues}
               onChange={(values) => onChange({ coreValues: values })}
               placeholder="e.g., Innovation, Accessibility, Authenticity"
             />
@@ -218,7 +219,8 @@ export default function VisionAndGoals({ data, onChange, errors }: VisionAndGoal
             helper="What unique advantages do you have?"
           >
             <ArrayInput
-              value={data.swot?.strengths || []}
+            label='Strengths'
+              values={data.swot?.strengths || []}
               onChange={(values) => onChange({
                 swot: { ...data.swot, strengths: values }
               })}
@@ -231,7 +233,8 @@ export default function VisionAndGoals({ data, onChange, errors }: VisionAndGoal
             helper="What could you improve?"
           >
             <ArrayInput
-              value={data.swot?.weaknesses || []}
+            label='Weaknesses'
+              values={data.swot?.weaknesses || []}
               onChange={(values) => onChange({
                 swot: { ...data.swot, weaknesses: values }
               })}
@@ -244,7 +247,8 @@ export default function VisionAndGoals({ data, onChange, errors }: VisionAndGoal
             helper="What external factors could you leverage?"
           >
             <ArrayInput
-              value={data.swot?.opportunities || []}
+            label='Opportunities'
+              values={data.swot?.opportunities || []}
               onChange={(values) => onChange({
                 swot: { ...data.swot, opportunities: values }
               })}
@@ -257,7 +261,8 @@ export default function VisionAndGoals({ data, onChange, errors }: VisionAndGoal
             helper="What external challenges should you prepare for?"
           >
             <ArrayInput
-              value={data.swot?.threats || []}
+            label='Threats'
+              values={data.swot?.threats || []}
               onChange={(values) => onChange({
                 swot: { ...data.swot, threats: values }
               })}

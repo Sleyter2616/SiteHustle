@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Tooltip from './Tooltip'
+import { FiInfo } from 'react-icons/fi'
 
 interface FormFieldProps {
   label: React.ReactNode
@@ -7,17 +8,27 @@ interface FormFieldProps {
   required?: boolean
   helper?: string
   children: React.ReactNode
+  tooltip?: string
 }
 
-export default function FormField({ label, error, required, helper, children }: FormFieldProps) {
+export default function FormField({ label, error, required, helper, children, tooltip }: FormFieldProps) {
   return (
     <div className="mb-4">
-      <div className="flex items-center justify-between mb-2">
-        <label className="block text-sm font-medium text-[#E2E8F0]">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-      </div>
+      {label && (
+        <div className="flex items-center gap-2 mb-2">
+          <label className="block text-sm font-medium text-[#E2E8F0]">
+            {label}
+            {required && <span className="text-red-500 ml-1">*</span>}
+          </label>
+          {tooltip && (
+            <Tooltip content={tooltip}>
+              <div className="cursor-help">
+                <FiInfo className="w-4 h-4 text-[#A0AEC0]" />
+              </div>
+            </Tooltip>
+          )}
+        </div>
+      )}
       {children}
       {helper && (
         <p className="mt-1 text-sm text-[#94A3B8]">{helper}</p>
