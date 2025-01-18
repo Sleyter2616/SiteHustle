@@ -1,19 +1,27 @@
 import React, { useState } from 'react'
+import Tooltip from './Tooltip'
+
 interface FormFieldProps {
   label: React.ReactNode
   error?: string
   required?: boolean
+  helper?: string
   children: React.ReactNode
 }
 
-export default function FormField({ label, error, required, children }: FormFieldProps) {
+export default function FormField({ label, error, required, helper, children }: FormFieldProps) {
   return (
     <div className="mb-4">
-      <label className="block text-sm font-medium text-[#E2E8F0] mb-2">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
+      <div className="flex items-center justify-between mb-2">
+        <label className="block text-sm font-medium text-[#E2E8F0]">
+          {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+      </div>
       {children}
+      {helper && (
+        <p className="mt-1 text-sm text-[#94A3B8]">{helper}</p>
+      )}
       {error && (
         <p className="mt-1 text-sm text-red-400">{error}</p>
       )}
@@ -22,24 +30,35 @@ export default function FormField({ label, error, required, children }: FormFiel
 }
 
 interface ArrayInputProps {
-  value: string[]
-  onChange: (value: string[]) => void
+  label: string
+  values?: string[]
+  onChange: (values: string[]) => void
   placeholder?: string
   error?: string
+  tooltip?: string
 }
 
-export function ArrayInput({ value, onChange, placeholder, error }: ArrayInputProps) {
-  const [inputValue, setInputValue] = useState('')
+export function ArrayInput({ 
+  label, 
+  values = [], 
+  onChange, 
+  error,
+  tooltip,
+  placeholder 
+}: ArrayInputProps) {
+  const [newItem, setNewItem] = useState('')
 
   const handleAdd = () => {
-    if (inputValue.trim()) {
-      onChange([...value, inputValue.trim()])
-      setInputValue('')
+    if (newItem.trim()) {
+      onChange([...(values || []), newItem.trim()])
+      setNewItem('')
     }
   }
 
   const handleRemove = (index: number) => {
-    onChange(value.filter((_, i) => i !== index))
+    const newValues = [...(values || [])]
+    newValues.splice(index, 1)
+    onChange(newValues)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -51,37 +70,41 @@ export function ArrayInput({ value, onChange, placeholder, error }: ArrayInputPr
 
   return (
     <div className="space-y-2">
-      <div className="flex gap-2">
+      <div className="flex items-center justify-between">
+        <label className="block text-sm font-medium text-[#E2E8F0]">
+          {label}
+        </label>
+        {tooltip && (
+          <Tooltip text={tooltip} />
+        )}
+      </div>
+      <div className="flex space-x-2">
         <input
           type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          value={newItem}
+          onChange={(e) => setNewItem(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={placeholder}
-          className="flex-1 bg-[#1E293B] text-[#E2E8F0] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5865F2]"
+          className="flex-1 bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5865F2]"
         />
         <button
-          type="button"
           onClick={handleAdd}
-          className="px-4 py-2 bg-[#5865F2] text-white rounded-md hover:bg-[#4752C4]"
+          disabled={!newItem.trim()}
+          className="px-4 py-2 bg-[#5865F2] text-white rounded-md hover:bg-[#4752C4] disabled:opacity-50"
         >
           Add
         </button>
       </div>
       {error && <p className="text-sm text-red-400">{error}</p>}
       <ul className="space-y-2">
-        {value.map((item, index) => (
-          <li
-            key={index}
-            className="flex items-center justify-between bg-[#1E293B] rounded-md px-3 py-2"
-          >
+        {(values || []).map((item, index) => (
+          <li key={index} className="flex items-center justify-between bg-[#2D3748] rounded-md px-3 py-2">
             <span className="text-[#E2E8F0]">{item}</span>
             <button
-              type="button"
               onClick={() => handleRemove(index)}
-              className="text-[#94A3B8] hover:text-red-400"
+              className="text-[#94A3B8] hover:text-[#E2E8F0]"
             >
-              Remove
+              ×
             </button>
           </li>
         ))}

@@ -15,6 +15,11 @@ export const worksheetSchema = z.object({
     midTerm: z.string().min(20, 'Describe your 1-2 year goals in detail'),
     longTerm: z.string().min(20, 'Describe your 3-5 year goals in detail')
   }),
+  targetAudience: z.object({
+    primaryProfile: z.string().min(1, 'Primary profile is required'),
+    secondaryAudiences: z.array(z.string()).optional(),
+    painPoints: z.array(z.string()).min(1, 'At least one pain point is required')
+  }),
   visionStatement: z.string()
     .min(20, 'Vision statement should describe your desired future impact')
     .max(300, 'Vision statement should be concise (max 300 characters)'),
@@ -88,6 +93,11 @@ export const tooltips = {
       midTerm: 'Where do you see your business in 1-2 years?',
       longTerm: 'What\'s your big picture vision for 3-5 years from now?'
     },
+    targetAudience: {
+      primaryProfile: "Describe your ideal customer's demographics, challenges, and desires",
+      secondaryAudiences: "List other potential customer segments who might benefit from your offerings",
+      painPoints: "List specific problems your target audience faces that your solution will address"
+    },
     visionStatement: 'The future impact you want your business to have on your industry or community',
     swot: {
       strengths: 'What unique advantages or capabilities do you have?',
@@ -136,8 +146,18 @@ export const validatePersona = (data: Persona) => {
 }
 
 export const isWorksheetComplete = (data: Worksheet): boolean => {
-  const result = worksheetSchema.safeParse(data)
-  return result.success
+  return (
+    !!data.businessName &&
+    !!data.tagline &&
+    !!data.missionStatement &&
+    data.coreValues.length > 0 &&
+    !!data.businessGoals.shortTerm &&
+    !!data.businessGoals.midTerm &&
+    !!data.businessGoals.longTerm &&
+    !!data.targetAudience?.primaryProfile &&
+    data.targetAudience?.painPoints?.length > 0 &&
+    !!data.visionStatement
+  )
 }
 
 export const isPersonaComplete = (data: Persona): boolean => {
