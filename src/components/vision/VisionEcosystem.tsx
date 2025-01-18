@@ -45,7 +45,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
       {/* Introduction */}
       <Section 
         title="Your Vision & Goals Foundation" 
-        subtitle="Welcome to the first step in building your digital business ecosystem"
+        subtitle="Welcome to the first step in building your digital business"
       >
         <div className="prose prose-invert max-w-none">
           <p>
@@ -320,49 +320,59 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
         </div>
       </Section>
 
-      {/* Target Audience */}
-      <Section 
-        title="Identify Your Target Audience"
-        subtitle="Understanding who you serve is crucial for crafting your message and offerings"
-      >
-        <div className="space-y-6">
+      {/* Identify Your Target Audience (ICP) */}
+      <Section title="Identify Your Target Audience (ICP)" subtitle="Understanding your Ideal Customer Profile helps you create content and products that perfectly match their needs.">
+        <div className="space-y-8">
           <div className="bg-[#2D3748] rounded-lg p-6">
-            <h4 className="text-[#E2E8F0] font-medium mb-4">Primary Customer Profile</h4>
-            <FormField
-              label="Who are they?"
-              error={errors?.worksheet?.targetAudience?.primaryProfile?.[0]}
-              required
-            >
-              <div className="relative">
-                <textarea
-                  value={data.worksheet.targetAudience.primaryProfile}
-                  onChange={(e) => onChange({
-                    ...data,
-                    worksheet: {
-                      ...data.worksheet,
-                      targetAudience: {
-                        ...data.worksheet.targetAudience,
-                        primaryProfile: e.target.value
-                      }
-                    }
-                  })}
-                  placeholder="They are ___ (age, location, profession). They struggle with ___ (pain points). They desire ___ (goals/outcomes)."
-                  className="w-full bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5865F2] min-h-[100px]"
-                />
-                <div className="absolute right-2 top-2">
-                  <Tooltip text={tooltips.worksheet.targetAudience.primaryProfile} />
-                </div>
-              </div>
-            </FormField>
-            <p className="text-[#94A3B8] text-sm mt-4">
-              Consider your ICP from The Ecosystem (non-technical entrepreneurs, for example).
+            <p className="text-[#E2E8F0] mb-6">
+              Your Ideal Customer Profile (ICP) is more than just demographics—it's a deep understanding of who your perfect customer is, what they struggle with, and how you can help them succeed. Taking time to define your ICP will help you:
             </p>
+            <ul className="list-disc list-inside text-[#E2E8F0] space-y-2 mb-6">
+              <li>Create content that resonates with your target audience</li>
+              <li>Focus your marketing efforts on the right channels</li>
+              <li>Develop products and services that solve real problems</li>
+              <li>Build stronger connections with your audience</li>
+            </ul>
           </div>
 
-          <div className="bg-[#2D3748] rounded-lg p-6">
+          {/* Primary Profile */}
+          <FormField
+            label="Who is your primary target audience?"
+            required
+            error={errors?.worksheet?.targetAudience?.primaryProfile}
+            helper="Describe the specific group of people who will benefit most from your solution"
+          >
+            <div className="relative">
+              <textarea
+                value={data.worksheet.targetAudience.primaryProfile}
+                onChange={(e) => onChange({
+                  ...data,
+                  worksheet: {
+                    ...data.worksheet,
+                    targetAudience: {
+                      ...data.worksheet.targetAudience,
+                      primaryProfile: e.target.value
+                    }
+                  }
+                })}
+                className="w-full bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5865F2] min-h-[100px]"
+                placeholder="Describe your ideal customer's demographics, challenges, and desires..."
+              />
+              <div className="absolute right-2 top-2">
+                <Tooltip text={tooltips.worksheet.targetAudience.primaryProfile} />
+              </div>
+            </div>
+          </FormField>
+
+          {/* Secondary Audiences */}
+          <FormField
+            label="Who are your secondary audiences?"
+            error={errors?.worksheet?.targetAudience?.secondaryAudiences?.[0]}
+            helper="List other groups who might benefit from your solution"
+          >
             <ArrayInput
               label="Secondary Audiences"
-              values={data.worksheet.targetAudience.secondaryAudiences}
+              values={data.worksheet.targetAudience.secondaryAudiences || []}
               onChange={(values) => onChange({
                 ...data,
                 worksheet: {
@@ -373,14 +383,49 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                   }
                 }
               })}
-              error={errors?.worksheet?.targetAudience?.secondaryAudiences?.[0]}
-              tooltip={tooltips.worksheet.targetAudience.secondaryAudiences}
-              required
               placeholder="Add another audience segment..."
             />
-          </div>
+          </FormField>
 
-          <div className="bg-[#2D3748] rounded-lg p-6">
+          {/* Problem */}
+          <FormField
+            label="What's the main problem your ideal customer faces?"
+            required
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.problem}
+            helper="Describe the core challenge that drives them to seek a solution"
+          >
+            <div className="relative">
+              <textarea
+                value={data.worksheet.targetAudience.idealCustomerProfile?.problem || ''}
+                onChange={(e) => onChange({
+                  ...data,
+                  worksheet: {
+                    ...data.worksheet,
+                    targetAudience: {
+                      ...data.worksheet.targetAudience,
+                      idealCustomerProfile: {
+                        ...data.worksheet.targetAudience.idealCustomerProfile,
+                        problem: e.target.value
+                      }
+                    }
+                  }
+                })}
+                className="w-full bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5865F2] min-h-[100px]"
+                placeholder="Example: Non-technical entrepreneurs struggling to build and maintain their website..."
+              />
+              <div className="absolute right-2 top-2">
+                <Tooltip text={tooltips.worksheet.targetAudience.idealCustomerProfile.problem} />
+              </div>
+            </div>
+          </FormField>
+
+          {/* Pain Points */}
+          <FormField
+            label="What specific pain points do they experience?"
+            required
+            error={errors?.worksheet?.targetAudience?.painPoints?.[0]}
+            helper="List the frustrations and challenges they face"
+          >
             <ArrayInput
               label="Pain Points"
               values={data.worksheet.targetAudience.painPoints}
@@ -394,14 +439,354 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                   }
                 }
               })}
-              error={errors?.worksheet?.targetAudience?.painPoints?.[0]}
-              tooltip={tooltips.worksheet.targetAudience.painPoints}
-              required
               placeholder="Add a pain point..."
+              required
             />
-            <p className="text-[#94A3B8] text-sm mt-4">
-              Think about how your "Conflict → Internal Pursuit → Action → Result → Content" cycle intersects with these pain points.
+          </FormField>
+
+          {/* Journey */}
+          <FormField
+            label="What transformation are they seeking?"
+            required
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.journey}
+            helper="Describe the journey they want to take and their end goal"
+          >
+            <div className="relative">
+              <textarea
+                value={data.worksheet.targetAudience.idealCustomerProfile?.journey || ''}
+                onChange={(e) => onChange({
+                  ...data,
+                  worksheet: {
+                    ...data.worksheet,
+                    targetAudience: {
+                      ...data.worksheet.targetAudience,
+                      idealCustomerProfile: {
+                        ...data.worksheet.targetAudience.idealCustomerProfile,
+                        journey: e.target.value
+                      }
+                    }
+                  }
+                })}
+                className="w-full bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5865F2] min-h-[100px]"
+                placeholder="Example: Want to go from struggling with technical details to having a professional, easy-to-maintain website..."
+              />
+              <div className="absolute right-2 top-2">
+                <Tooltip text={tooltips.worksheet.targetAudience.idealCustomerProfile.journey} />
+              </div>
+            </div>
+          </FormField>
+
+          {/* Desires */}
+          <FormField
+            label="What are their key desires?"
+            required
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.desires?.[0]}
+            helper="List what they truly want to achieve"
+          >
+            <ArrayInput
+              label="Desires"
+              values={data.worksheet.targetAudience.idealCustomerProfile?.desires || []}
+              onChange={(values) => onChange({
+                ...data,
+                worksheet: {
+                  ...data.worksheet,
+                  targetAudience: {
+                    ...data.worksheet.targetAudience,
+                    idealCustomerProfile: {
+                      ...data.worksheet.targetAudience.idealCustomerProfile,
+                      desires: values
+                    }
+                  }
+                }
+              })}
+              placeholder="Add a desire..."
+              required
+            />
+          </FormField>
+
+          {/* Desired State */}
+          <FormField
+            label="What's their desired end state?"
+            required
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.desiredState}
+            helper="Paint a picture of their ideal situation after using your solution"
+          >
+            <div className="relative">
+              <textarea
+                value={data.worksheet.targetAudience.idealCustomerProfile?.desiredState || ''}
+                onChange={(e) => onChange({
+                  ...data,
+                  worksheet: {
+                    ...data.worksheet,
+                    targetAudience: {
+                      ...data.worksheet.targetAudience,
+                      idealCustomerProfile: {
+                        ...data.worksheet.targetAudience.idealCustomerProfile,
+                        desiredState: e.target.value
+                      }
+                    }
+                  }
+                })}
+                className="w-full bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5865F2] min-h-[100px]"
+                placeholder="Example: Having a professional website they can easily update without technical knowledge..."
+              />
+              <div className="absolute right-2 top-2">
+                <Tooltip text={tooltips.worksheet.targetAudience.idealCustomerProfile.desiredState} />
+              </div>
+            </div>
+          </FormField>
+
+          {/* Gap */}
+          <FormField
+            label="What's the gap between their current and desired state?"
+            required
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.gap}
+            helper="Identify what's holding them back from achieving their goals"
+          >
+            <div className="relative">
+              <textarea
+                value={data.worksheet.targetAudience.idealCustomerProfile?.gap || ''}
+                onChange={(e) => onChange({
+                  ...data,
+                  worksheet: {
+                    ...data.worksheet,
+                    targetAudience: {
+                      ...data.worksheet.targetAudience,
+                      idealCustomerProfile: {
+                        ...data.worksheet.targetAudience.idealCustomerProfile,
+                        gap: e.target.value
+                      }
+                    }
+                  }
+                })}
+                className="w-full bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5865F2] min-h-[100px]"
+                placeholder="Example: Lack of technical skills and time to learn complex web development..."
+              />
+              <div className="absolute right-2 top-2">
+                <Tooltip text={tooltips.worksheet.targetAudience.idealCustomerProfile.gap} />
+              </div>
+            </div>
+          </FormField>
+
+          {/* Unique Selling Point */}
+          <FormField
+            label="What's your unique selling point?"
+            required
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.uniqueSellingPoint}
+            helper="How does your solution uniquely address their needs?"
+          >
+            <div className="relative">
+              <textarea
+                value={data.worksheet.targetAudience.idealCustomerProfile?.uniqueSellingPoint || ''}
+                onChange={(e) => onChange({
+                  ...data,
+                  worksheet: {
+                    ...data.worksheet,
+                    targetAudience: {
+                      ...data.worksheet.targetAudience,
+                      idealCustomerProfile: {
+                        ...data.worksheet.targetAudience.idealCustomerProfile,
+                        uniqueSellingPoint: e.target.value
+                      }
+                    }
+                  }
+                })}
+                className="w-full bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5865F2] min-h-[100px]"
+                placeholder="Example: Our no-code website builder specifically designed for non-technical entrepreneurs..."
+              />
+              <div className="absolute right-2 top-2">
+                <Tooltip text={tooltips.worksheet.targetAudience.idealCustomerProfile.uniqueSellingPoint} />
+              </div>
+            </div>
+          </FormField>
+
+          {/* Benefits */}
+          <FormField
+            label="What are the key benefits of your solution?"
+            required
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.benefits?.[0]}
+            helper="List the specific benefits they'll gain"
+          >
+            <ArrayInput
+              label="Benefits"
+              values={data.worksheet.targetAudience.idealCustomerProfile?.benefits || []}
+              onChange={(values) => onChange({
+                ...data,
+                worksheet: {
+                  ...data.worksheet,
+                  targetAudience: {
+                    ...data.worksheet.targetAudience,
+                    idealCustomerProfile: {
+                      ...data.worksheet.targetAudience.idealCustomerProfile,
+                      benefits: values
+                    }
+                  }
+                }
+              })}
+              placeholder="Add a benefit..."
+              required
+            />
+          </FormField>
+
+          {/* Objections */}
+          <FormField
+            label="What objections might they have?"
+            required
+            error={errors?.worksheet?.targetAudience?.idealCustomerProfile?.objections?.[0]}
+            helper="List potential concerns or hesitations"
+          >
+            <ArrayInput
+              label="Objections"
+              values={data.worksheet.targetAudience.idealCustomerProfile?.objections || []}
+              onChange={(values) => onChange({
+                ...data,
+                worksheet: {
+                  ...data.worksheet,
+                  targetAudience: {
+                    ...data.worksheet.targetAudience,
+                    idealCustomerProfile: {
+                      ...data.worksheet.targetAudience.idealCustomerProfile,
+                      objections: values
+                    }
+                  }
+                }
+              })}
+              placeholder="Add an objection..."
+              required
+            />
+          </FormField>
+        </div>
+      </Section>
+
+      {/* Customer Journey */}
+      <Section title="Map Out Your Ideal Customer Journey" subtitle="Understanding how customers discover, evaluate, and engage with your brand">
+        <div className="space-y-8">
+          {/* Awareness Stage */}
+          <div className="bg-[#2D3748] rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-[#E2E8F0] mb-4">A. Awareness</h3>
+            <p className="text-[#E2E8F0] mb-6">
+              How do new prospects first find out about you? Consider your signature style and preferred platforms.
             </p>
+            <FormField
+              label="Primary Awareness Channels"
+              required
+              error={errors?.worksheet?.customerJourney?.awarenessChannels?.[0]}
+              helper="List 2-3 main channels where your ideal customers will discover you"
+            >
+              <ArrayInput
+                label="Awareness Channels"
+                values={data.worksheet.customerJourney?.awareness || []}
+                onChange={(values) => onChange({
+                  ...data,
+                  worksheet: {
+                    ...data.worksheet,
+                    customerJourney: {
+                      ...data.worksheet.customerJourney,
+                      awareness: values
+                    }
+                  }
+                })}
+                placeholder="Add a channel (e.g., YouTube, Twitter, LinkedIn)..."
+                required
+              />
+            </FormField>
+          </div>
+
+          {/* Consideration Stage */}
+          <div className="bg-[#2D3748] rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-[#E2E8F0] mb-4">B. Consideration</h3>
+            <p className="text-[#E2E8F0] mb-6">
+              What trust-building elements do prospects need to see to be convinced you're the right solution?
+            </p>
+            <FormField
+              label="Trust-Building Elements"
+              required
+              error={errors?.worksheet?.customerJourney?.considerationElements?.[0]}
+              helper="List 2-3 elements that build credibility and trust"
+            >
+              <ArrayInput
+                label="Trust Elements"
+                values={data.worksheet.customerJourney?.consideration || []}
+                onChange={(values) => onChange({
+                  ...data,
+                  worksheet: {
+                    ...data.worksheet,
+                    customerJourney: {
+                      ...data.worksheet.customerJourney,
+                      consideration: values
+                    }
+                  }
+                })}
+                placeholder="Add an element (e.g., case studies, tutorials, transformation stories)..."
+                required
+              />
+            </FormField>
+          </div>
+
+          {/* Decision Stage */}
+          <div className="bg-[#2D3748] rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-[#E2E8F0] mb-4">C. Decision/Purchase</h3>
+            <p className="text-[#E2E8F0] mb-6">
+              How do you want customers to complete their purchase or sign up for your services?
+            </p>
+            <FormField
+              label="Purchase/Signup Process"
+              required
+              error={errors?.worksheet?.customerJourney?.decisionProcess}
+              helper="Detail your ideal purchase or signup process"
+            >
+              <div className="relative">
+                <textarea
+                  value={data.worksheet.customerJourney?.decision || ''}
+                  onChange={(e) => onChange({
+                    ...data,
+                    worksheet: {
+                      ...data.worksheet,
+                      customerJourney: {
+                        ...data.worksheet.customerJourney,
+                        decision: e.target.value
+                      }
+                    }
+                  })}
+                  className="w-full bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5865F2] min-h-[100px]"
+                  placeholder="Example: Simple checkout page with clear pricing tiers and FAQ section..."
+                />
+                <div className="absolute right-2 top-2">
+                  <Tooltip text={tooltips.worksheet.customerJourney.decisionProcess} />
+                </div>
+              </div>
+            </FormField>
+          </div>
+
+          {/* Retention Stage */}
+          <div className="bg-[#2D3748] rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-[#E2E8F0] mb-4">D. Retention & Referral</h3>
+            <p className="text-[#E2E8F0] mb-6">
+              How will you keep customers engaged and encourage them to refer others?
+            </p>
+            <FormField
+              label="Engagement Strategies"
+              required
+              error={errors?.worksheet?.customerJourney?.retentionStrategies?.[0]}
+              helper="List your strategies for ongoing engagement and referrals"
+            >
+              <ArrayInput
+                label="Retention Strategies"
+                values={data.worksheet.customerJourney?.retention || []}
+                onChange={(values) => onChange({
+                  ...data,
+                  worksheet: {
+                    ...data.worksheet,
+                    customerJourney: {
+                      ...data.worksheet.customerJourney,
+                      retention: values
+                    }
+                  }
+                })}
+                placeholder="Add a strategy (e.g., monthly Q&A calls, exclusive community)..."
+                required
+              />
+            </FormField>
           </div>
         </div>
       </Section>

@@ -46,10 +46,10 @@ export default function Pillar1Content() {
         threats: []
       },
       customerJourney: {
-        awareness: 'Awareness',
-        consideration: 'Consideration',
+        awareness: ['Awareness', 'Awareness'],
+        consideration: ['Consideration', 'Consideration'],
         decision: 'Decision',
-        retention: 'Retention'
+        retention: ['Retention', 'Retention']
       }
     },
     persona: {

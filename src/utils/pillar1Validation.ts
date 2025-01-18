@@ -18,7 +18,17 @@ export const worksheetSchema = z.object({
   targetAudience: z.object({
     primaryProfile: z.string().min(1, 'Primary profile is required'),
     secondaryAudiences: z.array(z.string()).optional(),
-    painPoints: z.array(z.string()).min(1, 'At least one pain point is required')
+    painPoints: z.array(z.string()).min(1, 'At least one pain point is required'),
+    idealCustomerProfile: z.object({
+      problem: z.string().min(20, 'Describe the main problem your audience faces'),
+      journey: z.string().min(20, 'Describe the transformation they seek'),
+      desires: z.array(z.string()).min(2, 'List at least 2 key desires'),
+      desiredState: z.string().min(20, 'Describe their ideal end state'),
+      gap: z.string().min(20, 'Describe what stands between them and their desired state'),
+      uniqueSellingPoint: z.string().min(20, 'What makes your solution unique?'),
+      benefits: z.array(z.string()).min(2, 'List at least 2 key benefits'),
+      objections: z.array(z.string()).min(2, 'List at least 2 potential objections')
+    })
   }),
   visionStatement: z.string()
     .min(20, 'Vision statement should describe your desired future impact')
@@ -30,10 +40,10 @@ export const worksheetSchema = z.object({
     threats: z.array(z.string()).min(2, 'List at least 2 potential threats')
   }).optional(),
   customerJourney: z.object({
-    awareness: z.string().min(20, 'Describe how customers discover you'),
-    consideration: z.string().min(20, 'Describe how customers evaluate you'),
-    decision: z.string().min(20, 'Describe how customers choose you'),
-    retention: z.string().min(20, 'Describe how you keep customers engaged')
+    awareness: z.array(z.string()).min(2, 'List at least 2 primary awareness channels'),
+    consideration: z.array(z.string()).min(2, 'List at least 2 trust-building elements'),
+    decision: z.string().min(20, 'Describe your ideal purchase/signup process'),
+    retention: z.array(z.string()).min(1, 'List at least 1 engagement strategy')
   }).optional()
 })
 
@@ -96,7 +106,17 @@ export const tooltips = {
     targetAudience: {
       primaryProfile: "Describe your ideal customer's demographics, challenges, and desires",
       secondaryAudiences: "List other potential customer segments who might benefit from your offerings",
-      painPoints: "List specific problems your target audience faces that your solution will address"
+      painPoints: "List specific problems your target audience faces that your solution will address",
+      idealCustomerProfile: {
+        problem: "What is the main problem or challenge your ideal customer is struggling with?",
+        journey: "What transformation or end result are they seeking?",
+        desires: "What are their deepest desires and aspirations?",
+        desiredState: "Describe their ideal situation after using your solution",
+        gap: "What's preventing them from achieving their desired state?",
+        uniqueSellingPoint: "How does your solution uniquely address their needs?",
+        benefits: "What specific benefits will they gain from your solution?",
+        objections: "What concerns might prevent them from choosing your solution?"
+      }
     },
     visionStatement: 'The future impact you want your business to have on your industry or community',
     swot: {
@@ -104,6 +124,12 @@ export const tooltips = {
       weaknesses: 'What areas need improvement or resources?',
       opportunities: 'What external factors could benefit your business?',
       threats: 'What external challenges could impact your success?'
+    },
+    customerJourney: {
+      awarenessChannels: "How do new prospects first discover you? List your main traffic sources.",
+      considerationElements: "What trust-building elements convince prospects you're the right solution?",
+      decisionProcess: "Describe your ideal purchase or signup process",
+      retentionStrategies: "How do you keep customers engaged and encourage referrals?"
     }
   },
   persona: {
@@ -156,7 +182,14 @@ export const isWorksheetComplete = (data: Worksheet): boolean => {
     !!data.businessGoals.longTerm &&
     !!data.targetAudience?.primaryProfile &&
     data.targetAudience?.painPoints?.length > 0 &&
-    !!data.visionStatement
+    !!data.visionStatement &&
+    !!data.targetAudience?.idealCustomerProfile?.problem &&
+    data.targetAudience?.idealCustomerProfile?.desires?.length > 0 &&
+    !!data.targetAudience?.idealCustomerProfile?.desiredState &&
+    !!data.targetAudience?.idealCustomerProfile?.gap &&
+    !!data.targetAudience?.idealCustomerProfile?.uniqueSellingPoint &&
+    data.targetAudience?.idealCustomerProfile?.benefits?.length > 0 &&
+    data.targetAudience?.idealCustomerProfile?.objections?.length > 0
   )
 }
 
