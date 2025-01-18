@@ -314,7 +314,7 @@ export default function Pillar4Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Brand Identity
               </h3>
-              <Tooltip text={tooltips.branding.identity} />
+              <Tooltip content={tooltips.branding.identity} />
             </div>
 
             <div className="space-y-4">
@@ -352,7 +352,7 @@ export default function Pillar4Content() {
                   <label className="block text-sm font-medium text-[#E2E8F0]">
                     Color Palette
                   </label>
-                  <Tooltip text={tooltips.branding.colors} />
+                  <Tooltip content={tooltips.branding.colors} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -425,7 +425,7 @@ export default function Pillar4Content() {
                   <label className="block text-sm font-medium text-[#E2E8F0]">
                     Typography
                   </label>
-                  <Tooltip text={tooltips.branding.typography} />
+                  <Tooltip content={tooltips.branding.typography} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {fontPairings.map((pair) => (
@@ -451,7 +451,7 @@ export default function Pillar4Content() {
           <div className="bg-[#1E293B] rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-[#E2E8F0]">Logo</h3>
-              <Tooltip text={tooltips.branding.logo} />
+              <Tooltip content={tooltips.branding.logo} />
             </div>
             
             <div className="space-y-4">
@@ -508,7 +508,7 @@ export default function Pillar4Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Content Templates
               </h3>
-              <Tooltip text={tooltips.content.templates} />
+              <Tooltip content={tooltips.content.templates} />
             </div>
 
             <div className="space-y-6">
@@ -559,7 +559,7 @@ export default function Pillar4Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 AI Content Assistant
               </h3>
-              <Tooltip text={tooltips.content.aiTools} />
+              <Tooltip content={tooltips.content.aiTools} />
             </div>
             <div className="space-y-4">
               <p className="text-[#94A3B8]">
@@ -599,7 +599,7 @@ export default function Pillar4Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 SEO Optimization
               </h3>
-              <Tooltip text={tooltips.seo.titles} />
+              <Tooltip content={tooltips.seo.titles} />
             </div>
 
             <div className="space-y-6">
@@ -610,7 +610,7 @@ export default function Pillar4Content() {
                       {item.title}
                       {item.required && <span className="text-red-400">*</span>}
                     </label>
-                    <Tooltip text={item.description} />
+                    <Tooltip content={item.description} />
                   </div>
                   <div className="space-y-2">
                     {data.seo.pages.map((page, index) => (

@@ -491,7 +491,7 @@ export default function Pillar5Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Domain Configuration
               </h3>
-              <Tooltip text={tooltips.domain.setup} />
+              <Tooltip content={tooltips.domain.setup} />
             </div>
 
             <div className="space-y-4">
@@ -537,7 +537,7 @@ export default function Pillar5Content() {
                   className="text-[#5865F2]"
                 />
                 <span className="text-[#E2E8F0]">SSL Certificate Configured</span>
-                <Tooltip text={tooltips.domain.ssl} />
+                <Tooltip content={tooltips.domain.ssl} />
               </div>
 
               {/* DNS Records */}
@@ -546,7 +546,7 @@ export default function Pillar5Content() {
                   <label className="block text-sm font-medium text-[#E2E8F0]">
                     DNS Records
                   </label>
-                  <Tooltip text={tooltips.domain.dns} />
+                  <Tooltip content={tooltips.domain.dns} />
                 </div>
                 <div className="space-y-2">
                   {data.domain.config.dnsRecords.map((record, index) => (
@@ -619,7 +619,7 @@ export default function Pillar5Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Analytics Setup
               </h3>
-              <Tooltip text={tooltips.analytics.tracking} />
+              <Tooltip content={tooltips.analytics.tracking} />
             </div>
 
             <div className="space-y-4">
@@ -679,7 +679,7 @@ export default function Pillar5Content() {
                   <label className="block text-sm font-medium text-[#E2E8F0]">
                     Additional Tools
                   </label>
-                  <Tooltip text={tooltips.analytics.tools} />
+                  <Tooltip content={tooltips.analytics.tools} />
                 </div>
                 <div className="space-y-2">
                   {analyticsTools.map((tool) => (
@@ -729,7 +729,7 @@ export default function Pillar5Content() {
                   <label className="block text-sm font-medium text-[#E2E8F0]">
                     Conversion Goals
                   </label>
-                  <Tooltip text={tooltips.analytics.goals} />
+                  <Tooltip content={tooltips.analytics.goals} />
                 </div>
                 <div className="space-y-2">
                   {data.analytics.goals.map((goal, index) => (
@@ -812,7 +812,7 @@ export default function Pillar5Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Performance Tests
               </h3>
-              <Tooltip text={tooltips.performance.testing} />
+              <Tooltip content={tooltips.performance.testing} />
             </div>
 
             <div className="space-y-4">
@@ -921,7 +921,7 @@ export default function Pillar5Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Optimizations
               </h3>
-              <Tooltip text={tooltips.performance.optimization} />
+              <Tooltip content={tooltips.performance.optimization} />
             </div>
 
             <div className="space-y-2">
@@ -1012,7 +1012,7 @@ export default function Pillar5Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Feature Planning
               </h3>
-              <Tooltip text={tooltips.scalability.planning} />
+              <Tooltip content={tooltips.scalability.planning} />
             </div>
 
             <div className="space-y-4">
@@ -1114,7 +1114,7 @@ export default function Pillar5Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Documentation
               </h3>
-              <Tooltip text={tooltips.scalability.documentation} />
+              <Tooltip content={tooltips.scalability.documentation} />
             </div>
 
             <div className="space-y-2">
@@ -1273,7 +1273,7 @@ export default function Pillar5Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Maintenance Schedule
               </h3>
-              <Tooltip text={tooltips.maintenance.schedule} />
+              <Tooltip content={tooltips.maintenance.schedule} />
             </div>
 
             <div className="space-y-4">
@@ -1386,7 +1386,7 @@ export default function Pillar5Content() {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Maintenance Logs
               </h3>
-              <Tooltip text={tooltips.maintenance.monitoring} />
+              <Tooltip content={tooltips.maintenance.monitoring} />
             </div>
 
             <div className="space-y-4">

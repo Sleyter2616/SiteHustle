@@ -456,7 +456,7 @@ export const Pillar6Content = () => {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Video Tutorial Library
               </h3>
-              <Tooltip text={tooltips.tutorials.library} />
+              <Tooltip content={tooltips.tutorials.library} />
             </div>
 
             {/* Category Tabs */}
@@ -569,7 +569,7 @@ export const Pillar6Content = () => {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Playback Preferences
               </h3>
-              <Tooltip text={tooltips.tutorials.preferences} />
+              <Tooltip content={tooltips.tutorials.preferences} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -655,7 +655,7 @@ export const Pillar6Content = () => {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 1:1 Coaching Sessions
               </h3>
-              <Tooltip text={tooltips.coaching.sessions} />
+              <Tooltip content={tooltips.coaching.sessions} />
             </div>
 
             {/* Session Preferences */}
@@ -1067,7 +1067,7 @@ export const Pillar6Content = () => {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Ongoing Support Plans
               </h3>
-              <Tooltip text={tooltips.support.plans} />
+              <Tooltip content={tooltips.support.plans} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1122,7 +1122,7 @@ export const Pillar6Content = () => {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Knowledge Base
               </h3>
-              <Tooltip text={tooltips.support.knowledge} />
+              <Tooltip content={tooltips.support.knowledge} />
             </div>
 
             <div className="space-y-4">
@@ -1289,7 +1289,7 @@ export const Pillar6Content = () => {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Your Achievements
               </h3>
-              <Tooltip text={tooltips.milestones.tracking} />
+              <Tooltip content={tooltips.milestones.tracking} />
             </div>
 
             <div className="space-y-4">
@@ -1328,7 +1328,7 @@ export const Pillar6Content = () => {
               <h3 className="text-lg font-medium text-[#E2E8F0]">
                 Share Your Experience
               </h3>
-              <Tooltip text={tooltips.milestones.celebration} />
+              <Tooltip content={tooltips.milestones.celebration} />
             </div>
 
             <div className="space-y-4">

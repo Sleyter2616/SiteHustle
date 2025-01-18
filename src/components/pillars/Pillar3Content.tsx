@@ -277,7 +277,7 @@ export default function Pillar3Content() {
                         <h4 className="font-medium text-[#E2E8F0]">
                           {task.title}
                         </h4>
-                        <Tooltip text={tooltips.setup[task.id]} />
+                        <Tooltip content={tooltips.setup[task.id]} />
                         {task.required && (
                           <span className="text-xs text-[#94A3B8]">(Required)</span>
                         )}
@@ -375,7 +375,7 @@ export default function Pillar3Content() {
                             <h4 className="font-medium text-[#E2E8F0]">
                               {section.title}
                             </h4>
-                            <Tooltip text={tooltips.pages[template.id][section.id]} />
+                            <Tooltip content={tooltips.pages[template.id][section.id]} />
                             {section.required && (
                               <span className="text-xs text-[#94A3B8]">(Required)</span>
                             )}
@@ -423,7 +423,7 @@ export default function Pillar3Content() {
                           <h4 className="font-medium text-[#E2E8F0]">
                             {test.title}
                           </h4>
-                          <Tooltip text={tooltips.testing[test.category]} />
+                          <Tooltip content={tooltips.testing[test.category]} />
                         </div>
                         <p className="text-sm text-[#94A3B8] mt-1">
                           {test.description}
