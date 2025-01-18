@@ -24,26 +24,26 @@ export default function Pillar1Content() {
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [data, setData] = useState<Pillar1Data>({
     worksheet: {
-      businessName: 'Business Name',
-      tagline: 'Tagline',
-      missionStatement: 'Mission Statement',
-      coreValues: ['Core Value 1', 'Core Value 2'],
+      businessName: '',
+      tagline: '',
+      missionStatement: '',
+      coreValues:[],
       businessGoals: {
-        shortTerm: 'Short Term Goal',
-        midTerm: 'Mid Term Goal',
-        longTerm: 'Long Term Goal'
+        shortTerm: '',
+        midTerm: '',
+        longTerm: ''
       },
       targetAudience: {
-        primaryProfile: 'Primary Profile',
-        secondaryAudiences: ['Secondary Audience 1', 'Secondary Audience 2'],
-        painPoints: ['Pain Point 1', 'Pain Point 2']
+        primaryProfile: '',
+        secondaryAudiences: [],
+        painPoints: []
       },
-      visionStatement: 'Vision Statement',
+      visionStatement: '',
       swot: {
-        strengths: ['Strength 1', 'Strength 2'],
-        weaknesses: ['Weakness 1', 'Weakness 2'],
-        opportunities: ['Opportunity 1', 'Opportunity 2'],
-        threats: ['Threat 1', 'Threat 2']
+        strengths: [],
+        weaknesses: [],
+        opportunities: [],
+        threats: []
       },
       customerJourney: {
         awareness: 'Awareness',

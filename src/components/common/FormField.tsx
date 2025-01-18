@@ -36,6 +36,7 @@ interface ArrayInputProps {
   placeholder?: string
   error?: string
   tooltip?: string
+  required?: boolean
 }
 
 export function ArrayInput({ 
@@ -43,8 +44,9 @@ export function ArrayInput({
   values = [], 
   onChange, 
   error,
+  placeholder,
   tooltip,
-  placeholder 
+  required
 }: ArrayInputProps) {
   const [newItem, setNewItem] = useState('')
 
@@ -71,8 +73,9 @@ export function ArrayInput({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-[#E2E8F0]">
+        <label className="block text-sm font-medium text-[#E2E8F0] mb-2">
           {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
         </label>
         {tooltip && (
           <Tooltip text={tooltip} />

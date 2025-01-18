@@ -205,6 +205,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                     coreValues: values
                   }
                 })}
+                required
                 placeholder="Add a core value..."
               />
             </FormField>
@@ -261,7 +262,8 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
               helper="Add 3-5 values that define your business culture and principles"
             >
               <ArrayInput
-                value={data.worksheet.coreValues}
+                label="Core Values"
+                values={data.worksheet.coreValues}
                 onChange={(values) => onChange({
                   ...data,
                   worksheet: {
@@ -269,6 +271,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                     coreValues: values
                   }
                 })}
+                required
                 placeholder="Add a core value..."
               />
             </FormField>
@@ -300,7 +303,8 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
               helper="Add 3-5 values that define your business culture and principles"
             >
               <ArrayInput
-                value={data.worksheet.coreValues}
+                label="Core Values"
+                values={data.worksheet.coreValues}
                 onChange={(values) => onChange({
                   ...data,
                   worksheet: {
@@ -308,6 +312,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                     coreValues: values
                   }
                 })}
+                required
                 placeholder="Add a core value..."
               />
             </FormField>
@@ -370,6 +375,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
               })}
               error={errors?.worksheet?.targetAudience?.secondaryAudiences?.[0]}
               tooltip={tooltips.worksheet.targetAudience.secondaryAudiences}
+              required
               placeholder="Add another audience segment..."
             />
           </div>
@@ -390,6 +396,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
               })}
               error={errors?.worksheet?.targetAudience?.painPoints?.[0]}
               tooltip={tooltips.worksheet.targetAudience.painPoints}
+              required
               placeholder="Add a pain point..."
             />
             <p className="text-[#94A3B8] text-sm mt-4">
@@ -500,7 +507,7 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
             <div className="bg-[#2D3748] rounded-lg p-6">
               <ArrayInput
                 label="Strengths"
-                values={data.worksheet.swot.strengths}
+                values={data.worksheet.swot?.strengths || []}
                 onChange={(values) => onChange({
                   ...data,
                   worksheet: {
@@ -511,15 +518,15 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                     }
                   }
                 })}
-                error={errors?.worksheet?.swot?.strengths?.[0]}
                 placeholder="Add a strength..."
+                required
               />
             </div>
 
             <div className="bg-[#2D3748] rounded-lg p-6">
               <ArrayInput
                 label="Weaknesses"
-                values={data.worksheet.swot.weaknesses}
+                values={data.worksheet.swot?.weaknesses || []}
                 onChange={(values) => onChange({
                   ...data,
                   worksheet: {
@@ -530,15 +537,15 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                     }
                   }
                 })}
-                error={errors?.worksheet?.swot?.weaknesses?.[0]}
                 placeholder="Add a weakness..."
+                required
               />
             </div>
 
             <div className="bg-[#2D3748] rounded-lg p-6">
               <ArrayInput
                 label="Opportunities"
-                values={data.worksheet.swot.opportunities}
+                values={data.worksheet.swot?.opportunities || []}
                 onChange={(values) => onChange({
                   ...data,
                   worksheet: {
@@ -549,15 +556,15 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                     }
                   }
                 })}
-                error={errors?.worksheet?.swot?.opportunities?.[0]}
                 placeholder="Add an opportunity..."
+                required
               />
             </div>
 
             <div className="bg-[#2D3748] rounded-lg p-6">
               <ArrayInput
                 label="Threats"
-                values={data.worksheet.swot.threats}
+                values={data.worksheet.swot?.threats || []}
                 onChange={(values) => onChange({
                   ...data,
                   worksheet: {
@@ -568,8 +575,8 @@ export default function VisionEcosystem({ data, onChange, errors }: VisionEcosys
                     }
                   }
                 })}
-                error={errors?.worksheet?.swot?.threats?.[0]}
                 placeholder="Add a threat..."
+                required
               />
             </div>
           </div>
