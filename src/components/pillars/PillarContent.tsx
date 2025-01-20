@@ -24,6 +24,7 @@ export default function PillarContent({ pillar, progress, userId }: PillarConten
   const [isUpdating, setIsUpdating] = useState(false)
   const router = useRouter()
   const supabase = createClientComponentClient()
+  const [pillarData, setPillarData] = useState<any>(null);
 
   useEffect(() => {
     console.log('Pillar ID:', pillar.id, typeof pillar.id)
@@ -58,6 +59,11 @@ export default function PillarContent({ pillar, progress, userId }: PillarConten
     }
   }
 
+  const handleDataChange = (newData: any) => {
+    setPillarData(newData);
+    // TODO: Save to database
+  };
+
   const renderPillarContent = () => {
     // Convert pillar.id to string for comparison
     const pillarId = String(pillar.id)
@@ -65,7 +71,7 @@ export default function PillarContent({ pillar, progress, userId }: PillarConten
     
     switch (pillarId) {
       case '1':
-        return <Pillar1Content />
+        return <Pillar1Content data={pillarData} onDataChange={handleDataChange} />
       case '2':
         return <Pillar2Content />
       case '3':
@@ -73,7 +79,7 @@ export default function PillarContent({ pillar, progress, userId }: PillarConten
       case '4':
         return <Pillar4Content />
       case '5':
-          return <Pillar5Content />
+        return <Pillar5Content />
       case '6':
         return <Pillar6Content />
       default:

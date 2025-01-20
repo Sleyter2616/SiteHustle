@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pillar1Data } from '@/types/pillar1Types';
+import { Pillar1Data } from '@/types/pillar1';
 import TextArea from '@/components/common/TextArea';
 
 type PersonalityData = NonNullable<NonNullable<Pillar1Data['brandIdentity']>>['personality'];
@@ -53,7 +53,7 @@ export default function PersonalityPage({ data, onChange }: PersonalityPageProps
         <div>
           <TextArea
             label="What's your preferred communication style with customers?"
-            value={data.communicationStyle}
+            value={data?.communicationStyle}
             onChange={(value) => onChange({ ...data, communicationStyle: value })}
             placeholder="Formal or chatty? Professional or casual?"
             rows={4}
@@ -66,7 +66,7 @@ export default function PersonalityPage({ data, onChange }: PersonalityPageProps
         <div>
           <TextArea
             label="How do you want your brand to sound?"
-            value={data.toneAndVoice}
+            value={data?.toneAndVoice}
             onChange={(value) => onChange({ ...data, toneAndVoice: value })}
             placeholder="Describe your ideal brand voice..."
             rows={4}
@@ -79,7 +79,7 @@ export default function PersonalityPage({ data, onChange }: PersonalityPageProps
         <div>
           <TextArea
             label="How do you speak when you're most passionate?"
-            value={data.passionateExpression}
+            value={data?.passionateExpression}
             onChange={(value) => onChange({ ...data, passionateExpression: value })}
             placeholder="Describe how you communicate when you're excited about your work..."
             rows={4}
@@ -92,7 +92,7 @@ export default function PersonalityPage({ data, onChange }: PersonalityPageProps
         <div>
           <TextArea
             label="What's your brand's personality?"
-            value={data.brandPersonality}
+            value={data?.brandPersonality}
             onChange={(value) => onChange({ ...data, brandPersonality: value })}
             placeholder="Straightforward or creative? Serious or playful?"
             rows={4}

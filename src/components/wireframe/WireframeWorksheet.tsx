@@ -1,6 +1,6 @@
 import React from 'react';
-import { WireframeData } from '@/types/pillar1Types';
-import TextArea from '@/components/common/TextArea';
+import { WireframeData } from '@/types/pillar1';
+import TextArea from '../common/TextArea';
 
 interface WireframeWorksheetProps {
   data?: WireframeData;

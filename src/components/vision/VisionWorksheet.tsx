@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pillar1Data } from '@/types/pillar1Types';
+import { VisionData } from '@/types/pillar1';
 import VisionClarityPage from './pages/VisionClarityPage';
 import TargetAudiencePage from './pages/TargetAudiencePage';
 import GoalsPage from './pages/GoalsPage';
@@ -10,8 +10,8 @@ import { generateVisionWorksheetPDF } from '@/utils/pdfUtils';
 import { toast } from 'react-hot-toast';
 
 interface VisionWorksheetProps {
-  data: Pillar1Data;
-  onChange: (data: Pillar1Data) => void;
+  data?: VisionData;
+  onChange: (data: VisionData) => void;
   errors?: Record<string, string[]>;
 }
 

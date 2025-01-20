@@ -1,23 +1,26 @@
-import { Pillar1Data } from '@/types/pillar1Types';
+import { Pillar1Data } from '@/types/pillar1';
+
+const isNonEmptyString = (str: string | undefined | null): boolean => {
+  return typeof str === 'string' && str.trim().length > 0;
+};
+
+const isNonEmptyArray = (arr: any[] | undefined | null): boolean => {
+  return Array.isArray(arr) && arr.length > 0 && arr.every(item => isNonEmptyString(item));
+};
 
 interface ValidationResult {
   success: boolean;
   errors: Record<string, string[]>;
 }
 
+// Brand Identity Validation
 export const validateReflection = (data: Pillar1Data['brandIdentity']['reflection']): ValidationResult => {
   const errors: Record<string, string[]> = {};
 
-  if (!data.whoIAm?.trim()) {
-    errors['reflection.whoIAm'] = ['Please describe who you are'];
-  }
-
-  if (!data.whoIAmNot?.trim()) {
-    errors['reflection.whoIAmNot'] = ['Please describe who you are not'];
-  }
-
-  if (!data.whyBuildBrand?.trim()) {
-    errors['reflection.whyBuildBrand'] = ['Please explain why you want to build this brand'];
+  if (!data?.whoIAm || !isNonEmptyString(data.whoIAm) ||
+      !data?.whoIAmNot || !isNonEmptyString(data.whoIAmNot) ||
+      !data?.whyBuildBrand || !isNonEmptyString(data.whyBuildBrand)) {
+    errors['reflection'] = ['Please fill out all reflection fields'];
   }
 
   return {
@@ -29,20 +32,11 @@ export const validateReflection = (data: Pillar1Data['brandIdentity']['reflectio
 export const validatePersonality = (data: Pillar1Data['brandIdentity']['personality']): ValidationResult => {
   const errors: Record<string, string[]> = {};
 
-  if (!data.communicationStyle?.trim()) {
-    errors['personality.communicationStyle'] = ['Please describe your communication style'];
-  }
-
-  if (!data.toneAndVoice?.trim()) {
-    errors['personality.toneAndVoice'] = ['Please describe your tone and voice'];
-  }
-
-  if (!data.passionateExpression?.trim()) {
-    errors['personality.passionateExpression'] = ['Please describe how you express your passion'];
-  }
-
-  if (!data.brandPersonality?.trim()) {
-    errors['personality.brandPersonality'] = ['Please describe your overall brand personality'];
+  if (!data?.communicationStyle || !isNonEmptyString(data.communicationStyle) ||
+      !data?.toneAndVoice || !isNonEmptyString(data.toneAndVoice) ||
+      !data?.passionateExpression || !isNonEmptyString(data.passionateExpression) ||
+      !data?.brandPersonality || !isNonEmptyString(data.brandPersonality)) {
+    errors['personality'] = ['Please fill out all personality fields'];
   }
 
   return {
@@ -54,16 +48,10 @@ export const validatePersonality = (data: Pillar1Data['brandIdentity']['personal
 export const validateStory = (data: Pillar1Data['brandIdentity']['story']): ValidationResult => {
   const errors: Record<string, string[]> = {};
 
-  if (!data.pivotalExperience?.trim()) {
-    errors['story.pivotalExperience'] = ['Please share your pivotal experience'];
-  }
-
-  if (!data.definingMoment?.trim()) {
-    errors['story.definingMoment'] = ['Please share your defining moment'];
-  }
-
-  if (!data.audienceRelevance?.trim()) {
-    errors['story.audienceRelevance'] = ['Please explain why your audience should care'];
+  if (!data?.pivotalExperience || !isNonEmptyString(data.pivotalExperience) ||
+      !data?.definingMoment || !isNonEmptyString(data.definingMoment) ||
+      !data?.audienceRelevance || !isNonEmptyString(data.audienceRelevance)) {
+    errors['story'] = ['Please fill out all story fields'];
   }
 
   return {
@@ -75,16 +63,10 @@ export const validateStory = (data: Pillar1Data['brandIdentity']['story']): Vali
 export const validateDifferentiation = (data: Pillar1Data['brandIdentity']['differentiation']): ValidationResult => {
   const errors: Record<string, string[]> = {};
 
-  if (!data.uniqueApproach?.trim()) {
-    errors['differentiation.uniqueApproach'] = ['Please describe your unique approach'];
-  }
-
-  if (!data.uniqueResources?.trim()) {
-    errors['differentiation.uniqueResources'] = ['Please list your unique resources'];
-  }
-
-  if (!data.competitivePerception?.trim()) {
-    errors['differentiation.competitivePerception'] = ['Please describe how you want to be perceived'];
+  if (!data?.uniqueApproach || !isNonEmptyString(data.uniqueApproach) ||
+      !data?.uniqueResources || !isNonEmptyString(data.uniqueResources) ||
+      !data?.competitivePerception || !isNonEmptyString(data.competitivePerception)) {
+    errors['differentiation'] = ['Please fill out all differentiation fields'];
   }
 
   return {
@@ -93,23 +75,131 @@ export const validateDifferentiation = (data: Pillar1Data['brandIdentity']['diff
   };
 };
 
-export const validateBrandIdentity = (data: Pillar1Data['brandIdentity']): ValidationResult => {
+export const validateBrandIdentity = (data?: Pillar1Data['brandIdentity']): ValidationResult => {
+  if (!data) {
+    return { success: false, errors: { general: ['No brand identity data provided'] } };
+  }
+
   const reflectionResult = validateReflection(data.reflection);
   const personalityResult = validatePersonality(data.personality);
   const storyResult = validateStory(data.story);
   const differentiationResult = validateDifferentiation(data.differentiation);
 
+  const errors: Record<string, string[]> = {
+    ...(!reflectionResult.success ? reflectionResult.errors : {}),
+    ...(!personalityResult.success ? personalityResult.errors : {}),
+    ...(!storyResult.success ? storyResult.errors : {}),
+    ...(!differentiationResult.success ? differentiationResult.errors : {})
+  };
+
   return {
-    success: reflectionResult.success && 
-             personalityResult.success && 
-             storyResult.success && 
-             differentiationResult.success,
-    errors: {
-      ...reflectionResult.errors,
-      ...personalityResult.errors,
-      ...storyResult.errors,
-      ...differentiationResult.errors
-    }
+    success: Object.keys(errors).length === 0,
+    errors
+  };
+};
+
+// Vision Validation
+export const validateVision = (data?: Pillar1Data['vision']): ValidationResult => {
+  if (!data) {
+    return { success: false, errors: { general: ['No vision data provided'] } };
+  }
+
+  const errors: Record<string, string[]> = {};
+
+  // Check basic info
+  if (!isNonEmptyString(data.businessName) ||
+      !isNonEmptyString(data.tagline) ||
+      !isNonEmptyString(data.missionStatement) ||
+      !isNonEmptyArray(data.coreValues)) {
+    errors['basicInfo'] = ['Please complete all basic information fields'];
+  }
+
+  // Check business goals
+  if (!data.businessGoals?.shortTerm || !isNonEmptyString(data.businessGoals.shortTerm) ||
+      !data.businessGoals?.midTerm || !isNonEmptyString(data.businessGoals.midTerm) ||
+      !data.businessGoals?.longTerm || !isNonEmptyString(data.businessGoals.longTerm) ||
+      !data.businessGoals?.websiteGoals || !isNonEmptyString(data.businessGoals.websiteGoals) ||
+      !data.businessGoals?.successIndicators || !isNonEmptyString(data.businessGoals.successIndicators)) {
+    errors['businessGoals'] = ['Please complete all business goals'];
+  }
+
+  // Check SWOT analysis
+  if (!data.swot?.strengths || !isNonEmptyArray(data.swot.strengths) ||
+      !data.swot?.weaknesses || !isNonEmptyArray(data.swot.weaknesses) ||
+      !data.swot?.opportunities || !isNonEmptyArray(data.swot.opportunities) ||
+      !data.swot?.threats || !isNonEmptyArray(data.swot.threats)) {
+    errors['swot'] = ['Please complete all SWOT analysis sections'];
+  }
+
+  return {
+    success: Object.keys(errors).length === 0,
+    errors
+  };
+};
+
+// Execution Roadmap Validation
+export const validateExecutionRoadmap = (data?: Pillar1Data['executionRoadmap']): ValidationResult => {
+  if (!data) {
+    return { success: false, errors: { general: ['No execution roadmap data provided'] } };
+  }
+
+  const errors: Record<string, string[]> = {};
+
+  if (!isNonEmptyString(data.thirtyDayGoal)) {
+    errors['thirtyDayGoal'] = ['Please set your 30-day goal'];
+  }
+
+  if (!isNonEmptyArray(data.weeklyMilestones)) {
+    errors['weeklyMilestones'] = ['Please set your weekly milestones'];
+  }
+
+  if (!isNonEmptyString(data.contentPlan)) {
+    errors['contentPlan'] = ['Please complete your content plan'];
+  }
+
+  if (!isNonEmptyArray(data.immediateActions)) {
+    errors['immediateActions'] = ['Please list your immediate actions'];
+  }
+
+  return {
+    success: Object.keys(errors).length === 0,
+    errors
+  };
+};
+
+// Wireframe Validation
+export const validateWireframe = (data?: Pillar1Data['wireframe']): ValidationResult => {
+  if (!data) {
+    return { success: false, errors: { general: ['No wireframe data provided'] } };
+  }
+
+  const errors: Record<string, string[]> = {};
+
+  // Check layout
+  if (!data.layout?.header || !isNonEmptyString(data.layout.header) ||
+      !data.layout?.navigation || !isNonEmptyString(data.layout.navigation) ||
+      !data.layout?.mainContent || !isNonEmptyString(data.layout.mainContent) ||
+      !data.layout?.footer || !isNonEmptyString(data.layout.footer)) {
+    errors['layout'] = ['Please complete all layout sections'];
+  }
+
+  // Check components
+  if (!data.components?.callToAction || !isNonEmptyString(data.components.callToAction) ||
+      !data.components?.featuredSections || !isNonEmptyArray(data.components.featuredSections) ||
+      !data.components?.contentBlocks || !isNonEmptyArray(data.components.contentBlocks)) {
+    errors['components'] = ['Please complete all component sections'];
+  }
+
+  // Check styling
+  if (!data.styling?.colorScheme || !isNonEmptyString(data.styling.colorScheme) ||
+      !data.styling?.typography || !isNonEmptyString(data.styling.typography) ||
+      !data.styling?.spacing || !isNonEmptyString(data.styling.spacing)) {
+    errors['styling'] = ['Please complete all styling sections'];
+  }
+
+  return {
+    success: Object.keys(errors).length === 0,
+    errors
   };
 };
 

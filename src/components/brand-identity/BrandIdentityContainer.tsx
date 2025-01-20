@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pillar1Data, BrandIdentityData } from '@/types/pillar1Types';
+import { Pillar1Data, BrandIdentityData } from '@/types/pillar1';
 import { validateBrandIdentity } from '@/utils/pillar1Validation';
 import BrandIdentityWorksheet from './BrandIdentityWorksheet';
 import { supabase } from '@/lib/supabase';

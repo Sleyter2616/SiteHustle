@@ -1,12 +1,12 @@
 import React from 'react';
-import { Pillar1Data } from '@/types/pillar1Types';
+import { VisionData } from '@/types/pillar1';
 import FormField from '@/components/common/FormField';
 import Tooltip from '@/components/common/Tooltip';
 import { tooltips } from '@/utils/pillar1Validation';
 
 interface GoalsPageProps {
-  data: Pillar1Data;
-  onChange: (data: Pillar1Data) => void;
+  data?: VisionData;
+  onChange: (data: VisionData) => void;
   errors?: Record<string, string[]>;
 }
 
@@ -14,12 +14,9 @@ export default function GoalsPage({ data, onChange, errors }: GoalsPageProps) {
   const updateBusinessGoals = (field: string, value: string) => {
     onChange({
       ...data,
-      worksheet: {
-        ...data.worksheet,
-        businessGoals: {
-          ...data.worksheet?.businessGoals,
-          [field]: value
-        }
+      businessGoals: {
+        ...data?.businessGoals,
+        [field]: value
       }
     });
   };
@@ -47,12 +44,12 @@ export default function GoalsPage({ data, onChange, errors }: GoalsPageProps) {
         <FormField
           label="What are your short-term goals? (6-12 months)"
           required
-          error={errors?.['worksheet.businessGoals.shortTerm']?.[0]}
+          error={errors?.['businessGoals.shortTerm']?.[0]}
           helper="Focus on immediate, achievable objectives"
         >
           <div className="relative">
             <textarea
-              value={data.worksheet?.businessGoals?.shortTerm || ''}
+              value={data?.businessGoals?.shortTerm || ''}
               onChange={(e) => updateBusinessGoals('shortTerm', e.target.value)}
               className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
               placeholder="List your short-term goals..."
@@ -66,12 +63,12 @@ export default function GoalsPage({ data, onChange, errors }: GoalsPageProps) {
         <FormField
           label="What are your mid-term goals? (1-2 years)"
           required
-          error={errors?.['worksheet.businessGoals.midTerm']?.[0]}
+          error={errors?.['businessGoals.midTerm']?.[0]}
           helper="Plan for sustainable growth and expansion"
         >
           <div className="relative">
             <textarea
-              value={data.worksheet?.businessGoals?.midTerm || ''}
+              value={data?.businessGoals?.midTerm || ''}
               onChange={(e) => updateBusinessGoals('midTerm', e.target.value)}
               className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
               placeholder="List your mid-term goals..."
@@ -85,12 +82,12 @@ export default function GoalsPage({ data, onChange, errors }: GoalsPageProps) {
         <FormField
           label="What's your long-term vision? (3-5 years)"
           required
-          error={errors?.['worksheet.businessGoals.longTerm']?.[0]}
+          error={errors?.['businessGoals.longTerm']?.[0]}
           helper="Envision your ultimate business aspirations"
         >
           <div className="relative">
             <textarea
-              value={data.worksheet?.businessGoals?.longTerm || ''}
+              value={data?.businessGoals?.longTerm || ''}
               onChange={(e) => updateBusinessGoals('longTerm', e.target.value)}
               className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
               placeholder="Describe your long-term vision..."
@@ -107,12 +104,12 @@ export default function GoalsPage({ data, onChange, errors }: GoalsPageProps) {
           <FormField
             label="What do you want your website to achieve?"
             required
-            error={errors?.['worksheet.businessGoals.websiteGoals']?.[0]}
+            error={errors?.['businessGoals.websiteGoals']?.[0]}
             helper="Define specific objectives for your online presence"
           >
             <div className="relative">
               <textarea
-                value={data.worksheet?.businessGoals?.websiteGoals || ''}
+                value={data?.businessGoals?.websiteGoals || ''}
                 onChange={(e) => updateBusinessGoals('websiteGoals', e.target.value)}
                 className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
                 placeholder="List your website goals..."
@@ -126,12 +123,12 @@ export default function GoalsPage({ data, onChange, errors }: GoalsPageProps) {
           <FormField
             label="Success Indicators"
             required
-            error={errors?.['worksheet.businessGoals.successIndicators']?.[0]}
+            error={errors?.['businessGoals.successIndicators']?.[0]}
             helper="How will you measure success?"
           >
             <div className="relative">
               <textarea
-                value={data.worksheet?.businessGoals?.successIndicators || ''}
+                value={data?.businessGoals?.successIndicators || ''}
                 onChange={(e) => updateBusinessGoals('successIndicators', e.target.value)}
                 className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
                 placeholder="List your success metrics..."

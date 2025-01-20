@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pillar1Data } from '@/types/pillar1Types';
+import { Pillar1Data } from '@/types/pillar1';
 import TextArea from '@/components/common/TextArea';
 
 type ExecutionRoadmapData = NonNullable<Pillar1Data['executionRoadmap']>;
@@ -11,7 +11,7 @@ interface ExecutionRoadmapPageProps {
 
 export default function ExecutionRoadmapPage({ data, onChange }: ExecutionRoadmapPageProps) {
   const handleMilestoneChange = (index: number, value: string) => {
-    const newMilestones = [...(data.weeklyMilestones || [])];
+    const newMilestones = [...(data?.weeklyMilestones || [])];
     newMilestones[index] = value;
     onChange({ ...data, weeklyMilestones: newMilestones });
   };
@@ -33,7 +33,7 @@ export default function ExecutionRoadmapPage({ data, onChange }: ExecutionRoadma
         <div>
           <TextArea
             label="What's your main goal for the next 30 days?"
-            value={data.thirtyDayGoal}
+            value={data?.thirtyDayGoal}
             onChange={(value) => onChange({ ...data, thirtyDayGoal: value })}
             placeholder="Define one clear, achievable goal for the next month..."
             rows={3}
@@ -51,7 +51,7 @@ export default function ExecutionRoadmapPage({ data, onChange }: ExecutionRoadma
             <div key={index}>
               <TextArea
                 label={`Week ${index + 1}`}
-                value={data.weeklyMilestones?.[index] || ''}
+                value={data?.weeklyMilestones?.[index] || ''}
                 onChange={(value) => handleMilestoneChange(index, value)}
                 placeholder={`What will you accomplish in week ${index + 1}?`}
                 rows={2}
@@ -63,7 +63,7 @@ export default function ExecutionRoadmapPage({ data, onChange }: ExecutionRoadma
         <div>
           <TextArea
             label="Content Plan"
-            value={data.contentPlan}
+            value={data?.contentPlan}
             onChange={(value) => onChange({ ...data, contentPlan: value })}
             placeholder="Outline 3 pieces of content that reflect your brand values..."
             rows={4}
@@ -76,7 +76,7 @@ export default function ExecutionRoadmapPage({ data, onChange }: ExecutionRoadma
         <div>
           <TextArea
             label="Immediate Actions"
-            value={data.immediateActions?.join('\n')}
+            value={data?.immediateActions?.join('\n')}
             onChange={(value) => onChange({ ...data, immediateActions: value.split('\n').filter(Boolean) })}
             placeholder="List 2-3 actions you can take right now..."
             rows={4}

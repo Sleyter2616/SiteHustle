@@ -1,12 +1,12 @@
 import React from 'react';
-import { Pillar1Data } from '@/types/pillar1Types';
+import { VisionData } from '@/types/pillar1';
 import FormField, { ArrayInput } from '@/components/common/FormField';
 import Tooltip from '@/components/common/Tooltip';
 import { tooltips } from '@/utils/pillar1Validation';
 
 interface CustomerJourneyPageProps {
-  data: Pillar1Data;
-  onChange: (data: Pillar1Data) => void;
+  data?: VisionData;
+  onChange: (data: VisionData) => void;
   errors?: Record<string, string[]>;
 }
 
@@ -14,12 +14,9 @@ export default function CustomerJourneyPage({ data, onChange, errors }: Customer
   const updateCustomerJourney = (field: string, value: any) => {
     onChange({
       ...data,
-      worksheet: {
-        ...data.worksheet,
-        customerJourney: {
-          ...data.worksheet?.customerJourney,
-          [field]: value
-        }
+      customerJourney: {
+        ...data?.customerJourney,
+        [field]: value
       }
     });
   };
@@ -27,14 +24,14 @@ export default function CustomerJourneyPage({ data, onChange, errors }: Customer
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold mb-4">Map Out Your Ideal Customer Journey</h1>
+        <h1 className="text-3xl font-bold mb-4">Customer Journey Map</h1>
         <p className="text-gray-300 mb-6">
-          Understanding how customers interact with your business helps create a seamless experience.
-          Map out each stage of their journey from discovery to long-term relationship.
+          Understanding your customer's journey helps you create content and touchpoints
+          that guide them from awareness to loyalty.
         </p>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* A. Awareness */}
         <div className="bg-[#2D3748] p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-4">A. Awareness</h2>
@@ -45,12 +42,12 @@ export default function CustomerJourneyPage({ data, onChange, errors }: Customer
           <FormField
             label="List your awareness channels and strategies"
             required
-            error={errors?.['worksheet.customerJourney.awareness']?.[0]}
+            error={errors?.['customerJourney.awareness']?.[0]}
             helper="Include both online and offline channels"
           >
   
               <ArrayInput
-                values={data.worksheet?.customerJourney?.awareness || []}
+                values={data?.customerJourney?.awareness || []}
                 onChange={(values) => updateCustomerJourney('awareness', values)}
                 placeholder="Add an awareness channel..."
               />
@@ -72,12 +69,12 @@ export default function CustomerJourneyPage({ data, onChange, errors }: Customer
           <FormField
             label="List your trust-building elements"
             required
-            error={errors?.['worksheet.customerJourney.consideration']?.[0]}
+            error={errors?.['customerJourney.consideration']?.[0]}
             helper="What convinces customers to choose you?"
           >
 
               <ArrayInput
-                values={data.worksheet?.customerJourney?.consideration || []}
+                values={data?.customerJourney?.consideration || []}
                 onChange={(values) => updateCustomerJourney('consideration', values)}
                 placeholder="Add a trust-building element..."
               />
@@ -99,12 +96,12 @@ export default function CustomerJourneyPage({ data, onChange, errors }: Customer
           <FormField
             label="Describe your decision/purchase process"
             required
-            error={errors?.['worksheet.customerJourney.decision']?.[0]}
+            error={errors?.['customerJourney.decision']?.[0]}
             helper="Make it as simple as possible"
           >
             <div className="relative">
               <textarea
-                value={data.worksheet?.customerJourney?.decision || ''}
+                value={data?.customerJourney?.decision || ''}
                 onChange={(e) => updateCustomerJourney('decision', e.target.value)}
                 className="w-full bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
                 placeholder="Describe your purchase process..."
@@ -126,12 +123,12 @@ export default function CustomerJourneyPage({ data, onChange, errors }: Customer
           <FormField
             label="List your retention strategies"
             required
-            error={errors?.['worksheet.customerJourney.retention']?.[0]}
+            error={errors?.['customerJourney.retention']?.[0]}
             helper="How will you maintain relationships?"
           >
 
               <ArrayInput
-                values={data.worksheet?.customerJourney?.retention || []}
+                values={data?.customerJourney?.retention || []}
                 onChange={(values) => updateCustomerJourney('retention', values)}
                 placeholder="Add a retention strategy..."
               />

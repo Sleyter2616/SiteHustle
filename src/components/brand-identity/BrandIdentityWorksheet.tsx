@@ -1,27 +1,52 @@
 import React, { useState } from 'react';
-import { Pillar1Data } from '@/types/pillar1Types';
+import { Pillar1Data } from '@/types/pillar1';
 import ReflectionPage from './pages/ReflectionPage';
 import PersonalityPage from './pages/PersonalityPage';
 import StoryPage from './pages/StoryPage';
 import DifferentiationPage from './pages/DifferentiationPage';
-import ExecutionRoadmapPage from './pages/ExecutionRoadmapPage';
-import ConclusionPage from './pages/ConclusionPage';
+import { FiArrowLeft, FiArrowRight, FiDownload } from 'react-icons/fi';
+import { generateBrandIdentityPDF } from '@/utils/pdfUtils';
+import { toast } from 'react-hot-toast';
 
 interface BrandIdentityWorksheetProps {
-  data: Pillar1Data;
-  onChange: (data: Partial<Pillar1Data>) => void;
-  onComplete?: () => void;
+  data: Pillar1Data['brandIdentity'];
+  onChange: (data: Pillar1Data['brandIdentity']) => void;
+  onPdfDownloaded?: () => void;
+  onNextSection?: () => void;
+  pdfDownloaded?: boolean;
 }
 
-export default function BrandIdentityWorksheet({ data, onChange, onComplete }: BrandIdentityWorksheetProps) {
+export default function BrandIdentityWorksheet({ 
+  data, 
+  onChange,
+  onPdfDownloaded,
+  onNextSection,
+  pdfDownloaded = false
+}: BrandIdentityWorksheetProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 6;
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const totalPages = 4;
+
+  const isDataComplete = () => {
+    if (!data) return false;
+    
+    const { reflection, personality, story, differentiation } = data;
+    
+    const isReflectionComplete = reflection?.whoIAm && reflection.whoIAmNot && reflection.whyBuildBrand;
+    const isPersonalityComplete = personality?.communicationStyle && personality.toneAndVoice && 
+                                personality.passionateExpression && personality.brandPersonality;
+    const isStoryComplete = story?.pivotalExperience && story.definingMoment && story.audienceRelevance;
+    const isDifferentiationComplete = differentiation?.uniqueApproach && differentiation.uniqueResources && 
+                                    differentiation.competitivePerception;
+
+    return isReflectionComplete && isPersonalityComplete && isStoryComplete && isDifferentiationComplete;
+  };
 
   const handleNext = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
-    } else {
-      onComplete?.();
+    } else if (onNextSection && pdfDownloaded) {
+      onNextSection();
     }
   };
 
@@ -31,19 +56,34 @@ export default function BrandIdentityWorksheet({ data, onChange, onComplete }: B
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!isDataComplete()) {
+      toast.error('Please complete all sections before downloading the PDF');
+      return;
+    }
+
+    try {
+      setIsGeneratingPDF(true);
+      const doc = generateBrandIdentityPDF(data);
+      doc.save('brand-identity-worksheet.pdf');
+      toast.success('Brand Identity PDF downloaded successfully!');
+      if (onPdfDownloaded) {
+        onPdfDownloaded();
+      }
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to generate PDF. Please try again.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   const renderPage = () => {
-    const defaultBrandIdentity = data.brandIdentity || {
+    const defaultBrandIdentity = data || {
       reflection: { whoIAm: '', whoIAmNot: '', whyBuildBrand: '' },
       personality: { communicationStyle: '', toneAndVoice: '', passionateExpression: '', brandPersonality: '' },
       story: { pivotalExperience: '', definingMoment: '', audienceRelevance: '' },
       differentiation: { uniqueApproach: '', uniqueResources: '', competitivePerception: '' }
-    };
-
-    const defaultExecutionRoadmap = data.executionRoadmap || {
-      thirtyDayGoal: '',
-      weeklyMilestones: ['', '', '', ''],
-      contentPlan: '',
-      immediateActions: []
     };
 
     switch (currentPage) {
@@ -52,7 +92,8 @@ export default function BrandIdentityWorksheet({ data, onChange, onComplete }: B
           <ReflectionPage
             data={defaultBrandIdentity.reflection}
             onChange={(reflection) => onChange({ 
-              brandIdentity: { ...defaultBrandIdentity, reflection }
+              ...defaultBrandIdentity,
+              reflection
             })}
           />
         );
@@ -60,8 +101,9 @@ export default function BrandIdentityWorksheet({ data, onChange, onComplete }: B
         return (
           <PersonalityPage
             data={defaultBrandIdentity.personality}
-            onChange={(personality) => onChange({ 
-              brandIdentity: { ...defaultBrandIdentity, personality }
+            onChange={(personality) => onChange({
+              ...defaultBrandIdentity,
+              personality
             })}
           />
         );
@@ -69,8 +111,9 @@ export default function BrandIdentityWorksheet({ data, onChange, onComplete }: B
         return (
           <StoryPage
             data={defaultBrandIdentity.story}
-            onChange={(story) => onChange({ 
-              brandIdentity: { ...defaultBrandIdentity, story }
+            onChange={(story) => onChange({
+              ...defaultBrandIdentity,
+              story
             })}
           />
         );
@@ -78,23 +121,10 @@ export default function BrandIdentityWorksheet({ data, onChange, onComplete }: B
         return (
           <DifferentiationPage
             data={defaultBrandIdentity.differentiation}
-            onChange={(differentiation) => onChange({ 
-              brandIdentity: { ...defaultBrandIdentity, differentiation }
+            onChange={(differentiation) => onChange({
+              ...defaultBrandIdentity,
+              differentiation
             })}
-          />
-        );
-      case 5:
-        return (
-          <ExecutionRoadmapPage
-            data={defaultExecutionRoadmap}
-            onChange={(executionRoadmap) => onChange({ executionRoadmap })}
-          />
-        );
-      case 6:
-        return (
-          <ConclusionPage
-            data={data}
-            onComplete={onComplete}
           />
         );
       default:
@@ -104,45 +134,41 @@ export default function BrandIdentityWorksheet({ data, onChange, onComplete }: B
 
   return (
     <div className="space-y-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">Brand Identity</h1>
-        <p className="text-gray-300">
-          Build a strong foundation for your brand by defining who you are and how you communicate.
-        </p>
-      </div>
-
       {renderPage()}
-
-      <div className="flex justify-between mt-8">
+      <div className="flex justify-between items-center">
         <button
           onClick={handleBack}
-          disabled={currentPage === 1}
-          className={`px-4 py-2 rounded ${
+          className={`flex items-center space-x-2 px-4 py-2 rounded ${
             currentPage === 1
               ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
               : 'bg-gray-700 text-white hover:bg-gray-600'
           }`}
+          disabled={currentPage === 1}
         >
-          Back
+          <FiArrowLeft />
+          <span>Back</span>
         </button>
-        <button
-          onClick={handleNext}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
-        >
-          {currentPage === totalPages ? 'Complete' : 'Next'}
-        </button>
-      </div>
-
-      <div className="mt-4 flex justify-center">
-        <div className="flex space-x-2">
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <div
-              key={index}
-              className={`w-2 h-2 rounded-full ${
-                currentPage === index + 1 ? 'bg-blue-500' : 'bg-gray-600'
-              }`}
-            />
-          ))}
+        <div className="flex space-x-4">
+          <button
+            onClick={handleDownloadPDF}
+            className="flex items-center space-x-2 px-4 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white"
+            disabled={isGeneratingPDF || !isDataComplete()}
+          >
+            <FiDownload />
+            <span>{isGeneratingPDF ? 'Generating PDF...' : !isDataComplete() ? 'Complete All Sections First' : 'Download PDF'}</span>
+          </button>
+          <button
+            onClick={handleNext}
+            className={`flex items-center space-x-2 px-4 py-2 rounded ${
+              currentPage === totalPages && !pdfDownloaded
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-500'
+            }`}
+            disabled={currentPage === totalPages && !pdfDownloaded}
+          >
+            <span>{currentPage === totalPages ? 'Next Section' : 'Next'}</span>
+            <FiArrowRight />
+          </button>
         </div>
       </div>
     </div>

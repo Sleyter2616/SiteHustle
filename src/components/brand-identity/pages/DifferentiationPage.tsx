@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pillar1Data } from '@/types/pillar1Types';
+import { Pillar1Data } from '@/types/pillar1';
 import TextArea from '@/components/common/TextArea';
 
 type DifferentiationData = NonNullable<NonNullable<Pillar1Data['brandIdentity']>>['differentiation'];
@@ -27,7 +27,7 @@ export default function DifferentiationPage({ data, onChange }: DifferentiationP
         <div>
           <TextArea
             label="What's a common approach in your niche that you do better—or differently?"
-            value={data.uniqueApproach}
+            value={data?.uniqueApproach}
             onChange={(value) => onChange({ ...data, uniqueApproach: value })}
             placeholder="Describe how your approach differs from the standard in your industry..."
             rows={4}
@@ -40,7 +40,7 @@ export default function DifferentiationPage({ data, onChange }: DifferentiationP
         <div>
           <TextArea
             label="What unique resources or knowledge do you have?"
-            value={data.uniqueResources}
+            value={data?.uniqueResources}
             onChange={(value) => onChange({ ...data, uniqueResources: value })}
             placeholder="List your unique skills, experiences, or resources..."
             rows={4}
@@ -53,7 +53,7 @@ export default function DifferentiationPage({ data, onChange }: DifferentiationP
         <div>
           <TextArea
             label="How do you want to be perceived compared to your top competitors?"
-            value={data.competitivePerception}
+            value={data?.competitivePerception}
             onChange={(value) => onChange({ ...data, competitivePerception: value })}
             placeholder="Describe how you want customers to see you vs. competitors..."
             rows={4}

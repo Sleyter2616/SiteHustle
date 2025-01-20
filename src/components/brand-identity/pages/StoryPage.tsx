@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pillar1Data } from '@/types/pillar1Types';
+import { Pillar1Data } from '@/types/pillar1';
 import TextArea from '@/components/common/TextArea';
 
 type StoryData = NonNullable<NonNullable<Pillar1Data['brandIdentity']>>['story'];
@@ -27,7 +27,7 @@ export default function StoryPage({ data, onChange }: StoryPageProps) {
         <div>
           <TextArea
             label="What pivotal experience led you here?"
-            value={data.pivotalExperience}
+            value={data?.pivotalExperience}
             onChange={(value) => onChange({ ...data, pivotalExperience: value })}
             placeholder="Share the key moment or experience that sparked your journey..."
             rows={4}
@@ -40,7 +40,7 @@ export default function StoryPage({ data, onChange }: StoryPageProps) {
         <div>
           <TextArea
             label="Which struggle or aha-moment defines your motivation?"
-            value={data.definingMoment}
+            value={data?.definingMoment}
             onChange={(value) => onChange({ ...data, definingMoment: value })}
             placeholder="Describe a challenge you overcame or insight that changed everything..."
             rows={4}
@@ -53,7 +53,7 @@ export default function StoryPage({ data, onChange }: StoryPageProps) {
         <div>
           <TextArea
             label="Why should your audience care about your journey?"
-            value={data.audienceRelevance}
+            value={data?.audienceRelevance}
             onChange={(value) => onChange({ ...data, audienceRelevance: value })}
             placeholder="Connect your story to your audience's needs and aspirations..."
             rows={4}

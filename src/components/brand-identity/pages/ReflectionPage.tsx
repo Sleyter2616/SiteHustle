@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pillar1Data } from '@/types/pillar1Types';
+import { Pillar1Data } from '@/types/pillar1';
 import TextArea from '@/components/common/TextArea';
 
 type ReflectionData = NonNullable<NonNullable<Pillar1Data['brandIdentity']>>['reflection'];
@@ -31,7 +31,7 @@ export default function ReflectionPage({ data, onChange }: ReflectionPageProps) 
         <div>
           <TextArea
             label="Who Am I, Really?"
-            value={data.whoIAm}
+            value={data?.whoIAm}
             onChange={(value) => onChange({ ...data, whoIAm: value })}
             placeholder="Reflect on your authentic self, your values, and what makes you unique..."
             rows={4}
@@ -44,7 +44,7 @@ export default function ReflectionPage({ data, onChange }: ReflectionPageProps) 
         <div>
           <TextArea
             label="Who Am I Not?"
-            value={data.whoIAmNot}
+            value={data?.whoIAmNot}
             onChange={(value) => onChange({ ...data, whoIAmNot: value })}
             placeholder="What approaches or personas don't align with your authentic self..."
             rows={4}
@@ -57,7 +57,7 @@ export default function ReflectionPage({ data, onChange }: ReflectionPageProps) 
         <div>
           <TextArea
             label="Why Build This Brand?"
-            value={data.whyBuildBrand}
+            value={data?.whyBuildBrand}
             onChange={(value) => onChange({ ...data, whyBuildBrand: value })}
             placeholder="Share your deeper motivation for building this brand..."
             rows={4}

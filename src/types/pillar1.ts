@@ -1,22 +1,21 @@
-
 export interface BrandIdentityData {
-  reflection: {
+  reflection?: {
     whoIAm: string;
     whoIAmNot: string;
     whyBuildBrand: string;
   };
-  personality: {
+  personality?: {
     communicationStyle: string;
     toneAndVoice: string;
     passionateExpression: string;
     brandPersonality: string;
   };
-  story: {
+  story?: {
     pivotalExperience: string;
     definingMoment: string;
     audienceRelevance: string;
   };
-  differentiation: {
+  differentiation?: {
     uniqueApproach: string;
     uniqueResources: string;
     competitivePerception: string;
@@ -43,39 +42,54 @@ export interface VisionData {
     threats: string[];
   };
   customerJourney?: {
-    awareness: string;
-    consideration: string;
+    awareness: string[];
+    consideration: string[];
     decision: string;
-    retention: string;
-    advocacy: string;
+    retention: string[];
+  };
+  targetAudience?: {
+    primaryProfile?: string;
+    secondaryAudiences?: string[];
+    painPoints?: string[];
+    idealCustomerProfile?: {
+      problem?: string;
+      journey?: string;
+      desires?: string[];
+      desiredState?: string;
+      gap?: string;
+      uniqueSellingPoint?: string;
+      benefits?: string[];
+      objections?: string[];
+    };
   };
 }
 
 export interface ExecutionRoadmapData {
-  thirtyDayGoal: string;
-  weeklyMilestones: string[];
-  contentPlan: string;
-  immediateActions: string[];
+  thirtyDayGoal?: string;
+  weeklyMilestones?: string[];
+  contentPlan?: string;
+  immediateActions?: string[];
 }
 
 export interface WireframeData {
-  layout: {
+  layout?: {
     header: string;
     navigation: string;
     mainContent: string;
     footer: string;
   };
-  components: {
+  components?: {
     callToAction: string;
     featuredSections: string[];
     contentBlocks: string[];
   };
-  styling: {
+  styling?: {
     colorScheme: string;
     typography: string;
     spacing: string;
   };
 }
+
 export interface WorksheetData {
 
     businessName?: string;
@@ -154,6 +168,7 @@ export interface PersonaData {
     objections?: string[];
   };
 } 
+
 export interface Pillar1Data {
   brandIdentity?: BrandIdentityData;
   vision?: VisionData;

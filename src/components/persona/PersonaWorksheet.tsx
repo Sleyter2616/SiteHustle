@@ -1,5 +1,5 @@
 import React from 'react';
-import { PersonaData } from '@/types/pillar1Types';
+import { PersonaData } from '@/types/pillar1';
 
 interface PersonaWorksheetProps {
   data: PersonaData;

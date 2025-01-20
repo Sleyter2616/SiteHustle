@@ -1,12 +1,12 @@
 import React from 'react';
-import { Pillar1Data } from '@/types/pillar1Types';
+import { VisionData } from '@/types/pillar1';
 import FormField, { ArrayInput } from '@/components/common/FormField';
 import Tooltip from '@/components/common/Tooltip';
 import { tooltips } from '@/utils/pillar1Validation';
 
 interface VisionClarityPageProps {
-  data: Pillar1Data;
-  onChange: (data: Pillar1Data) => void;
+  data?: VisionData;
+  onChange: (data: VisionData) => void;
   errors?: Record<string, string[]>;
 }
 
@@ -14,10 +14,7 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
   const updateField = (field: string, value: any) => {
     onChange({
       ...data,
-      worksheet: {
-        ...data.worksheet,
-        [field]: value
-      }
+      [field]: value
     });
   };
 
@@ -47,40 +44,30 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
         <FormField
           label="What's your business name?"
           required
-          error={errors?.['worksheet.businessName']?.[0]}
+          error={errors?.['businessName']?.[0]}
         >
-          <div className="relative">
-            <input
-              type="text"
-              value={data.worksheet?.businessName || ''}
-              onChange={(e) => updateField('businessName', e.target.value)}
-              className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
-              placeholder="Enter your business name"
-            />
-            <div className="absolute right-2 top-2">
-              <Tooltip content="Choose a memorable name that captures your brand essence. Consider something unique, easy to pronounce, and available as a domain name." />
-            </div>
-          </div>
+          <input
+            type="text"
+            value={data?.businessName || ''}
+            onChange={(e) => updateField('businessName', e.target.value)}
+            className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
+            placeholder="Enter your business name"
+          />
         </FormField>
 
         <FormField
           label="What's your tagline?"
           required
-          error={errors?.['worksheet.tagline']?.[0]}
+          error={errors?.['tagline']?.[0]}
           helper="A short, memorable phrase that captures your value proposition"
         >
-          <div className="relative">
-            <input
-              type="text"
-              value={data.worksheet?.tagline || ''}
-              onChange={(e) => updateField('tagline', e.target.value)}
-              className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
-              placeholder="Enter your tagline"
-            />
-            <div className="absolute right-2 top-2">
-              <Tooltip content="A great tagline is short, memorable, and communicates your unique value. Focus on the benefit you provide to customers." />
-            </div>
-          </div>
+          <input
+            type="text"
+            value={data?.tagline || ''}
+            onChange={(e) => updateField('tagline', e.target.value)}
+            className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
+            placeholder="Enter your tagline"
+          />
         </FormField>
 
         <div className="bg-[#2D3748] p-6 rounded-lg mb-6">
@@ -99,48 +86,41 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
         <FormField
           label="What's your mission statement?"
           required
-          error={errors?.['worksheet.missionStatement']?.[0]}
+          error={errors?.['missionStatement']?.[0]}
           helper="Use the formula above to craft a clear, impactful mission statement"
         >
-          <div className="relative">
-            <textarea
-              value={data.worksheet?.missionStatement || ''}
-              onChange={(e) => updateField('missionStatement', e.target.value)}
-              className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
-              placeholder="We exist to... for... so they can..."
-            />
-            <div className="absolute right-2 top-2">
-              <Tooltip content="Your mission statement should answer: What do you do? Who do you serve? How do you serve them? Why does it matter? Keep it clear, concise, and inspiring." />
-            </div>
-          </div>
+          <textarea
+            value={data?.missionStatement || ''}
+            onChange={(e) => updateField('missionStatement', e.target.value)}
+            className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
+            placeholder="We exist to... for... so they can..."
+          />
         </FormField>
 
         <FormField
           label="What are your core values?"
           required
-          error={errors?.['worksheet.coreValues']?.[0]}
+          error={errors?.['coreValues']?.[0]}
           helper="Add 3-5 values that define your business culture and principles"
         >
-          <div className="relative">
-            <ArrayInput
-              label="Core Values"
-              values={data.worksheet?.coreValues || []}
-              onChange={(values) => updateField('coreValues', values)}
-              required
-              placeholder="Add a core value..."
-            />
-            <div className="absolute right-2 top-2">
-              <Tooltip content="Core values are the fundamental beliefs that guide your business decisions. Choose 3-5 values that truly represent what your business stands for and how you operate." />
-            </div>
-            <div className="mt-4 bg-[#1A202C] p-4 rounded-md">
-              <p className="text-sm text-gray-400">Example core values:</p>
-              <ul className="list-disc list-inside text-gray-300">
-                <li>Customer Success First</li>
-                <li>Continuous Innovation</li>
-                <li>Radical Transparency</li>
-                <li>Sustainable Growth</li>
-              </ul>
-            </div>
+          <ArrayInput
+            label="Core Values"
+            values={data?.coreValues || []}
+            onChange={(values) => updateField('coreValues', values)}
+            required
+            placeholder="Add a core value..."
+          />
+          <div className="absolute right-2 top-2">
+            <Tooltip content="Core values are the fundamental beliefs that guide your business decisions. Choose 3-5 values that truly represent what your business stands for and how you operate." />
+          </div>
+          <div className="mt-4 bg-[#1A202C] p-4 rounded-md">
+            <p className="text-sm text-gray-400">Example core values:</p>
+            <ul className="list-disc list-inside text-gray-300">
+              <li>Customer Success First</li>
+              <li>Continuous Innovation</li>
+              <li>Radical Transparency</li>
+              <li>Sustainable Growth</li>
+            </ul>
           </div>
         </FormField>
       </div>

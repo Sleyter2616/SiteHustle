@@ -1,5 +1,5 @@
 import { z } from 'zod'
-export type { Pillar1Data } from '@/types/pillar1Types'
+export type { Pillar1Data } from '@/types/pillar1'
 
 export const businessGoalsSchema = z.object({
   shortTerm: z.string().min(1, 'Short-term goals are required'),

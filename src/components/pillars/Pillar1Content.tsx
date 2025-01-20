@@ -1,635 +1,436 @@
-'use client'
+import React, { useState, useEffect } from 'react';
+import { validateBrandIdentity, validateVision, validateExecutionRoadmap, validateWireframe } from '@/utils/brandIdentityValidation';
+import BrandIdentityWorksheet from '../brand-identity/BrandIdentityWorksheet';
+import VisionWorksheet from '../vision/VisionWorksheet';
+import WireframeWorksheet from '../wireframe/WireframeWorksheet';
+import { generateBrandIdentityPDF, generateVisionWorksheetPDF, generateExecutionRoadmapPDF, generateWireframePDF } from '@/utils/pdfUtils';
+import { Pillar1Data } from '@/types/pillar1';
+import { toast } from 'react-hot-toast';
 
-import { useEffect, useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { FiDownload, FiCheckCircle } from 'react-icons/fi'
-import ProgressBar from '../dashboard/ProgressBar'
-import Alert from '../common/Alert'
-import FormField, { ArrayInput } from '../common/FormField'
-import Tooltip from '../common/Tooltip'
-import VisionWorksheet from '../vision/VisionWorksheet'
-import { 
-  type Pillar1Data,
-  validateWorksheet,
-  validatePersona,
-  isWorksheetComplete,
-  isPersonaComplete,
-  tooltips
-} from '@/utils/pillar1Validation'
+interface Pillar1ContentProps {
+  data: Pillar1Data | null;
+  onDataChange: (data: Pillar1Data) => void;
+}
 
-export default function Pillar1Content() {
-  const [activeTab, setActiveTab] = useState<'worksheet' | 'persona' | 'wireframe'>('worksheet')
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
-  const [data, setData] = useState<Pillar1Data>({
-    worksheet: {
-      businessName: '',
-      tagline: '',
-      missionStatement: '',
-      coreValues: [],
-      businessGoals: {
-        shortTerm: '',
-        midTerm: '',
-        longTerm: '',
-        websiteGoals: '',
-        successIndicators: ''
-      },
-      targetAudience: {
-        primaryProfile: '',
-        secondaryAudiences: [],
-        painPoints: [],
-        idealCustomerProfile: {
-          problem: '',
-          journey: '',
-          desires: [],
-          desiredState: '',
-          gap: '',
-          uniqueSellingPoint: '',
-          benefits: [],
-          objections: []
-        }
-      },
-      visionStatement: '',
-      swot: {
-        strengths: [],
-        weaknesses: [],
-        opportunities: [],
-        threats: []
-      },
-      customerJourney: {
-        awareness: [],
-        consideration: [],
-        decision: '',
-        retention: []
-      }
-    },
-    persona: {
-      demographics: {
-        ageRange: '',
-        gender: '',
-        location: '',
-        income: '',
-        education: ''
-      },
-      psychographics: {
-        interests: [],
-        values: [],
-        lifestyle: '',
-        challenges: [],
-        motivators: []
-      },
-      professional: {
-        occupation: '',
-        industry: '',
-        companySize: '',
-        roleLevel: '',
-        painPoints: []
-      },
-      valueProposition: {
-        needs: [],
-        solutions: [],
-        benefits: []
-      }
-    },
-    progress: {
-      worksheetCompleted: false,
-      personaCompleted: false,
-      totalTasks: 15,
-      completedTasks: 0
-    }
-  })
-  const [errors, setErrors] = useState<Record<string, string[]>>({})
-  
-  const supabase = createClientComponentClient()
+export default function Pillar1Content({ data, onDataChange }: Pillar1ContentProps) {
+  const [activeSection, setActiveSection] = useState(1);
+  const [sectionValidation, setSectionValidation] = useState({
+    brandIdentity: false,
+    vision: false,
+    executionRoadmap: false,
+    wireframe: false
+  });
+
+  const [downloadedPdfs, setDownloadedPdfs] = useState({
+    brandIdentity: false,
+    vision: false,
+    executionRoadmap: false,
+    wireframe: false
+  });
 
   useEffect(() => {
-    loadData()
-  }, [])
-
-  const loadData = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-
-      const { data: pillarData, error } = await supabase
-        .from('pillar_1_data')
-        .select('*')
-        .eq('user_id', user.id)
-        .single()
-
-      if (error) throw error
-
-      if (pillarData) {
-        setData(pillarData)
-      }
-    } catch (error) {
-      console.error('Error loading data:', error)
-      setAlert({
-        type: 'error',
-        message: 'Failed to load your data. Please try refreshing the page.'
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSave = async () => {
-    setSaving(true)
-    setErrors({})
-    
-    try {
-      // Validate based on active tab
-      const validationResult = activeTab === 'worksheet' 
-        ? validateWorksheet(data.worksheet)
-        : validatePersona(data.persona)
-
-      if (!validationResult.success) {
-        setErrors(validationResult.errors)
-        throw new Error('Please fix the validation errors')
-      }
-
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-
-      const { error } = await supabase
-        .from('pillar_1_data')
-        .upsert({
-          user_id: user.id,
-          ...data,
-          updated_at: new Date().toISOString()
-        })
-
-      if (error) throw error
-
-      setAlert({
-        type: 'success',
-        message: 'Progress saved successfully!'
-      })
-    } catch (error) {
-      console.error('Error saving:', error)
-      setAlert({
-        type: 'error',
-        message: error instanceof Error ? error.message : 'Failed to save progress'
-      })
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const handleComplete = async () => {
-    const newProgress = {
-      ...data.progress,
-      [activeTab === 'worksheet' ? 'worksheetCompleted' : 'personaCompleted']: true
-    }
-    
-    setData(prev => ({
+    // Reset PDF download status when section data changes
+    setDownloadedPdfs(prev => ({
       ...prev,
-      progress: {
-        ...newProgress,
-        completedTasks: (newProgress.worksheetCompleted ? 7 : 0) + (newProgress.personaCompleted ? 8 : 0)
+      brandIdentity: false,
+      vision: false,
+      executionRoadmap: false,
+      wireframe: false
+    }));
+  }, [data]);
+
+  useEffect(() => {
+    // Validate each section whenever data changes
+    const brandIdentityValidation = validateBrandIdentity(data?.brandIdentity);
+    const visionValidation = validateVision(data?.vision);
+    const executionRoadmapValidation = validateExecutionRoadmap(data?.executionRoadmap);
+    const wireframeValidation = validateWireframe(data?.wireframe);
+
+    setSectionValidation({
+      brandIdentity: brandIdentityValidation.success,
+      vision: visionValidation.success,
+      executionRoadmap: executionRoadmapValidation.success,
+      wireframe: wireframeValidation.success
+    });
+  }, [data]);
+
+  const handleDownloadPDF = async (section: string) => {
+    if (!data) return;
+
+    let doc;
+    switch (section) {
+      case 'brandIdentity':
+        if (validateBrandIdentity(data.brandIdentity).success) {
+          doc = generateBrandIdentityPDF(data.brandIdentity);
+          doc.save('brand-identity-worksheet.pdf');
+          setDownloadedPdfs(prev => ({ ...prev, brandIdentity: true }));
+        }
+        break;
+      case 'vision':
+        if (validateVision(data.vision).success) {
+          doc = generateVisionWorksheetPDF(data.vision);
+          doc.save('vision-worksheet.pdf');
+          setDownloadedPdfs(prev => ({ ...prev, vision: true }));
+        }
+        break;
+      case 'executionRoadmap':
+        if (validateExecutionRoadmap(data.executionRoadmap).success) {
+          doc = generateExecutionRoadmapPDF(data.executionRoadmap);
+          doc.save('execution-roadmap.pdf');
+          setDownloadedPdfs(prev => ({ ...prev, executionRoadmap: true }));
+        }
+        break;
+      case 'wireframe':
+        if (validateWireframe(data.wireframe).success) {
+          doc = generateWireframePDF(data.wireframe);
+          doc.save('wireframe-plan.pdf');
+          setDownloadedPdfs(prev => ({ ...prev, wireframe: true }));
+        }
+        break;
+    }
+  };
+
+  const handleNext = () => {
+    if (activeSection === 1 && !downloadedPdfs.brandIdentity) {
+      toast.error('Please complete and download the Brand Identity PDF first');
+      return;
+    }
+    if (activeSection === 2 && !downloadedPdfs.vision) {
+      toast.error('Please complete and download the Vision Worksheet PDF first');
+      return;
+    }
+    if (activeSection === 3 && !downloadedPdfs.executionRoadmap) {
+      toast.error('Please complete and download the Execution Roadmap PDF first');
+      return;
+    }
+    setActiveSection(prev => Math.min(prev + 1, 4));
+  };
+
+  const handleSectionClick = (section: number) => {
+    if (section === 2 && !downloadedPdfs.brandIdentity) {
+      toast.error('Please complete and download the Brand Identity PDF first');
+      return;
+    }
+    if (section === 3 && !downloadedPdfs.vision) {
+      toast.error('Please complete and download the Vision Worksheet PDF first');
+      return;
+    }
+    if (section === 4 && !downloadedPdfs.executionRoadmap) {
+      toast.error('Please complete and download the Execution Roadmap PDF first');
+      return;
+    }
+    setActiveSection(section);
+  };
+
+  const isNextSectionAvailable = (currentSection: number) => {
+    switch (currentSection) {
+      case 1:
+        return sectionValidation.brandIdentity && downloadedPdfs.brandIdentity;
+      case 2:
+        return sectionValidation.vision && downloadedPdfs.vision;
+      case 3:
+        return sectionValidation.executionRoadmap && downloadedPdfs.executionRoadmap;
+      case 4:
+        return sectionValidation.wireframe && downloadedPdfs.wireframe;
+      default:
+        return false;
+    }
+  };
+
+  const renderCompletionStatus = (section: number) => {
+    const getValidationStatus = () => {
+      switch (section) {
+        case 1:
+          return sectionValidation.brandIdentity;
+        case 2:
+          return sectionValidation.vision;
+        case 3:
+          return sectionValidation.executionRoadmap;
+        case 4:
+          return sectionValidation.wireframe;
+        default:
+          return false;
       }
-    }))
+    };
 
-    await handleSave()
-  }
+    const getPdfStatus = () => {
+      switch (section) {
+        case 1:
+          return downloadedPdfs.brandIdentity;
+        case 2:
+          return downloadedPdfs.vision;
+        case 3:
+          return downloadedPdfs.executionRoadmap;
+        case 4:
+          return downloadedPdfs.wireframe;
+        default:
+          return false;
+      }
+    };
 
-  if (loading) {
-    return <div className="text-center py-8">Loading...</div>
-  }
+    const isValid = getValidationStatus();
+    const hasPdf = getPdfStatus();
 
-  return (
-    <div className="space-y-8">
-      {/* Progress Section */}
-      <div className="bg-[#1E293B] rounded-lg p-6">
-        <div className="flex items-center justify-between mb-4">
+    return (
+      <div className="mt-6 p-4 bg-gray-800 rounded-lg">
+        <h3 className="text-lg font-medium mb-2">Section Completion Requirements:</h3>
+        <ul className="space-y-2">
+          <li className="flex items-center">
+            <span className={`mr-2 ${isValid ? 'text-green-500' : 'text-gray-400'}`}>
+              {isValid ? '✓' : '○'}
+            </span>
+            Fill out all required fields
+          </li>
+          <li className="flex items-center">
+            <span className={`mr-2 ${hasPdf ? 'text-green-500' : 'text-gray-400'}`}>
+              {hasPdf ? '✓' : '○'}
+            </span>
+            Download section PDF
+          </li>
+        </ul>
+        {!isValid && (
+          <p className="mt-2 text-sm text-yellow-500">
+            Please complete all fields to enable PDF download
+          </p>
+        )}
+        {isValid && !hasPdf && (
+          <p className="mt-2 text-sm text-yellow-500">
+            Please download the PDF to proceed to the next section
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  const renderSection = (sectionNumber: number) => {
+    const canAccess = sectionNumber === 1 || 
+      (sectionNumber === 2 && isNextSectionAvailable(1)) ||
+      (sectionNumber === 3 && isNextSectionAvailable(2)) ||
+      (sectionNumber === 4 && isNextSectionAvailable(3));
+
+    if (!canAccess) {
+      return (
+        <div className="p-4 text-gray-500">
+          Please complete the previous section before proceeding.
+        </div>
+      );
+    }
+
+    switch (sectionNumber) {
+      case 1:
+        return (
           <div>
-            <h2 className="text-xl font-semibold text-[#E2E8F0]">
-              Your Progress
-            </h2>
-            <p className="text-[#94A3B8] text-sm">
-              Complete both sections to unlock Pillar 2
-            </p>
-          </div>
-          <ProgressBar 
-            completed={data.progress.completedTasks} 
-            total={data.progress.totalTasks} 
-            type="tasks" 
-          />
-        </div>
-      </div>
-
-      {/* Alert Messages */}
-      {alert && (
-        <Alert
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
-
-      {/* Navigation */}
-      <div className="flex space-x-4 border-b border-[#1E293B]">
-        <button
-          onClick={() => setActiveTab('worksheet')}
-          className={`px-4 py-2 text-sm font-medium ${
-            activeTab === 'worksheet'
-              ? 'text-[#5865F2] border-b-2 border-[#5865F2]'
-              : 'text-[#94A3B8] hover:text-[#E2E8F0]'
-          }`}
-        >
-          Vision & Goals Worksheet
-          {data.progress.worksheetCompleted && (
-            <span className="ml-2 text-green-400">
-              <FiCheckCircle className="inline w-4 h-4" />
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab('persona')}
-          className={`px-4 py-2 text-sm font-medium ${
-            activeTab === 'persona'
-              ? 'text-[#5865F2] border-b-2 border-[#5865F2]'
-              : 'text-[#94A3B8] hover:text-[#E2E8F0]'
-          }`}
-        >
-          Target Audience Persona
-          {data.progress.personaCompleted && (
-            <span className="ml-2 text-green-400">
-              <FiCheckCircle className="inline w-4 h-4" />
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab('wireframe')}
-          className={`px-4 py-2 text-sm font-medium ${
-            activeTab === 'wireframe'
-              ? 'text-[#5865F2] border-b-2 border-[#5865F2]'
-              : 'text-[#94A3B8] hover:text-[#E2E8F0]'
-          }`}
-        >
-          Wireframe Template
-        </button>
-      </div>
-
-      {/* Content Sections */}
-      {activeTab === 'wireframe' ? (
-        <div className="space-y-6">
-          <div className="bg-[#1E293B] rounded-lg p-6">
-            <h3 className="text-xl font-semibold text-[#E2E8F0] mb-4">
-              Website Wireframe Template
-            </h3>
-            <p className="text-[#94A3B8] mb-6">
-              Download our wireframe template to start planning your website structure.
-              This template includes:
-            </p>
-            <ul className="list-disc list-inside text-[#94A3B8] mb-6 space-y-2">
-              <li>Homepage layout suggestions</li>
-              <li>Common navigation patterns</li>
-              <li>Content section recommendations</li>
-              <li>Mobile-responsive considerations</li>
-            </ul>
-            <button 
-              onClick={() => window.open('/templates/wireframe-template.pdf', '_blank')}
-              className="inline-flex items-center px-4 py-2 bg-[#5865F2] text-white rounded-md hover:bg-[#4752C4]"
-            >
-              <FiDownload className="mr-2" />
-              Download Template
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {activeTab === 'worksheet' && (
-            <VisionWorksheet
-              data={data}
-              onChange={(newData) => setData(prev => ({
-                ...prev,
-                ...newData
-              }))}
-              errors={errors}
+            <BrandIdentityWorksheet
+              data={data?.brandIdentity}
+              onChange={(brandIdentity) => onDataChange({ ...data, brandIdentity })}
+              onPdfDownloaded={() => setDownloadedPdfs(prev => ({ ...prev, brandIdentity: true }))}
+              onNextSection={() => setActiveSection(2)}
+              pdfDownloaded={downloadedPdfs.brandIdentity}
             />
-          )}
-          {activeTab === 'persona' && (
-            <div className="space-y-6">
-              <div className="bg-[#1E293B] rounded-lg p-6 space-y-4">
-                <h3 className="text-lg font-medium text-[#E2E8F0] mb-4">
-                  Demographics
-                </h3>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    label="Age Range"
-                    required
-                    error={errors['demographics.ageRange']?.[0]}
-                  >
-                    <input
-                      type="text"
-                      value={data.persona.demographics.ageRange}
-                      onChange={(e) => setData(prev => ({
-                        ...prev,
-                        persona: {
-                          ...prev.persona,
-                          demographics: {
-                            ...prev.persona.demographics,
-                            ageRange: e.target.value
-                          }
-                        }
-                      }))}
-                      className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
-                    />
-                  </FormField>
-
-                  <FormField
-                    label="Gender"
-                    error={errors['demographics.gender']?.[0]}
-                  >
-                    <input
-                      type="text"
-                      value={data.persona.demographics.gender}
-                      onChange={(e) => setData(prev => ({
-                        ...prev,
-                        persona: {
-                          ...prev.persona,
-                          demographics: {
-                            ...prev.persona.demographics,
-                            gender: e.target.value
-                          }
-                        }
-                      }))}
-                      className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
-                    />
-                  </FormField>
-                </div>
-
-                <FormField
-                  label="Location"
-                  required
-                  error={errors['demographics.location']?.[0]}
-                >
-                  <input
-                    type="text"
-                    value={data.persona.demographics.location}
-                    onChange={(e) => setData(prev => ({
-                      ...prev,
-                      persona: {
-                        ...prev.persona,
-                        demographics: {
-                          ...prev.persona.demographics,
-                          location: e.target.value
-                        }
-                      }
-                    }))}
-                    className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
-                  />
-                </FormField>
+          </div>
+        );
+      case 2:
+        return (
+          <div>
+            <VisionWorksheet
+              data={data?.vision}
+              onChange={(vision) => {
+                if (data) {
+                  onDataChange({ ...data, vision });
+                }
+              }}
+            />
+            <button
+              onClick={() => handleDownloadPDF('vision')}
+              disabled={!sectionValidation.vision}
+              className={`mt-4 px-4 py-2 rounded ${
+                !sectionValidation.vision
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  : downloadedPdfs.vision
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-blue-500 hover:bg-blue-600'
+              } text-white`}
+            >
+              {downloadedPdfs.vision ? 'PDF Downloaded ✓' : 'Download Vision Worksheet PDF'}
+            </button>
+            {renderCompletionStatus(2)}
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">30-Day Goal</h3>
+                <textarea
+                  value={data?.executionRoadmap?.thirtyDayGoal || ''}
+                  onChange={(e) => onDataChange({
+                    ...data,
+                    executionRoadmap: {
+                      ...data?.executionRoadmap,
+                      thirtyDayGoal: e.target.value
+                    }
+                  })}
+                  className="w-full h-32 p-2 border rounded"
+                  placeholder="What do you want to achieve in the next 30 days?"
+                />
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Weekly Milestones</h3>
+                <textarea
+                  value={data?.executionRoadmap?.weeklyMilestones?.join('\n') || ''}
+                  onChange={(e) => onDataChange({
+                    ...data,
+                    executionRoadmap: {
+                      ...data?.executionRoadmap,
+                      weeklyMilestones: e.target.value.split('\n').filter(Boolean)
+                    }
+                  })}
+                  className="w-full h-32 p-2 border rounded"
+                  placeholder="List your weekly milestones (one per line)"
+                />
               </div>
 
-              <div className="bg-[#1E293B] rounded-lg p-6 space-y-4">
-                <h3 className="text-lg font-medium text-[#E2E8F0] mb-4">
-                  Psychographics
-                </h3>
-
-                <FormField
-                  label="Interests"
-                  required
-                  error={errors['psychographics.interests']?.[0]}
-                >
-                  <ArrayInput
-                    label="Interests"
-                    values={data.persona.psychographics.interests}
-                    onChange={(values) => setData(prev => ({
-                      ...prev,
-                      persona: {
-                        ...prev.persona,
-                        psychographics: {
-                          ...prev.persona.psychographics,
-                          interests: values
-                        }
-                      }
-                    }))}
-                    placeholder="Add an interest..."
-                  />
-                </FormField>
-
-                <FormField
-                  label="Challenges"
-                  required
-                  error={errors['psychographics.challenges']?.[0]}
-                >
-                  <ArrayInput
-                    label="Challenges"
-                    values={data.persona.psychographics.challenges}
-                    onChange={(values) => setData(prev => ({
-                      ...prev,
-                      persona: {
-                        ...prev.persona,
-                        psychographics: {
-                          ...prev.persona.psychographics,
-                          challenges: values
-                        }
-                      }
-                    }))}
-                    placeholder="Add a challenge..."
-                  />
-                </FormField>
-
-                <FormField
-                  label="Motivators"
-                  required
-                  error={errors['psychographics.motivators']?.[0]}
-                >
-                  <ArrayInput
-                    label="Motivators"
-                    values={data.persona.psychographics.motivators}
-                    onChange={(values) => setData(prev => ({
-                      ...prev,
-                      persona: {
-                        ...prev.persona,
-                        psychographics: {
-                          ...prev.persona.psychographics,
-                          motivators: values
-                        }
-                      }
-                    }))}
-                    placeholder="Add a motivator..."
-                  />
-                </FormField>
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Content Plan</h3>
+                <textarea
+                  value={data?.executionRoadmap?.contentPlan || ''}
+                  onChange={(e) => onDataChange({
+                    ...data,
+                    executionRoadmap: {
+                      ...data?.executionRoadmap,
+                      contentPlan: e.target.value
+                    }
+                  })}
+                  className="w-full h-32 p-2 border rounded"
+                  placeholder="Outline your content strategy"
+                />
               </div>
 
-              <div className="bg-[#1E293B] rounded-lg p-6 space-y-4">
-                <h3 className="text-lg font-medium text-[#E2E8F0] mb-4">
-                  Professional Profile
-                </h3>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    label="Occupation"
-                    required
-                    error={errors['professional.occupation']?.[0]}
-                  >
-                    <input
-                      type="text"
-                      value={data.persona.professional.occupation}
-                      onChange={(e) => setData(prev => ({
-                        ...prev,
-                        persona: {
-                          ...prev.persona,
-                          professional: {
-                            ...prev.persona.professional,
-                            occupation: e.target.value
-                          }
-                        }
-                      }))}
-                      className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
-                    />
-                  </FormField>
-
-                  <FormField
-                    label="Industry"
-                    required
-                    error={errors['professional.industry']?.[0]}
-                  >
-                    <input
-                      type="text"
-                      value={data.persona.professional.industry}
-                      onChange={(e) => setData(prev => ({
-                        ...prev,
-                        persona: {
-                          ...prev.persona,
-                          professional: {
-                            ...prev.persona.professional,
-                            industry: e.target.value
-                          }
-                        }
-                      }))}
-                      className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
-                    />
-                  </FormField>
-                </div>
-
-                <FormField
-                  label="Core Values"
-                  required
-                  error={errors['worksheet.coreValues']?.[0]}
-                >
-                  <ArrayInput
-                    label="Core Values"
-                    values={data.worksheet.coreValues}
-                    onChange={(values) => setData(prev => ({
-                      ...prev,
-                      worksheet: {
-                        ...prev.worksheet,
-                        coreValues: values
-                      }
-                    }))}
-                    placeholder="Add a core value..."
-                  />
-                </FormField>
-
-                <FormField
-                  label="Strengths"
-                  required
-                  error={errors['worksheet.swot.strengths']?.[0]}
-                >
-                  <ArrayInput
-                    label="Strengths"
-                    values={data.worksheet.swot?.strengths || []}
-                    onChange={(values) => setData(prev => ({
-                      ...prev,
-                      worksheet: {
-                        ...prev.worksheet,
-                        swot: {
-                          ...prev.worksheet.swot,
-                          strengths: values
-                        }
-                      }
-                    }))}
-                    placeholder="Add a strength..."
-                  />
-                </FormField>
-
-                <FormField
-                  label="Weaknesses"
-                  required
-                  error={errors['worksheet.swot.weaknesses']?.[0]}
-                >
-                  <ArrayInput
-                    label="Weaknesses"
-                    values={data.worksheet.swot?.weaknesses || []}
-                    onChange={(values) => setData(prev => ({
-                      ...prev,
-                      worksheet: {
-                        ...prev.worksheet,
-                        swot: {
-                          ...prev.worksheet.swot,
-                          weaknesses: values
-                        }
-                      }
-                    }))}
-                    placeholder="Add a weakness..."
-                  />
-                </FormField>
-
-                <FormField
-                  label="Pain Points"
-                  required
-                  error={errors['professional.painPoints']?.[0]}
-                >
-                  <ArrayInput
-                    label="Pain Points"
-                    values={data.persona.professional.painPoints}
-                    onChange={(values) => setData(prev => ({
-                      ...prev,
-                      persona: {
-                        ...prev.persona,
-                        professional: {
-                          ...prev.persona.professional,
-                          painPoints: values
-                        }
-                      }
-                    }))}
-                    placeholder="Add a pain point..."
-                  />
-                </FormField>
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Immediate Actions</h3>
+                <textarea
+                  value={data?.executionRoadmap?.immediateActions?.join('\n') || ''}
+                  onChange={(e) => onDataChange({
+                    ...data,
+                    executionRoadmap: {
+                      ...data?.executionRoadmap,
+                      immediateActions: e.target.value.split('\n').filter(Boolean)
+                    }
+                  })}
+                  className="w-full h-32 p-2 border rounded"
+                  placeholder="List your immediate actions (one per line)"
+                />
               </div>
             </div>
-          )}
-        </div>
-      )}
+            <button
+              onClick={() => handleDownloadPDF('executionRoadmap')}
+              disabled={!sectionValidation.executionRoadmap}
+              className={`mt-4 px-4 py-2 rounded ${
+                !sectionValidation.executionRoadmap
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  : downloadedPdfs.executionRoadmap
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-blue-500 hover:bg-blue-600'
+              } text-white`}
+            >
+              {downloadedPdfs.executionRoadmap ? 'PDF Downloaded ✓' : 'Download Execution Roadmap PDF'}
+            </button>
+            {renderCompletionStatus(3)}
+          </div>
+        );
+      case 4:
+        return (
+          <div>
+            <WireframeWorksheet
+              data={data?.wireframe}
+              onChange={(wireframe) => onDataChange({ ...data, wireframe })}
+            />
+            <button
+              onClick={() => handleDownloadPDF('wireframe')}
+              disabled={!sectionValidation.wireframe}
+              className={`mt-4 px-4 py-2 rounded ${
+                !sectionValidation.wireframe
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  : downloadedPdfs.wireframe
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-blue-500 hover:bg-blue-600'
+              } text-white`}
+            >
+              {downloadedPdfs.wireframe ? 'PDF Downloaded ✓' : 'Download Wireframe Plan PDF'}
+            </button>
+            {renderCompletionStatus(4)}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
-      {/* Action Buttons */}
-      {activeTab !== 'wireframe' && (
-        <div className="flex justify-between items-center pt-8 border-t border-[#1E293B]">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-6 py-3 bg-[#5865F2] text-white rounded-md hover:bg-[#4752C4] disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save Progress'}
-          </button>
-
-          <button
-            onClick={handleComplete}
-            disabled={
-              saving || 
-              (activeTab === 'worksheet' 
-                ? data.progress.worksheetCompleted || !isWorksheetComplete(data.worksheet)
-                : data.progress.personaCompleted || !isPersonaComplete(data.persona))
-            }
-            className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
-            title={
-              activeTab === 'worksheet' && !isWorksheetComplete(data.worksheet)
-                ? 'Please complete all required fields in the worksheet'
-                : activeTab === 'persona' && !isPersonaComplete(data.persona)
-                ? 'Please complete all required fields in the persona'
-                : ''
-            }
-          >
-            {activeTab === 'worksheet' ? 'Complete Worksheet' : 'Complete Persona'}
-          </button>
+  return (
+    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <div className="mb-8">
+        <div className="border-b border-gray-700">
+          <nav className="-mb-px flex space-x-8 overflow-x-auto">
+            {[
+              { id: 1, name: 'Who You Are & Why' },
+              { id: 2, name: 'Vision & Goals' },
+              { id: 3, name: '30-Day Roadmap' },
+              { id: 4, name: 'Wireframe Template' }
+            ].map((tab) => {
+              const isDisabled = 
+                (tab.id === 2 && !downloadedPdfs.brandIdentity) ||
+                (tab.id === 3 && !isNextSectionAvailable(2)) ||
+                (tab.id === 4 && !isNextSectionAvailable(3));
+              
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => !isDisabled && handleSectionClick(tab.id)}
+                  disabled={isDisabled}
+                  className={`
+                    whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                    ${activeSection === tab.id
+                      ? 'border-blue-500 text-blue-500'
+                      : isDisabled
+                        ? 'border-transparent text-gray-400 cursor-not-allowed'
+                        : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                    }
+                  `}
+                >
+                  {tab.name}
+                </button>
+              );
+            })}
+          </nav>
         </div>
-      )}
+      </div>
+
+      {renderSection(activeSection)}
+
+      {/* Progress indicator */}
+      <div className="mt-8">
+        <div className="h-2 bg-gray-200 rounded">
+          <div
+            className="h-full bg-blue-500 rounded transition-all duration-300"
+            style={{
+              width: `${
+                ((sectionValidation.brandIdentity ? 1 : 0) +
+                 (sectionValidation.vision ? 1 : 0) +
+                 (sectionValidation.executionRoadmap ? 1 : 0) +
+                 (sectionValidation.wireframe ? 1 : 0)) * 25
+              }%`
+            }}
+          />
+        </div>
+        <div className="mt-2 text-sm text-gray-600 text-right">
+          {((sectionValidation.brandIdentity ? 1 : 0) +
+            (sectionValidation.vision ? 1 : 0) +
+            (sectionValidation.executionRoadmap ? 1 : 0) +
+            (sectionValidation.wireframe ? 1 : 0)) * 25}% Complete
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};

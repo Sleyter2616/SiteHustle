@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pillar1Data } from '@/types/pillar1Types';
+import { Pillar1Data } from '@/types/pillar1';
 
 export const useBrandIdentity = (
   initialData: Pillar1Data['brandIdentity'],
