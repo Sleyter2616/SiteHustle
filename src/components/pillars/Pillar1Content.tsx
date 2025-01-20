@@ -7,7 +7,7 @@ import ProgressBar from '../dashboard/ProgressBar'
 import Alert from '../common/Alert'
 import FormField, { ArrayInput } from '../common/FormField'
 import Tooltip from '../common/Tooltip'
-import VisionEcosystem from '../vision/VisionEcosystem'
+import VisionWorksheet from '../vision/VisionWorksheet'
 import { 
   type Pillar1Data,
   validateWorksheet,
@@ -31,7 +31,9 @@ export default function Pillar1Content() {
       businessGoals: {
         shortTerm: '',
         midTerm: '',
-        longTerm: ''
+        longTerm: '',
+        websiteGoals: '',
+        successIndicators: ''
       },
       targetAudience: {
         primaryProfile: '',
@@ -299,11 +301,11 @@ export default function Pillar1Content() {
       ) : (
         <div className="space-y-6">
           {activeTab === 'worksheet' && (
-            <VisionEcosystem
-              data={{ worksheet: data.worksheet }}
+            <VisionWorksheet
+              data={data}
               onChange={(newData) => setData(prev => ({
                 ...prev,
-                worksheet: newData.worksheet
+                ...newData
               }))}
               errors={errors}
             />

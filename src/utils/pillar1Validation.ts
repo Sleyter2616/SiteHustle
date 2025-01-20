@@ -1,33 +1,33 @@
 import { z } from 'zod'
+export type { Pillar1Data } from '@/types/pillar1Types'
+
+export const businessGoalsSchema = z.object({
+  shortTerm: z.string().min(1, 'Short-term goals are required'),
+  midTerm: z.string().min(1, 'Mid-term goals are required'),
+  longTerm: z.string().min(1, 'Long-term goals are required'),
+  websiteGoals: z.string().optional(),
+  successIndicators: z.string().optional()
+})
 
 export const worksheetSchema = z.object({
   businessName: z.string().min(1, 'Business name is required'),
-  tagline: z.string().min(1, 'Tagline is required')
-    .max(100, 'Tagline should be concise (max 100 characters)'),
-  missionStatement: z.string()
-    .min(20, 'Mission statement should clearly explain what you do, for whom, and why')
-    .max(200, 'Mission statement should be concise (max 200 characters)'),
-  coreValues: z.array(z.string())
-    .min(3, 'Define at least 3 core values')
-    .max(7, 'Try to focus on your most important values (max 7)'),
-  businessGoals: z.object({
-    shortTerm: z.string().min(20, 'Describe your 6-12 month goals in detail'),
-    midTerm: z.string().min(20, 'Describe your 1-2 year goals in detail'),
-    longTerm: z.string().min(20, 'Describe your 3-5 year goals in detail')
-  }),
+  tagline: z.string().min(1, 'Tagline is required'),
+  missionStatement: z.string().min(1, 'Mission statement is required'),
+  coreValues: z.array(z.string()).min(1, 'At least one core value is required'),
+  businessGoals: businessGoalsSchema,
   targetAudience: z.object({
     primaryProfile: z.string().min(1, 'Primary profile is required'),
-    secondaryAudiences: z.array(z.string()).optional(),
+    secondaryAudiences: z.array(z.string()),
     painPoints: z.array(z.string()).min(1, 'At least one pain point is required'),
     idealCustomerProfile: z.object({
-      problem: z.string().min(20, 'Describe the main problem your audience faces'),
-      journey: z.string().min(20, 'Describe the transformation they seek'),
-      desires: z.array(z.string()).min(2, 'List at least 2 key desires'),
-      desiredState: z.string().min(20, 'Describe their ideal end state'),
-      gap: z.string().min(20, 'Describe what stands between them and their desired state'),
-      uniqueSellingPoint: z.string().min(20, 'What makes your solution unique?'),
-      benefits: z.array(z.string()).min(2, 'List at least 2 key benefits'),
-      objections: z.array(z.string()).min(2, 'List at least 2 potential objections')
+      problem: z.string().min(1, 'Problem description is required'),
+      journey: z.string().min(1, 'Journey description is required'),
+      desires: z.array(z.string()).min(1, 'At least one desire is required'),
+      desiredState: z.string().min(1, 'Desired state is required'),
+      gap: z.string().min(1, 'Gap description is required'),
+      uniqueSellingPoint: z.string().min(1, 'Unique selling point is required'),
+      benefits: z.array(z.string()).min(1, 'At least one benefit is required'),
+      objections: z.array(z.string()).min(1, 'At least one objection is required')
     })
   }),
   visionStatement: z.string()
@@ -81,17 +81,6 @@ export const personaSchema = z.object({
 export type Worksheet = z.infer<typeof worksheetSchema>
 export type Persona = z.infer<typeof personaSchema>
 
-export interface Pillar1Data {
-  worksheet: Worksheet
-  persona: Persona
-  progress: {
-    worksheetCompleted: boolean
-    personaCompleted: boolean
-    totalTasks: number
-    completedTasks: number
-  }
-}
-
 export const tooltips = {
   worksheet: {
     businessName: 'Your official business name as it will appear on your website and materials',
@@ -126,10 +115,10 @@ export const tooltips = {
       threats: 'What external challenges could impact your success?'
     },
     customerJourney: {
-      awarenessChannels: "How do new prospects first discover you? List your main traffic sources.",
-      considerationElements: "What trust-building elements convince prospects you're the right solution?",
-      decisionProcess: "Describe your ideal purchase or signup process",
-      retentionStrategies: "How do you keep customers engaged and encourage referrals?"
+      awareness: "How do new prospects first discover you? List your main traffic sources.",
+      consideration: "What trust-building elements convince prospects you're the right solution?",
+      decision: "Describe your ideal purchase or signup process",
+      retention: "How do you keep customers engaged and encourage referrals?"
     }
   },
   persona: {

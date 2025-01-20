@@ -41,7 +41,7 @@ export default function FormField({ label, error, required, helper, children, to
 }
 
 interface ArrayInputProps {
-  label: string
+  label?: string
   values?: string[]
   onChange: (values: string[]) => void
   placeholder?: string

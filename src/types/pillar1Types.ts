@@ -5,9 +5,11 @@ export interface Pillar1Data {
     missionStatement?: string;
     coreValues?: string[];
     businessGoals?: {
-      shortTerm?: string;
-      midTerm?: string;
-      longTerm?: string;
+      shortTerm: string;
+      midTerm: string;
+      longTerm: string;
+      websiteGoals?: string;
+      successIndicators?: string;
     };
     targetAudience?: {
       primaryProfile?: string;
@@ -39,6 +41,46 @@ export interface Pillar1Data {
     };
   };
   persona?: {
-    // Add persona fields if needed
+    demographics?: {
+      ageRange?: string;
+      gender?: string;
+      location?: string;
+      income?: string;
+      education?: string;
+    };
+    psychographics?: {
+      values?: string[];
+      objections?: string[];
+      interests?: string[];
+      lifestyle?: string;
+      challenges?: string[];
+      motivators?: string[];
+    };
+    professional?: {
+      occupation?: string;
+      jobTitle?: string;
+      industry?: string;
+      companySize?: string;
+      responsibilities?: string[];
+      challenges?: string[];
+      goals?: string[];
+      painPoints?: string[];
+      roleLevel?: string;
+    };
+    valueProposition?: {
+      benefits?: string[];
+      features?: string[];
+      needs?: string[];
+      solutions?: string[];
+      objections?: string[];
+    };
+  };
+  progress?: {
+    worksheet?: number;
+    persona?: number;
+    worksheetCompleted?: boolean;
+    personaCompleted?: boolean;
+    completedTasks?: number;
+    totalTasks?: number;
   };
 }
