@@ -3,6 +3,7 @@ import { validateBrandIdentity, validateVision, validateExecutionRoadmap, valida
 import BrandIdentityWorksheet from '../brand-identity/BrandIdentityWorksheet';
 import VisionWorksheet from '../vision/VisionWorksheet';
 import WireframeWorksheet from '../wireframe/WireframeWorksheet';
+import ExecutionRoadmapWorksheet from '../execution-roadmap/ExecutionRoadmapWorksheet';
 import { generateBrandIdentityPDF, generateVisionWorksheetPDF, generateExecutionRoadmapPDF, generateWireframePDF } from '@/utils/pdfUtils';
 import { Pillar1Data } from '@/types/pillar1';
 import { toast } from 'react-hot-toast';
@@ -226,6 +227,7 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
               onPdfDownloaded={() => setDownloadedPdfs(prev => ({ ...prev, brandIdentity: true }))}
               onNextSection={() => setActiveSection(2)}
               pdfDownloaded={downloadedPdfs.brandIdentity}
+              currentPage={1}
             />
           </div>
         );
@@ -234,110 +236,25 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
           <div>
             <VisionWorksheet
               data={data?.vision}
-              onChange={(vision) => {
-                if (data) {
-                  onDataChange({ ...data, vision });
-                }
-              }}
+              onChange={(vision) => onDataChange({ ...data, vision })}
+              onPdfDownloaded={() => setDownloadedPdfs(prev => ({ ...prev, vision: true }))}
+              onNextSection={() => setActiveSection(3)}
+              pdfDownloaded={downloadedPdfs.vision}
+              currentPage={2}
             />
-            <button
-              onClick={() => handleDownloadPDF('vision')}
-              disabled={!sectionValidation.vision}
-              className={`mt-4 px-4 py-2 rounded ${
-                !sectionValidation.vision
-                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                  : downloadedPdfs.vision
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-blue-500 hover:bg-blue-600'
-              } text-white`}
-            >
-              {downloadedPdfs.vision ? 'PDF Downloaded ✓' : 'Download Vision Worksheet PDF'}
-            </button>
             {renderCompletionStatus(2)}
           </div>
         );
       case 3:
         return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">30-Day Goal</h3>
-                <textarea
-                  value={data?.executionRoadmap?.thirtyDayGoal || ''}
-                  onChange={(e) => onDataChange({
-                    ...data,
-                    executionRoadmap: {
-                      ...data?.executionRoadmap,
-                      thirtyDayGoal: e.target.value
-                    }
-                  })}
-                  className="w-full h-32 p-2 border rounded"
-                  placeholder="What do you want to achieve in the next 30 days?"
-                />
-              </div>
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Weekly Milestones</h3>
-                <textarea
-                  value={data?.executionRoadmap?.weeklyMilestones?.join('\n') || ''}
-                  onChange={(e) => onDataChange({
-                    ...data,
-                    executionRoadmap: {
-                      ...data?.executionRoadmap,
-                      weeklyMilestones: e.target.value.split('\n').filter(Boolean)
-                    }
-                  })}
-                  className="w-full h-32 p-2 border rounded"
-                  placeholder="List your weekly milestones (one per line)"
-                />
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Content Plan</h3>
-                <textarea
-                  value={data?.executionRoadmap?.contentPlan || ''}
-                  onChange={(e) => onDataChange({
-                    ...data,
-                    executionRoadmap: {
-                      ...data?.executionRoadmap,
-                      contentPlan: e.target.value
-                    }
-                  })}
-                  className="w-full h-32 p-2 border rounded"
-                  placeholder="Outline your content strategy"
-                />
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Immediate Actions</h3>
-                <textarea
-                  value={data?.executionRoadmap?.immediateActions?.join('\n') || ''}
-                  onChange={(e) => onDataChange({
-                    ...data,
-                    executionRoadmap: {
-                      ...data?.executionRoadmap,
-                      immediateActions: e.target.value.split('\n').filter(Boolean)
-                    }
-                  })}
-                  className="w-full h-32 p-2 border rounded"
-                  placeholder="List your immediate actions (one per line)"
-                />
-              </div>
-            </div>
-            <button
-              onClick={() => handleDownloadPDF('executionRoadmap')}
-              disabled={!sectionValidation.executionRoadmap}
-              className={`mt-4 px-4 py-2 rounded ${
-                !sectionValidation.executionRoadmap
-                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                  : downloadedPdfs.executionRoadmap
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-blue-500 hover:bg-blue-600'
-              } text-white`}
-            >
-              {downloadedPdfs.executionRoadmap ? 'PDF Downloaded ✓' : 'Download Execution Roadmap PDF'}
-            </button>
-            {renderCompletionStatus(3)}
+          <div>
+            <ExecutionRoadmapWorksheet
+              data={data?.executionRoadmap}
+              onChange={(executionRoadmap) => onDataChange({ ...data, executionRoadmap })}
+              onPdfDownloaded={() => setDownloadedPdfs(prev => ({ ...prev, executionRoadmap: true }))}
+              onNextSection={() => setActiveSection(4)}
+              pdfDownloaded={downloadedPdfs.executionRoadmap}
+            />
           </div>
         );
       case 4:

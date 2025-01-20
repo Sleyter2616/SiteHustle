@@ -1,83 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Pillar1Data } from '@/types/pillar1';
 import ReflectionPage from './pages/ReflectionPage';
 import PersonalityPage from './pages/PersonalityPage';
 import StoryPage from './pages/StoryPage';
 import DifferentiationPage from './pages/DifferentiationPage';
-import { FiArrowLeft, FiArrowRight, FiDownload } from 'react-icons/fi';
 import { generateBrandIdentityPDF } from '@/utils/pdfUtils';
-import { toast } from 'react-hot-toast';
+import { withWorksheetLogic, WithWorksheetLogicProps } from '../common/withWorksheetLogic';
 
-interface BrandIdentityWorksheetProps {
+interface BrandIdentityWorksheetProps extends WithWorksheetLogicProps {
   data: Pillar1Data['brandIdentity'];
   onChange: (data: Pillar1Data['brandIdentity']) => void;
-  onPdfDownloaded?: () => void;
-  onNextSection?: () => void;
-  pdfDownloaded?: boolean;
+  currentPage: number;
 }
 
-export default function BrandIdentityWorksheet({ 
+function BrandIdentityWorksheet({ 
   data, 
   onChange,
-  onPdfDownloaded,
-  onNextSection,
-  pdfDownloaded = false
+  currentPage,
+  errors
 }: BrandIdentityWorksheetProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const totalPages = 4;
-
-  const isDataComplete = () => {
-    if (!data) return false;
-    
-    const { reflection, personality, story, differentiation } = data;
-    
-    const isReflectionComplete = reflection?.whoIAm && reflection.whoIAmNot && reflection.whyBuildBrand;
-    const isPersonalityComplete = personality?.communicationStyle && personality.toneAndVoice && 
-                                personality.passionateExpression && personality.brandPersonality;
-    const isStoryComplete = story?.pivotalExperience && story.definingMoment && story.audienceRelevance;
-    const isDifferentiationComplete = differentiation?.uniqueApproach && differentiation.uniqueResources && 
-                                    differentiation.competitivePerception;
-
-    return isReflectionComplete && isPersonalityComplete && isStoryComplete && isDifferentiationComplete;
-  };
-
-  const handleNext = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    } else if (onNextSection && pdfDownloaded) {
-      onNextSection();
-    }
-  };
-
-  const handleBack = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleDownloadPDF = async () => {
-    if (!isDataComplete()) {
-      toast.error('Please complete all sections before downloading the PDF');
-      return;
-    }
-
-    try {
-      setIsGeneratingPDF(true);
-      const doc = generateBrandIdentityPDF(data);
-      doc.save('brand-identity-worksheet.pdf');
-      toast.success('Brand Identity PDF downloaded successfully!');
-      if (onPdfDownloaded) {
-        onPdfDownloaded();
-      }
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast.error('Failed to generate PDF. Please try again.');
-    } finally {
-      setIsGeneratingPDF(false);
-    }
-  };
-
   const renderPage = () => {
     const defaultBrandIdentity = data || {
       reflection: { whoIAm: '', whoIAmNot: '', whyBuildBrand: '' },
@@ -132,45 +73,30 @@ export default function BrandIdentityWorksheet({
     }
   };
 
-  return (
-    <div className="space-y-8">
-      {renderPage()}
-      <div className="flex justify-between items-center">
-        <button
-          onClick={handleBack}
-          className={`flex items-center space-x-2 px-4 py-2 rounded ${
-            currentPage === 1
-              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-gray-700 text-white hover:bg-gray-600'
-          }`}
-          disabled={currentPage === 1}
-        >
-          <FiArrowLeft />
-          <span>Back</span>
-        </button>
-        <div className="flex space-x-4">
-          <button
-            onClick={handleDownloadPDF}
-            className="flex items-center space-x-2 px-4 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white"
-            disabled={isGeneratingPDF || !isDataComplete()}
-          >
-            <FiDownload />
-            <span>{isGeneratingPDF ? 'Generating PDF...' : !isDataComplete() ? 'Complete All Sections First' : 'Download PDF'}</span>
-          </button>
-          <button
-            onClick={handleNext}
-            className={`flex items-center space-x-2 px-4 py-2 rounded ${
-              currentPage === totalPages && !pdfDownloaded
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-500'
-            }`}
-            disabled={currentPage === totalPages && !pdfDownloaded}
-          >
-            <span>{currentPage === totalPages ? 'Next Section' : 'Next'}</span>
-            <FiArrowRight />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return <>{renderPage()}</>;
 }
+
+const isDataComplete = (data: Pillar1Data['brandIdentity']) => {
+  if (!data) return false;
+  
+  const { reflection, personality, story, differentiation } = data;
+  
+  const isReflectionComplete = reflection?.whoIAm && reflection.whoIAmNot && reflection.whyBuildBrand;
+  const isPersonalityComplete = personality?.communicationStyle && personality.toneAndVoice && 
+                              personality.passionateExpression && personality.brandPersonality;
+  const isStoryComplete = story?.pivotalExperience && story.definingMoment && story.audienceRelevance;
+  const isDifferentiationComplete = differentiation?.uniqueApproach && differentiation.uniqueResources && 
+                                  differentiation.competitivePerception;
+
+  return Boolean(isReflectionComplete && isPersonalityComplete && isStoryComplete && isDifferentiationComplete);
+};
+
+const config = {
+  generatePdf: generateBrandIdentityPDF,
+  isDataComplete,
+  pdfFileName: 'brand-identity-worksheet.pdf',
+  title: 'Brand Identity',
+  description: 'Build a strong foundation for your brand by defining who you are and how you communicate.'
+};
+
+export default withWorksheetLogic(BrandIdentityWorksheet, config);
