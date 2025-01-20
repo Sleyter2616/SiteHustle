@@ -49,13 +49,18 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
           required
           error={errors?.['worksheet.businessName']?.[0]}
         >
-          <input
-            type="text"
-            value={data.worksheet?.businessName || ''}
-            onChange={(e) => updateField('businessName', e.target.value)}
-            className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
-            placeholder="Enter your business name"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              value={data.worksheet?.businessName || ''}
+              onChange={(e) => updateField('businessName', e.target.value)}
+              className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
+              placeholder="Enter your business name"
+            />
+            <div className="absolute right-2 top-2">
+              <Tooltip content="Choose a memorable name that captures your brand essence. Consider something unique, easy to pronounce, and available as a domain name." />
+            </div>
+          </div>
         </FormField>
 
         <FormField
@@ -64,13 +69,18 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
           error={errors?.['worksheet.tagline']?.[0]}
           helper="A short, memorable phrase that captures your value proposition"
         >
-          <input
-            type="text"
-            value={data.worksheet?.tagline || ''}
-            onChange={(e) => updateField('tagline', e.target.value)}
-            className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
-            placeholder="Enter your tagline"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              value={data.worksheet?.tagline || ''}
+              onChange={(e) => updateField('tagline', e.target.value)}
+              className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
+              placeholder="Enter your tagline"
+            />
+            <div className="absolute right-2 top-2">
+              <Tooltip content="A great tagline is short, memorable, and communicates your unique value. Focus on the benefit you provide to customers." />
+            </div>
+          </div>
         </FormField>
 
         <div className="bg-[#2D3748] p-6 rounded-lg mb-6">
@@ -100,7 +110,7 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
               placeholder="We exist to... for... so they can..."
             />
             <div className="absolute right-2 top-2">
-              <Tooltip content={tooltips.worksheet.missionStatement} />
+              <Tooltip content="Your mission statement should answer: What do you do? Who do you serve? How do you serve them? Why does it matter? Keep it clear, concise, and inspiring." />
             </div>
           </div>
         </FormField>
@@ -119,6 +129,9 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
               required
               placeholder="Add a core value..."
             />
+            <div className="absolute right-2 top-2">
+              <Tooltip content="Core values are the fundamental beliefs that guide your business decisions. Choose 3-5 values that truly represent what your business stands for and how you operate." />
+            </div>
             <div className="mt-4 bg-[#1A202C] p-4 rounded-md">
               <p className="text-sm text-gray-400">Example core values:</p>
               <ul className="list-disc list-inside text-gray-300">

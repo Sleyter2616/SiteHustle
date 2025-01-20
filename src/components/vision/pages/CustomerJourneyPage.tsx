@@ -41,24 +41,25 @@ export default function CustomerJourneyPage({ data, onChange, errors }: Customer
           <p className="text-gray-300 mb-6">
             How will potential customers first discover your business?
           </p>
-          
+          <div className="relative">
           <FormField
             label="List your awareness channels and strategies"
             required
             error={errors?.['worksheet.customerJourney.awareness']?.[0]}
             helper="Include both online and offline channels"
           >
-            <div className="relative">
+  
               <ArrayInput
                 values={data.worksheet?.customerJourney?.awareness || []}
                 onChange={(values) => updateCustomerJourney('awareness', values)}
                 placeholder="Add an awareness channel..."
               />
-              <div className="absolute right-2 top-2">
-                <Tooltip content={tooltips.worksheet.customerJourney?.awareness} />
+        
+          </FormField>
+          <div className="absolute right-2 top-2">
+                <Tooltip content="Consider all ways customers might find you: Social media, SEO, Content marketing, Paid ads, Word of mouth, Events, Partnerships, PR, Industry directories." />
               </div>
             </div>
-          </FormField>
         </div>
 
         {/* B. Consideration */}
@@ -67,24 +68,25 @@ export default function CustomerJourneyPage({ data, onChange, errors }: Customer
           <p className="text-gray-300 mb-6">
             What will help build trust and credibility with potential customers?
           </p>
-          
+          <div className="relative">
           <FormField
             label="List your trust-building elements"
             required
             error={errors?.['worksheet.customerJourney.consideration']?.[0]}
             helper="What convinces customers to choose you?"
           >
-            <div className="relative">
+
               <ArrayInput
                 values={data.worksheet?.customerJourney?.consideration || []}
                 onChange={(values) => updateCustomerJourney('consideration', values)}
                 placeholder="Add a trust-building element..."
               />
-              <div className="absolute right-2 top-2">
-                <Tooltip content={tooltips.worksheet.customerJourney?.consideration} />
+
+          </FormField>
+          <div className="absolute right-2 top-2">
+                <Tooltip content="What convinces customers to choose you? Examples: Case studies, Reviews, Testimonials, Portfolio, Free trials, Demos, Guarantees, Industry certifications, Expert content." />
               </div>
             </div>
-          </FormField>
         </div>
 
         {/* C. Decision */}
@@ -108,7 +110,7 @@ export default function CustomerJourneyPage({ data, onChange, errors }: Customer
                 placeholder="Describe your purchase process..."
               />
               <div className="absolute right-2 top-2">
-                <Tooltip content={tooltips.worksheet.customerJourney?.decision} />
+                <Tooltip content="Make it easy to say yes! Detail your entire process: Initial contact, Consultation, Proposal/Quote, Payment options, Onboarding. Focus on removing friction points." />
               </div>
             </div>
           </FormField>
@@ -120,24 +122,25 @@ export default function CustomerJourneyPage({ data, onChange, errors }: Customer
           <p className="text-gray-300 mb-6">
             How will you keep customers engaged and turn them into advocates?
           </p>
-          
+          <div className="relative">
           <FormField
             label="List your retention strategies"
             required
             error={errors?.['worksheet.customerJourney.retention']?.[0]}
             helper="How will you maintain relationships?"
           >
-            <div className="relative">
+
               <ArrayInput
                 values={data.worksheet?.customerJourney?.retention || []}
                 onChange={(values) => updateCustomerJourney('retention', values)}
                 placeholder="Add a retention strategy..."
               />
-              <div className="absolute right-2 top-2">
-                <Tooltip content={tooltips.worksheet.customerJourney?.retention} />
+
+          </FormField>
+          <div className="absolute right-2 top-2">
+                <Tooltip content="Think long-term relationships: Follow-up systems, Support channels, Loyalty programs, Regular check-ins, Exclusive content, Community building, Referral incentives." />
               </div>
             </div>
-          </FormField>
         </div>
       </div>
     </div>

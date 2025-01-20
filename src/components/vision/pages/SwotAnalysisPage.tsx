@@ -42,23 +42,24 @@ export default function SwotAnalysisPage({ data, onChange, errors }: SwotAnalysi
           <p className="text-gray-300 mb-4">
             What internal advantages does your business have?
           </p>
-          
+          <div className="relative">
           <FormField
             label="List your business strengths"
             required
             error={errors?.['worksheet.swot.strengths']?.[0]}
           >
-            <div className="relative">
+
               <ArrayInput
                 values={data.worksheet?.swot?.strengths || []}
                 onChange={(values) => updateSwot('strengths', values)}
                 placeholder="Add a strength..."
               />
-              <div className="absolute right-2 top-2">
-                <Tooltip content={tooltips.worksheet.swot?.strengths} />
+
+          </FormField>
+          <div className="absolute right-2 top-2">
+                <Tooltip content="Consider: Unique skills, Industry experience, Strong network, Proprietary technology, Brand reputation, Customer relationships, Location advantages." />
               </div>
             </div>
-          </FormField>
         </div>
 
         {/* Weaknesses */}
@@ -67,23 +68,24 @@ export default function SwotAnalysisPage({ data, onChange, errors }: SwotAnalysi
           <p className="text-gray-300 mb-4">
             What internal limitations could hold your business back?
           </p>
-          
+          <div className="relative">   
           <FormField
             label="List your business weaknesses"
             required
             error={errors?.['worksheet.swot.weaknesses']?.[0]}
           >
-            <div className="relative">
+
               <ArrayInput
                 values={data.worksheet?.swot?.weaknesses || []}
                 onChange={(values) => updateSwot('weaknesses', values)}
                 placeholder="Add a weakness..."
               />
-              <div className="absolute right-2 top-2">
-                <Tooltip content={tooltips.worksheet.swot?.weaknesses} />
+        
+          </FormField>
+          <div className="absolute right-2 top-2">
+                <Tooltip content="Be honest about: Limited resources, Skill gaps, Market knowledge gaps, Financial constraints, Technology limitations, Process inefficiencies." />
               </div>
             </div>
-          </FormField>
         </div>
 
         {/* Opportunities */}
@@ -92,23 +94,24 @@ export default function SwotAnalysisPage({ data, onChange, errors }: SwotAnalysi
           <p className="text-gray-300 mb-4">
             What external factors could benefit your business?
           </p>
-          
+          <div className="relative">
           <FormField
             label="List your business opportunities"
             required
             error={errors?.['worksheet.swot.opportunities']?.[0]}
           >
-            <div className="relative">
+
               <ArrayInput
                 values={data.worksheet?.swot?.opportunities || []}
                 onChange={(values) => updateSwot('opportunities', values)}
                 placeholder="Add an opportunity..."
               />
-              <div className="absolute right-2 top-2">
-                <Tooltip content={tooltips.worksheet.swot?.opportunities} />
+
+          </FormField>
+          <div className="absolute right-2 top-2">
+                <Tooltip content="Look for: Market trends, Technology changes, Economic shifts, Industry gaps, Partnership possibilities, New customer segments, Regulatory changes." />
               </div>
             </div>
-          </FormField>
         </div>
 
         {/* Threats */}
@@ -117,23 +120,24 @@ export default function SwotAnalysisPage({ data, onChange, errors }: SwotAnalysi
           <p className="text-gray-300 mb-4">
             What external factors could harm your business?
           </p>
-          
+          <div className="relative"> 
           <FormField
             label="List your business threats"
             required
             error={errors?.['worksheet.swot.threats']?.[0]}
           >
-            <div className="relative">
+
               <ArrayInput
                 values={data.worksheet?.swot?.threats || []}
                 onChange={(values) => updateSwot('threats', values)}
                 placeholder="Add a threat..."
               />
-              <div className="absolute right-2 top-2">
-                <Tooltip content={tooltips.worksheet.swot?.threats} />
+
+          </FormField>
+          <div className="absolute right-2 top-2">
+                <Tooltip content="Consider: Competitor actions, Market changes, Economic conditions, Technology disruption, Changing regulations, Resource costs, Customer behavior shifts." />
               </div>
             </div>
-          </FormField>
         </div>
       </div>
 

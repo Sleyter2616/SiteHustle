@@ -7,6 +7,7 @@ import CustomerJourneyPage from './pages/CustomerJourneyPage';
 import SwotAnalysisPage from './pages/SwotAnalysisPage';
 import { FiArrowLeft, FiArrowRight, FiDownload } from 'react-icons/fi';
 import { generateVisionWorksheetPDF } from '@/utils/pdfUtils';
+import { toast } from 'react-hot-toast';
 
 interface VisionWorksheetProps {
   data: Pillar1Data;
@@ -18,6 +19,7 @@ const TOTAL_PAGES = 5;
 
 export default function VisionWorksheet({ data, onChange, errors }: VisionWorksheetProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const handleNext = () => {
     if (currentPage < TOTAL_PAGES) {
@@ -32,7 +34,16 @@ export default function VisionWorksheet({ data, onChange, errors }: VisionWorksh
   };
 
   const handleDownload = async () => {
-    await generateVisionWorksheetPDF(data);
+    try {
+      setIsGeneratingPDF(true);
+      await generateVisionWorksheetPDF(data);
+      toast.success('PDF downloaded successfully!');
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      toast.error('Failed to generate PDF. Please try again.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   const renderProgressBar = () => {
@@ -49,45 +60,15 @@ export default function VisionWorksheet({ data, onChange, errors }: VisionWorksh
   const renderCurrentPage = () => {
     switch (currentPage) {
       case 1:
-        return (
-          <VisionClarityPage
-            data={data}
-            onChange={onChange}
-            errors={errors}
-          />
-        );
+        return <VisionClarityPage data={data} onChange={onChange} errors={errors} />;
       case 2:
-        return (
-          <TargetAudiencePage
-            data={data}
-            onChange={onChange}
-            errors={errors}
-          />
-        );
+        return <TargetAudiencePage data={data} onChange={onChange} errors={errors} />;
       case 3:
-        return (
-          <GoalsPage
-            data={data}
-            onChange={onChange}
-            errors={errors}
-          />
-        );
+        return <GoalsPage data={data} onChange={onChange} errors={errors} />;
       case 4:
-        return (
-          <CustomerJourneyPage
-            data={data}
-            onChange={onChange}
-            errors={errors}
-          />
-        );
+        return <CustomerJourneyPage data={data} onChange={onChange} errors={errors} />;
       case 5:
-        return (
-          <SwotAnalysisPage
-            data={data}
-            onChange={onChange}
-            errors={errors}
-          />
-        );
+        return <SwotAnalysisPage data={data} onChange={onChange} errors={errors} />;
       default:
         return null;
     }
@@ -116,10 +97,15 @@ export default function VisionWorksheet({ data, onChange, errors }: VisionWorksh
           {currentPage === TOTAL_PAGES ? (
             <button
               onClick={handleDownload}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-md hover:bg-blue-500 transition-colors"
+              disabled={isGeneratingPDF}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md ${
+                isGeneratingPDF
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-500 transition-colors'
+              }`}
             >
               <FiDownload />
-              Download Worksheet
+              {isGeneratingPDF ? 'Generating...' : 'Download Worksheet'}
             </button>
           ) : (
             <button

@@ -58,7 +58,7 @@ export default function GoalsPage({ data, onChange, errors }: GoalsPageProps) {
               placeholder="List your short-term goals..."
             />
             <div className="absolute right-2 top-2">
-              <Tooltip content={tooltips.worksheet.businessGoals?.shortTerm} />
+              <Tooltip content="Focus on specific, measurable goals you can achieve in the next 6-12 months. Examples: Launch website, Get first 10 customers, Reach 100 email subscribers." />
             </div>
           </div>
         </FormField>
@@ -77,7 +77,7 @@ export default function GoalsPage({ data, onChange, errors }: GoalsPageProps) {
               placeholder="List your mid-term goals..."
             />
             <div className="absolute right-2 top-2">
-              <Tooltip content={tooltips.worksheet.businessGoals?.midTerm} />
+              <Tooltip content="Set ambitious but realistic goals for the next 1-2 years. Examples: Reach $5K monthly revenue, Expand to new market, Launch new product line." />
             </div>
           </div>
         </FormField>
@@ -96,7 +96,7 @@ export default function GoalsPage({ data, onChange, errors }: GoalsPageProps) {
               placeholder="Describe your long-term vision..."
             />
             <div className="absolute right-2 top-2">
-              <Tooltip content={tooltips.worksheet.businessGoals?.longTerm} />
+              <Tooltip content="Think big! What's your ultimate vision for the business? Examples: Become industry leader, Expand nationally, Hit $1M annual revenue." />
             </div>
           </div>
         </FormField>
@@ -110,12 +110,17 @@ export default function GoalsPage({ data, onChange, errors }: GoalsPageProps) {
             error={errors?.['worksheet.businessGoals.websiteGoals']?.[0]}
             helper="Define specific objectives for your online presence"
           >
-            <textarea
-              value={data.worksheet?.businessGoals?.websiteGoals || ''}
-              onChange={(e) => updateBusinessGoals('websiteGoals', e.target.value)}
-              className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
-              placeholder="List your website goals..."
-            />
+            <div className="relative">
+              <textarea
+                value={data.worksheet?.businessGoals?.websiteGoals || ''}
+                onChange={(e) => updateBusinessGoals('websiteGoals', e.target.value)}
+                className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
+                placeholder="List your website goals..."
+              />
+              <div className="absolute right-2 top-2">
+                <Tooltip content="What should your website accomplish? Examples: Generate leads, Showcase portfolio, Sell products, Build email list, Provide information." />
+              </div>
+            </div>
           </FormField>
 
           <FormField
@@ -124,12 +129,17 @@ export default function GoalsPage({ data, onChange, errors }: GoalsPageProps) {
             error={errors?.['worksheet.businessGoals.successIndicators']?.[0]}
             helper="How will you measure success?"
           >
-            <textarea
-              value={data.worksheet?.businessGoals?.successIndicators || ''}
-              onChange={(e) => updateBusinessGoals('successIndicators', e.target.value)}
-              className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
-              placeholder="List your success metrics..."
-            />
+            <div className="relative">
+              <textarea
+                value={data.worksheet?.businessGoals?.successIndicators || ''}
+                onChange={(e) => updateBusinessGoals('successIndicators', e.target.value)}
+                className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
+                placeholder="List your success metrics..."
+              />
+              <div className="absolute right-2 top-2">
+                <Tooltip content="List specific metrics you'll track. Examples: Monthly revenue, Number of clients, Website conversion rate, Customer satisfaction score, Email subscribers." />
+              </div>
+            </div>
           </FormField>
         </div>
       </div>
