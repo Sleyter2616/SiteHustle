@@ -13,6 +13,45 @@ interface Pillar1ContentProps {
   onDataChange: (data: Pillar1Data) => void;
 }
 
+interface SectionConfig {
+  key: string;
+  validateFn: (data: any) => { success: boolean };
+  pdfFn: (data: any) => any;
+  pdfFilename: string;
+  title: string;
+}
+
+const sectionConfig: Record<number, SectionConfig> = {
+  1: {
+    key: 'brandIdentity',
+    validateFn: validateBrandIdentity,
+    pdfFn: generateBrandIdentityPDF,
+    pdfFilename: 'brand-identity-worksheet.pdf',
+    title: 'Who You Are & Why'
+  },
+  2: {
+    key: 'vision',
+    validateFn: validateVision,
+    pdfFn: generateVisionWorksheetPDF,
+    pdfFilename: 'vision-worksheet.pdf',
+    title: 'Vision & Goals'
+  },
+  3: {
+    key: 'executionRoadmap',
+    validateFn: validateExecutionRoadmap,
+    pdfFn: generateExecutionRoadmapPDF,
+    pdfFilename: 'execution-roadmap.pdf',
+    title: '30-Day Roadmap'
+  },
+  4: {
+    key: 'wireframe',
+    validateFn: validateWireframe,
+    pdfFn: generateWireframePDF,
+    pdfFilename: 'wireframe-plan.pdf',
+    title: 'Wireframe Template'
+  }
+};
+
 export default function Pillar1Content({ data, onDataChange }: Pillar1ContentProps) {
   const [activeSection, setActiveSection] = useState(1);
   const [sectionValidation, setSectionValidation] = useState({
@@ -31,146 +70,67 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
 
   useEffect(() => {
     // Reset PDF download status when section data changes
-    setDownloadedPdfs(prev => ({
-      ...prev,
+    setDownloadedPdfs({
       brandIdentity: false,
       vision: false,
       executionRoadmap: false,
       wireframe: false
-    }));
+    });
   }, [data]);
 
   useEffect(() => {
     // Validate each section whenever data changes
-    const brandIdentityValidation = validateBrandIdentity(data?.brandIdentity);
-    const visionValidation = validateVision(data?.vision);
-    const executionRoadmapValidation = validateExecutionRoadmap(data?.executionRoadmap);
-    const wireframeValidation = validateWireframe(data?.wireframe);
-
     setSectionValidation({
-      brandIdentity: brandIdentityValidation.success,
-      vision: visionValidation.success,
-      executionRoadmap: executionRoadmapValidation.success,
-      wireframe: wireframeValidation.success
+      brandIdentity: validateBrandIdentity(data?.brandIdentity).success,
+      vision: validateVision(data?.vision).success,
+      executionRoadmap: validateExecutionRoadmap(data?.executionRoadmap).success,
+      wireframe: validateWireframe(data?.wireframe).success
     });
   }, [data]);
 
-  const handleDownloadPDF = async (section: string) => {
+  const handleDownloadPDF = (sectionNumber: number) => {
     if (!data) return;
-
-    let doc;
-    switch (section) {
-      case 'brandIdentity':
-        if (validateBrandIdentity(data.brandIdentity).success) {
-          doc = generateBrandIdentityPDF(data.brandIdentity);
-          doc.save('brand-identity-worksheet.pdf');
-          setDownloadedPdfs(prev => ({ ...prev, brandIdentity: true }));
-        }
-        break;
-      case 'vision':
-        if (validateVision(data.vision).success) {
-          doc = generateVisionWorksheetPDF(data.vision);
-          doc.save('vision-worksheet.pdf');
-          setDownloadedPdfs(prev => ({ ...prev, vision: true }));
-        }
-        break;
-      case 'executionRoadmap':
-        if (validateExecutionRoadmap(data.executionRoadmap).success) {
-          doc = generateExecutionRoadmapPDF(data.executionRoadmap);
-          doc.save('execution-roadmap.pdf');
-          setDownloadedPdfs(prev => ({ ...prev, executionRoadmap: true }));
-        }
-        break;
-      case 'wireframe':
-        if (validateWireframe(data.wireframe).success) {
-          doc = generateWireframePDF(data.wireframe);
-          doc.save('wireframe-plan.pdf');
-          setDownloadedPdfs(prev => ({ ...prev, wireframe: true }));
-        }
-        break;
+    const { key, validateFn, pdfFn, pdfFilename } = sectionConfig[sectionNumber];
+  
+    const result = validateFn(data[key]);
+    if (result.success) {
+      const doc = pdfFn(data[key]);
+      doc.save(pdfFilename);
+      setDownloadedPdfs(prev => ({ ...prev, [key]: true }));
     }
   };
+  
 
   const handleNext = () => {
-    if (activeSection === 1 && !downloadedPdfs.brandIdentity) {
-      toast.error('Please complete and download the Brand Identity PDF first');
-      return;
-    }
-    if (activeSection === 2 && !downloadedPdfs.vision) {
-      toast.error('Please complete and download the Vision Worksheet PDF first');
-      return;
-    }
-    if (activeSection === 3 && !downloadedPdfs.executionRoadmap) {
-      toast.error('Please complete and download the Execution Roadmap PDF first');
+    const currentConfig = sectionConfig[activeSection];
+    if (!downloadedPdfs[currentConfig.key]) {
+      toast.error(`Please complete and download the ${currentConfig.title} PDF first`);
       return;
     }
     setActiveSection(prev => Math.min(prev + 1, 4));
   };
 
   const handleSectionClick = (section: number) => {
-    if (section === 2 && !downloadedPdfs.brandIdentity) {
-      toast.error('Please complete and download the Brand Identity PDF first');
-      return;
-    }
-    if (section === 3 && !downloadedPdfs.vision) {
-      toast.error('Please complete and download the Vision Worksheet PDF first');
-      return;
-    }
-    if (section === 4 && !downloadedPdfs.executionRoadmap) {
-      toast.error('Please complete and download the Execution Roadmap PDF first');
-      return;
+    // Check if all previous sections are completed
+    for (let i = 1; i < section; i++) {
+      const prevConfig = sectionConfig[i];
+      if (!downloadedPdfs[prevConfig.key]) {
+        toast.error(`Please complete and download the ${prevConfig.title} PDF first`);
+        return;
+      }
     }
     setActiveSection(section);
   };
 
   const isNextSectionAvailable = (currentSection: number) => {
-    switch (currentSection) {
-      case 1:
-        return sectionValidation.brandIdentity && downloadedPdfs.brandIdentity;
-      case 2:
-        return sectionValidation.vision && downloadedPdfs.vision;
-      case 3:
-        return sectionValidation.executionRoadmap && downloadedPdfs.executionRoadmap;
-      case 4:
-        return sectionValidation.wireframe && downloadedPdfs.wireframe;
-      default:
-        return false;
-    }
+    const config = sectionConfig[currentSection];
+    return sectionValidation[config.key] && downloadedPdfs[config.key];
   };
 
   const renderCompletionStatus = (section: number) => {
-    const getValidationStatus = () => {
-      switch (section) {
-        case 1:
-          return sectionValidation.brandIdentity;
-        case 2:
-          return sectionValidation.vision;
-        case 3:
-          return sectionValidation.executionRoadmap;
-        case 4:
-          return sectionValidation.wireframe;
-        default:
-          return false;
-      }
-    };
-
-    const getPdfStatus = () => {
-      switch (section) {
-        case 1:
-          return downloadedPdfs.brandIdentity;
-        case 2:
-          return downloadedPdfs.vision;
-        case 3:
-          return downloadedPdfs.executionRoadmap;
-        case 4:
-          return downloadedPdfs.wireframe;
-        default:
-          return false;
-      }
-    };
-
-    const isValid = getValidationStatus();
-    const hasPdf = getPdfStatus();
+    const config = sectionConfig[section];
+    const isValid = sectionValidation[config.key];
+    const hasPdf = downloadedPdfs[config.key];
 
     return (
       <div className="mt-6 p-4 bg-gray-800 rounded-lg">
@@ -204,6 +164,7 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
   };
 
   const renderSection = (sectionNumber: number) => {
+    const config = sectionConfig[sectionNumber];
     const canAccess = sectionNumber === 1 || 
       (sectionNumber === 2 && isNextSectionAvailable(1)) ||
       (sectionNumber === 3 && isNextSectionAvailable(2)) ||
@@ -265,7 +226,7 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
               onChange={(wireframe) => onDataChange({ ...data, wireframe })}
             />
             <button
-              onClick={() => handleDownloadPDF('wireframe')}
+              onClick={() => handleDownloadPDF(4)}
               disabled={!sectionValidation.wireframe}
               className={`mt-4 px-4 py-2 rounded ${
                 !sectionValidation.wireframe
@@ -290,25 +251,18 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
       <div className="mb-8">
         <div className="border-b border-gray-700">
           <nav className="-mb-px flex space-x-8 overflow-x-auto">
-            {[
-              { id: 1, name: 'Who You Are & Why' },
-              { id: 2, name: 'Vision & Goals' },
-              { id: 3, name: '30-Day Roadmap' },
-              { id: 4, name: 'Wireframe Template' }
-            ].map((tab) => {
-              const isDisabled = 
-                (tab.id === 2 && !downloadedPdfs.brandIdentity) ||
-                (tab.id === 3 && !isNextSectionAvailable(2)) ||
-                (tab.id === 4 && !isNextSectionAvailable(3));
+            {Object.entries(sectionConfig).map(([id, config]) => {
+              const sectionId = parseInt(id);
+              const isDisabled = sectionId > 1 && !isNextSectionAvailable(sectionId - 1);
               
               return (
                 <button
-                  key={tab.id}
-                  onClick={() => !isDisabled && handleSectionClick(tab.id)}
+                  key={sectionId}
+                  onClick={() => !isDisabled && handleSectionClick(sectionId)}
                   disabled={isDisabled}
                   className={`
                     whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
-                    ${activeSection === tab.id
+                    ${activeSection === sectionId
                       ? 'border-blue-500 text-blue-500'
                       : isDisabled
                         ? 'border-transparent text-gray-400 cursor-not-allowed'
@@ -316,7 +270,7 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
                     }
                   `}
                 >
-                  {tab.name}
+                  {config.title}
                 </button>
               );
             })}
@@ -332,20 +286,12 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
           <div
             className="h-full bg-blue-500 rounded transition-all duration-300"
             style={{
-              width: `${
-                ((sectionValidation.brandIdentity ? 1 : 0) +
-                 (sectionValidation.vision ? 1 : 0) +
-                 (sectionValidation.executionRoadmap ? 1 : 0) +
-                 (sectionValidation.wireframe ? 1 : 0)) * 25
-              }%`
+              width: `${Object.values(sectionValidation).filter(Boolean).length * 25}%`
             }}
           />
         </div>
         <div className="mt-2 text-sm text-gray-600 text-right">
-          {((sectionValidation.brandIdentity ? 1 : 0) +
-            (sectionValidation.vision ? 1 : 0) +
-            (sectionValidation.executionRoadmap ? 1 : 0) +
-            (sectionValidation.wireframe ? 1 : 0)) * 25}% Complete
+          {Object.values(sectionValidation).filter(Boolean).length * 25}% Complete
         </div>
       </div>
     </div>
