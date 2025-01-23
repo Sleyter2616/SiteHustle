@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Database } from '../../lib/supabase'
@@ -9,7 +9,7 @@ import Pillar2Content from './Pillar2Content'
 import Pillar3Content from './Pillar3Content'
 import Pillar4Content from './Pillar4Content'
 import Pillar5Content from './Pillar5Content'
-import Pillar6Content  from './Pillar6Content'
+import Pillar6Content from './Pillar6Content'
 
 type Pillar = Database['public']['Tables']['pillars']['Row']
 type Progress = Database['public']['Tables']['user_progress']['Row']
@@ -22,14 +22,11 @@ interface PillarContentProps {
 
 export default function PillarContent({ pillar, progress, userId }: PillarContentProps) {
   const [isUpdating, setIsUpdating] = useState(false)
+  const [pillarData, setPillarData] = useState<any>(null) // or more specific if you want
   const router = useRouter()
   const supabase = createClientComponentClient()
-  const [pillarData, setPillarData] = useState<any>(null);
 
-  useEffect(() => {
-    console.log('Pillar ID:', pillar.id, typeof pillar.id)
-  }, [pillar.id])
-
+  // This handles user_progress "Completed" toggling
   const handleComplete = async () => {
     setIsUpdating(true)
     try {
@@ -59,16 +56,42 @@ export default function PillarContent({ pillar, progress, userId }: PillarConten
     }
   }
 
+  // Called when sub-components (e.g. Pillar1Content) change data
   const handleDataChange = (newData: any) => {
-    setPillarData(newData);
-    // TODO: Save to database
-  };
+    setPillarData(newData)
+    // Up to you if you want to do local or server saving here.
+    // We'll add a separate "Save" button to do the actual POST to /api/pillar1.
+  }
+
+  // NEW: Manually save Pillar 1 data to /api/pillar1
+  const handleSavePillar1 = async () => {
+    try {
+      // Optional: only do this if pillar is Pillar 1
+      if (String(pillar.id) !== '1') {
+        console.log('Save only applies to Pillar 1 in this example.')
+        return
+      }
+      if (!pillarData) {
+        console.log('No Pillar 1 data to save.')
+        return
+      }
+      const res = await fetch('/api/pillar1', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pillarData) // This must match your Pillar1Data shape
+      })
+      if (!res.ok) {
+        throw new Error(`Failed to save Pillar1 data: ${res.status}`)
+      }
+      console.log('Pillar 1 data saved successfully.')
+      // Optionally show a toast or UI feedback
+    } catch (error) {
+      console.error('Error saving Pillar 1 data:', error)
+    }
+  }
 
   const renderPillarContent = () => {
-    // Convert pillar.id to string for comparison
     const pillarId = String(pillar.id)
-    console.log('Rendering content for pillar:', pillarId)
-    
     switch (pillarId) {
       case '1':
         return <Pillar1Content data={pillarData} onDataChange={handleDataChange} />
@@ -93,15 +116,23 @@ export default function PillarContent({ pillar, progress, userId }: PillarConten
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-[#E2E8F0] mb-4">{pillar.title}</h1>
-        <p className="text-lg text-[#94A3B8]">{pillar.description}</p>
-      </div>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h1 className="text-3xl font-bold text-[#E2E8F0] mb-4">{pillar.title}</h1>
+      <p className="text-lg text-[#94A3B8] mb-8">{pillar.description}</p>
 
       {renderPillarContent()}
 
-      <div className="border-t border-[#1E293B] pt-8">
+      <div className="border-t border-[#1E293B] pt-8 flex gap-4">
+        {/* NEW: Add a Save button for Pillar 1 */}
+        {String(pillar.id) === '1' && (
+          <button
+            onClick={handleSavePillar1}
+            className="rounded-md px-6 py-3 text-base font-medium text-white shadow-sm bg-[#3B82F6] hover:bg-[#2563EB]"
+          >
+            Save Data
+          </button>
+        )}
+
         <button
           onClick={handleComplete}
           disabled={isUpdating || (progress?.completed)}

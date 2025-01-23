@@ -72,17 +72,17 @@ export const VisionWorksheetPDF: React.FC<VisionWorksheetPDFProps> = ({ data }) 
           <View style={styles.section}>
             <Text style={styles.subtitle}>Basic Information</Text>
             <Text style={styles.sectionTitle}>Business Name</Text>
-            <Text style={styles.text}>{data.worksheet?.businessName}</Text>
+            <Text style={styles.text}>{data?.businessName}</Text>
             
             <Text style={styles.sectionTitle}>Tagline</Text>
-            <Text style={styles.text}>{data.worksheet?.tagline}</Text>
+            <Text style={styles.text}>{data?.tagline}</Text>
             
             <Text style={styles.sectionTitle}>Mission Statement</Text>
-            <Text style={styles.text}>{data.worksheet?.missionStatement}</Text>
+            <Text style={styles.text}>{data?.missionStatement}</Text>
             
             <Text style={styles.sectionTitle}>Core Values</Text>
             <View style={styles.list}>
-              {data.worksheet?.coreValues?.map((value, index) => (
+              {data?.coreValues?.map((value, index) => (
                 <Text key={index} style={styles.listItem}>• {value}</Text>
               ))}
             </View>
@@ -91,25 +91,25 @@ export const VisionWorksheetPDF: React.FC<VisionWorksheetPDFProps> = ({ data }) 
           <View style={styles.section}>
             <Text style={styles.subtitle}>Business Goals</Text>
             <Text style={styles.sectionTitle}>Short Term Goals</Text>
-            <Text style={styles.text}>{data.worksheet?.businessGoals?.shortTerm}</Text>
+            <Text style={styles.text}>{data?.businessGoals?.shortTerm}</Text>
             
             <Text style={styles.sectionTitle}>Mid Term Goals</Text>
-            <Text style={styles.text}>{data.worksheet?.businessGoals?.midTerm}</Text>
+            <Text style={styles.text}>{data?.businessGoals?.midTerm}</Text>
             
             <Text style={styles.sectionTitle}>Long Term Goals</Text>
-            <Text style={styles.text}>{data.worksheet?.businessGoals?.longTerm}</Text>
+            <Text style={styles.text}>{data?.businessGoals?.longTerm}</Text>
             
-            {data.worksheet?.businessGoals?.websiteGoals && (
+            {data?.businessGoals?.websiteGoals && (
               <>
                 <Text style={styles.sectionTitle}>Website Goals</Text>
-                <Text style={styles.text}>{data.worksheet?.businessGoals?.websiteGoals}</Text>
+                <Text style={styles.text}>{data?.businessGoals?.websiteGoals}</Text>
               </>
             )}
             
-            {data.worksheet?.businessGoals?.successIndicators && (
+            {data?.businessGoals?.successIndicators && (
               <>
                 <Text style={styles.sectionTitle}>Success Indicators</Text>
-                <Text style={styles.text}>{data.worksheet?.businessGoals?.successIndicators}</Text>
+                <Text style={styles.text}>{data?.businessGoals?.successIndicators}</Text>
               </>
             )}
           </View>
@@ -118,28 +118,28 @@ export const VisionWorksheetPDF: React.FC<VisionWorksheetPDFProps> = ({ data }) 
             <Text style={styles.subtitle}>SWOT Analysis</Text>
             <Text style={styles.sectionTitle}>Strengths</Text>
             <View style={styles.list}>
-              {data.worksheet?.swot?.strengths?.map((strength, index) => (
+              {data?.swot?.strengths?.map((strength, index) => (
                 <Text key={index} style={styles.listItem}>• {strength}</Text>
               ))}
             </View>
             
             <Text style={styles.sectionTitle}>Weaknesses</Text>
             <View style={styles.list}>
-              {data.worksheet?.swot?.weaknesses?.map((weakness, index) => (
+              {data?.swot?.weaknesses?.map((weakness, index) => (
                 <Text key={index} style={styles.listItem}>• {weakness}</Text>
               ))}
             </View>
             
             <Text style={styles.sectionTitle}>Opportunities</Text>
             <View style={styles.list}>
-              {data.worksheet?.swot?.opportunities?.map((opportunity, index) => (
+              {data?.swot?.opportunities?.map((opportunity, index) => (
                 <Text key={index} style={styles.listItem}>• {opportunity}</Text>
               ))}
             </View>
             
             <Text style={styles.sectionTitle}>Threats</Text>
             <View style={styles.list}>
-              {data.worksheet?.swot?.threats?.map((threat, index) => (
+              {data?.swot?.threats?.map((threat, index) => (
                 <Text key={index} style={styles.listItem}>• {threat}</Text>
               ))}
             </View>
@@ -149,24 +149,24 @@ export const VisionWorksheetPDF: React.FC<VisionWorksheetPDFProps> = ({ data }) 
             <Text style={styles.subtitle}>Customer Journey</Text>
             <Text style={styles.sectionTitle}>Awareness</Text>
             <View style={styles.list}>
-              {data.worksheet?.customerJourney?.awareness?.map((item, index) => (
+              {data?.customerJourney?.awareness?.map((item, index) => (
                 <Text key={index} style={styles.listItem}>• {item}</Text>
               ))}
             </View>
             
             <Text style={styles.sectionTitle}>Consideration</Text>
             <View style={styles.list}>
-              {data.worksheet?.customerJourney?.consideration?.map((item, index) => (
+              {data?.customerJourney?.consideration?.map((item, index) => (
                 <Text key={index} style={styles.listItem}>• {item}</Text>
               ))}
             </View>
             
             <Text style={styles.sectionTitle}>Decision</Text>
-            <Text style={styles.text}>{data.worksheet?.customerJourney?.decision}</Text>
+            <Text style={styles.text}>{data?.customerJourney?.decision}</Text>
             
             <Text style={styles.sectionTitle}>Retention</Text>
             <View style={styles.list}>
-              {data.worksheet?.customerJourney?.retention?.map((item, index) => (
+              {data?.customerJourney?.retention?.map((item, index) => (
                 <Text key={index} style={styles.listItem}>• {item}</Text>
               ))}
             </View>
@@ -175,55 +175,55 @@ export const VisionWorksheetPDF: React.FC<VisionWorksheetPDFProps> = ({ data }) 
           <View style={styles.section}>
             <Text style={styles.subtitle}>Target Audience</Text>
             <Text style={styles.sectionTitle}>Primary Profile</Text>
-            <Text style={styles.text}>{data.worksheet?.targetAudience?.primaryProfile}</Text>
+            <Text style={styles.text}>{data?.targetAudience?.primaryProfile}</Text>
             
             <Text style={styles.sectionTitle}>Secondary Audiences</Text>
             <View style={styles.list}>
-              {data.worksheet?.targetAudience?.secondaryAudiences?.map((audience, index) => (
+              {data?.targetAudience?.secondaryAudiences?.map((audience, index) => (
                 <Text key={index} style={styles.listItem}>• {audience}</Text>
               ))}
             </View>
             
             <Text style={styles.sectionTitle}>Pain Points</Text>
             <View style={styles.list}>
-              {data.worksheet?.targetAudience?.painPoints?.map((point, index) => (
+              {data?.targetAudience?.painPoints?.map((point, index) => (
                 <Text key={index} style={styles.listItem}>• {point}</Text>
               ))}
             </View>
             
             <Text style={styles.sectionTitle}>Ideal Customer Profile</Text>
             <Text style={styles.sectionTitle}>Problem</Text>
-            <Text style={styles.text}>{data.worksheet?.targetAudience?.idealCustomerProfile?.problem}</Text>
+            <Text style={styles.text}>{data?.targetAudience?.idealCustomerProfile?.problem}</Text>
             
             <Text style={styles.sectionTitle}>Journey</Text>
-            <Text style={styles.text}>{data.worksheet?.targetAudience?.idealCustomerProfile?.journey}</Text>
+            <Text style={styles.text}>{data?.targetAudience?.idealCustomerProfile?.journey}</Text>
             
             <Text style={styles.sectionTitle}>Desires</Text>
             <View style={styles.list}>
-              {data.worksheet?.targetAudience?.idealCustomerProfile?.desires?.map((desire, index) => (
+              {data?.targetAudience?.idealCustomerProfile?.desires?.map((desire, index) => (
                 <Text key={index} style={styles.listItem}>• {desire}</Text>
               ))}
             </View>
             
             <Text style={styles.sectionTitle}>Desired State</Text>
-            <Text style={styles.text}>{data.worksheet?.targetAudience?.idealCustomerProfile?.desiredState}</Text>
+            <Text style={styles.text}>{data?.targetAudience?.idealCustomerProfile?.desiredState}</Text>
             
             <Text style={styles.sectionTitle}>Gap Analysis</Text>
-            <Text style={styles.text}>{data.worksheet?.targetAudience?.idealCustomerProfile?.gap}</Text>
+            <Text style={styles.text}>{data?.targetAudience?.idealCustomerProfile?.gap}</Text>
             
             <Text style={styles.sectionTitle}>Unique Selling Point</Text>
-            <Text style={styles.text}>{data.worksheet?.targetAudience?.idealCustomerProfile?.uniqueSellingPoint}</Text>
+            <Text style={styles.text}>{data?.targetAudience?.idealCustomerProfile?.uniqueSellingPoint}</Text>
             
             <Text style={styles.sectionTitle}>Benefits</Text>
             <View style={styles.list}>
-              {data.worksheet?.targetAudience?.idealCustomerProfile?.benefits?.map((benefit, index) => (
+              {data?.targetAudience?.idealCustomerProfile?.benefits?.map((benefit, index) => (
                 <Text key={index} style={styles.listItem}>• {benefit}</Text>
               ))}
             </View>
             
             <Text style={styles.sectionTitle}>Common Objections</Text>
             <View style={styles.list}>
-              {data.worksheet?.targetAudience?.idealCustomerProfile?.objections?.map((objection, index) => (
+              {data?.targetAudience?.idealCustomerProfile?.objections?.map((objection, index) => (
                 <Text key={index} style={styles.listItem}>• {objection}</Text>
               ))}
             </View>

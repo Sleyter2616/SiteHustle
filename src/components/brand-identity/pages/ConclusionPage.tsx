@@ -1,15 +1,9 @@
 import React from 'react';
-import { Pillar1Data } from '@/types/pillar1';
 
 interface ConclusionPageProps {
-  data: Pillar1Data;
-  onComplete?: () => void;
 }
 
-export default function ConclusionPage({ data, onComplete }: ConclusionPageProps) {
-  const handleComplete = () => {
-    onComplete?.();
-  };
+export default function ConclusionPage( {}: ConclusionPageProps) {
 
   return (
     <div className="space-y-8">
@@ -60,12 +54,6 @@ export default function ConclusionPage({ data, onComplete }: ConclusionPageProps
       </div>
 
       <div className="flex justify-end mt-8">
-        <button
-          onClick={handleComplete}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
-        >
-          Complete Pillar 1
-        </button>
       </div>
     </div>
   );

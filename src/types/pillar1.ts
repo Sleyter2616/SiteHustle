@@ -20,6 +20,7 @@ export interface BrandIdentityData {
     uniqueResources: string;
     competitivePerception: string;
   };
+  executionRoadmap?: ExecutionRoadmapData;
 }
 
 export interface VisionData {
@@ -174,7 +175,6 @@ export interface Pillar1Data {
   vision?: VisionData;
   executionRoadmap?: ExecutionRoadmapData;
   wireframe?: WireframeData;
-  worksheet?: WorksheetData;
   persona?: PersonaData;
   progress?: {
     currentStep?: number;

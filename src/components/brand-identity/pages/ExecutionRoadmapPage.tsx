@@ -1,8 +1,9 @@
 import React from 'react';
 import { Pillar1Data } from '@/types/pillar1';
 import TextArea from '@/components/common/TextArea';
+import { BrandIdentity } from '@/types/pillar4';
 
-type ExecutionRoadmapData = NonNullable<Pillar1Data['executionRoadmap']>;
+type ExecutionRoadmapData = NonNullable<Pillar1Data['brandIdentity']['executionRoadmap']>;
 
 interface ExecutionRoadmapPageProps {
   data: ExecutionRoadmapData;

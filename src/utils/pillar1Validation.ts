@@ -78,6 +78,30 @@ export const personaSchema = z.object({
   })
 })
 
+export const brandIdentitySchema = z.object({
+  reflection: z.object({
+    whoIAm: z.string().min(1, 'Please describe who you are'),
+    whoIAmNot: z.string().min(1, 'Please describe who you are not'),
+    whyBuildBrand: z.string().min(1, 'Please explain why you are building this brand')
+  }),
+  personality: z.object({
+    communicationStyle: z.string().min(1, 'Please describe your communication style'),
+    toneAndVoice: z.string().min(1, 'Please describe your tone and voice'),
+    passionateExpression: z.string().min(1, 'Please describe how you express your passion'),
+    brandPersonality: z.string().min(1, 'Please describe your brand personality')
+  }),
+  story: z.object({
+    pivotalExperience: z.string().min(1, 'Please share a pivotal experience'),
+    definingMoment: z.string().min(1, 'Please describe a defining moment'),
+    audienceRelevance: z.string().min(1, 'Please explain how your story relates to your audience')
+  }),
+  differentiation: z.object({
+    uniqueApproach: z.string().min(1, 'Please describe your unique approach'),
+    uniqueResources: z.string().min(1, 'Please list your unique resources'),
+    competitivePerception: z.string().min(1, 'Please describe how you want to be perceived vs competitors')
+  })
+});
+
 export type Worksheet = z.infer<typeof worksheetSchema>
 export type Persona = z.infer<typeof personaSchema>
 
@@ -144,7 +168,7 @@ export const tooltips = {
   }
 }
 
-export const validateWorksheet = (data: Worksheet) => {
+export function validateWorksheet(data: Worksheet) {
   const result = worksheetSchema.safeParse(data)
   return {
     success: result.success,
@@ -152,11 +176,31 @@ export const validateWorksheet = (data: Worksheet) => {
   }
 }
 
-export const validatePersona = (data: Persona) => {
+export function validatePersona(data: Persona) {
   const result = personaSchema.safeParse(data)
   return {
     success: result.success,
     errors: !result.success ? result.error.flatten().fieldErrors : {}
+  }
+}
+
+export function validateBrandIdentity(data: any) {
+  try {
+    brandIdentitySchema.parse(data);
+    return { success: true, errors: {} };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors: Record<string, string[]> = {};
+      error.errors.forEach((err) => {
+        const path = err.path.join('.');
+        if (!errors[path]) {
+          errors[path] = [];
+        }
+        errors[path].push(err.message);
+      });
+      return { success: false, errors };
+    }
+    throw error;
   }
 }
 
