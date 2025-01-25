@@ -1,7 +1,8 @@
+// src/components/common/TextArea.tsx
+
 import React from 'react';
 
 interface TextAreaProps {
-  label: string;
   value?: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -12,7 +13,6 @@ interface TextAreaProps {
 }
 
 export default function TextArea({
-  label,
   value = '',
   onChange,
   placeholder,
@@ -23,17 +23,8 @@ export default function TextArea({
 }: TextAreaProps) {
   return (
     <div className={`space-y-2 ${className}`}>
-      <div className="flex justify-between">
-        <label className="block text-sm font-medium text-gray-200">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-        {error && (
-          <span className="text-sm text-red-500">{error}</span>
-        )}
-      </div>
       <textarea
-        value={value || ''}
+        value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}

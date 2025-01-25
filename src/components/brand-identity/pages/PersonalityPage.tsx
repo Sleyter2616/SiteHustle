@@ -1,6 +1,10 @@
+// src/components/brand-identity/pages/PersonalityPage.tsx
+
 import React from 'react';
 import { Pillar1Data } from '@/types/pillar1';
 import TextArea from '@/components/common/TextArea';
+import Tooltip from '@/components/common/Tooltip';
+import { FiInfo } from 'react-icons/fi';
 
 type PersonalityData = NonNullable<NonNullable<Pillar1Data['brandIdentity']>>['personality'];
 
@@ -12,93 +16,130 @@ interface PersonalityPageProps {
 export default function PersonalityPage({ data, onChange }: PersonalityPageProps) {
   return (
     <div className="space-y-8">
+      {/* Header & Opening */}
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Finding Your Brand Personality & Voice</h2>
-        <div className="prose prose-invert max-w-none">
+        <h2 className="text-3xl font-semibold mb-4 text-center">
+          Shaping Your Brand Personality & Voice
+        </h2>
+        <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed">
           <p>
-            Your brand's tone and voice are how you communicate with your audience. A consistent 
-            approach builds trust, helps people remember you, and ensures your message aligns with your values.
+            Your brand’s personality is how you “sound” and “feel” to others. A recognizable tone 
+            builds instant familiarity and trust—people know what to expect each time they encounter you.
           </p>
-          
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <h3 className="font-medium mb-2">Casual & Friendly</h3>
-              <p className="text-sm text-gray-300">
-                Imagine chatting with a friend over coffee, relaxed and approachable.
-              </p>
-            </div>
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <h3 className="font-medium mb-2">Authoritative & Professional</h3>
-              <p className="text-sm text-gray-300">
-                Clearly stated facts, data-driven insights, precise language.
-              </p>
-            </div>
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <h3 className="font-medium mb-2">Energetic & Inspiring</h3>
-              <p className="text-sm text-gray-300">
-                Enthusiastic, motivational, uses strong verbs, forward-looking.
-              </p>
-            </div>
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <h3 className="font-medium mb-2">Quirky & Humorous</h3>
-              <p className="text-sm text-gray-300">
-                Playful, uses lighthearted language and unexpected turns of phrase.
-              </p>
-            </div>
-          </div>
+          <p className="mt-4">
+            In this section, consider which tone, style, and voice traits naturally match who you 
+            are. Authentic communication helps your message reach the right audience on a human level.
+          </p>
         </div>
       </div>
 
+      {/* Questions */}
       <div className="space-y-6">
+        {/* Communication Style */}
         <div>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="text-lg font-medium text-gray-200">
+              What’s your preferred communication style with customers?
+            </h3>
+            <Tooltip content="Consider how formal or casual your interactions should be for brand consistency.">
+              <div className="cursor-help">
+                <FiInfo className="w-4 h-4 text-[#A0AEC0]" />
+              </div>
+            </Tooltip>
+          </div>
+          <p className="text-sm text-gray-400 mb-2">
+            Whether it’s formal, chatty, or somewhere in between, consistency in style reinforces credibility.
+          </p>
           <TextArea
-            label="What's your preferred communication style with customers?"
             value={data?.communicationStyle}
             onChange={(value) => onChange({ ...data, communicationStyle: value })}
-            placeholder="Formal or chatty? Professional or casual?"
+            placeholder="Formal and polished, casual and friendly, or something else?"
             rows={4}
           />
           <p className="mt-2 text-sm text-gray-400">
-            Think about how you naturally communicate when you're at your best.
+            Think about the energy you want to convey every time you engage with your audience.
           </p>
         </div>
 
+        {/* Tone & Voice */}
         <div>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="text-lg font-medium text-gray-200">
+              How do you want your brand to sound?
+            </h3>
+            <Tooltip content="Reflect on the feelings you want to invoke in your audience when they read or hear from you.">
+              <div className="cursor-help">
+                <FiInfo className="w-4 h-4 text-[#A0AEC0]" />
+              </div>
+            </Tooltip>
+          </div>
+          <p className="text-sm text-gray-400 mb-2">
+            Consider the emotional response you’re hoping to evoke. Perhaps you’re looking to reassure, 
+            energize, or even challenge your audience.
+          </p>
           <TextArea
-            label="How do you want your brand to sound?"
             value={data?.toneAndVoice}
             onChange={(value) => onChange({ ...data, toneAndVoice: value })}
-            placeholder="Describe your ideal brand voice..."
+            placeholder="Describe your dream brand voice in a short paragraph..."
             rows={4}
           />
           <p className="mt-2 text-sm text-gray-400">
-            Consider how you want your audience to feel when they read your content.
+            A strong tone and voice can make your brand more memorable and approachable.
           </p>
         </div>
 
+        {/* Passionate Expression */}
         <div>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="text-lg font-medium text-gray-200">
+              How do you speak when you're most passionate?
+            </h3>
+            <Tooltip content="Think about the tone or style you naturally fall into when you’re energized about a topic.">
+              <div className="cursor-help">
+                <FiInfo className="w-4 h-4 text-[#A0AEC0]" />
+              </div>
+            </Tooltip>
+          </div>
+          <p className="text-sm text-gray-400 mb-2">
+            Identifying your “peak enthusiasm style” helps capture the spark that makes your 
+            content unique and inspiring.
+          </p>
           <TextArea
-            label="How do you speak when you're most passionate?"
             value={data?.passionateExpression}
             onChange={(value) => onChange({ ...data, passionateExpression: value })}
-            placeholder="Describe how you communicate when you're excited about your work..."
+            placeholder="Reflect on times you’ve been truly excited about your work..."
             rows={4}
           />
           <p className="mt-2 text-sm text-gray-400">
-            Your natural enthusiasm can be a powerful part of your brand voice.
+            Sharing this energy can create an authentic bond with your audience.
           </p>
         </div>
 
+        {/* Brand Personality */}
         <div>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="text-lg font-medium text-gray-200">
+              What’s your brand’s overall personality?
+            </h3>
+            <Tooltip content="Consider traits that best describe your brand’s character and long-term perception.">
+              <div className="cursor-help">
+                <FiInfo className="w-4 h-4 text-[#A0AEC0]" />
+              </div>
+            </Tooltip>
+          </div>
+          <p className="text-sm text-gray-400 mb-2">
+            Go beyond a single descriptor—are you bold, friendly, witty, or calm? This is how 
+            your audience will feel about your brand after repeated interactions.
+          </p>
           <TextArea
-            label="What's your brand's personality?"
+        
             value={data?.brandPersonality}
             onChange={(value) => onChange({ ...data, brandPersonality: value })}
-            placeholder="Straightforward or creative? Serious or playful?"
+            placeholder='E.g., “Playful, smart, approachable,” or “Bold, technical, confident.”'
             rows={4}
           />
           <p className="mt-2 text-sm text-gray-400">
-            Remember to stay true to your brand values in how you express yourself.
+            Remain consistent: the personality you shape here sets a standard for all brand expressions.
           </p>
         </div>
       </div>

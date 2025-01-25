@@ -1,7 +1,4 @@
-
-/***************************************
- FILE 5: src/components/pillars/Pillar1Content.tsx
-***************************************/
+// src/components/pillars/Pillar1Content.tsx
 import React, { useEffect, useState } from 'react';
 import { Pillar1Data } from '@/types/pillar1';
 import { useSections } from '@/hooks/useSections';
@@ -9,10 +6,11 @@ import { savePillar1Data, loadPillar1Data } from '@/utils/storage';
 import BrandIdentityWorksheet from '@/components/brand-identity/BrandIdentityWorksheet';
 import VisionWorksheet from '@/components/vision/VisionWorksheet';
 import ExecutionRoadmapWorksheet from '@/components/execution-roadmap/ExecutionRoadmapWorksheet';
-import WireframeWorksheet from '@/components/wireframe/WireframeWorksheet';
+// Removed WireframeWorksheet import
+
 import { toast } from 'react-hot-toast';
 
-/* Example optional backend calls for persistent storage */
+// Example optional backend calls for persistent storage
 async function fetchPillar1DataFromServer(): Promise<Pillar1Data | null> {
   try {
     const res = await fetch('/api/pillar1');
@@ -186,23 +184,18 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
             {renderCompletionStatus(3)}
           </>
         );
-      case 4:
-        return (
-          <>
-            <WireframeWorksheet
-              data={data?.wireframe}
-              onChange={(val) => handleSectionDataChange('wireframe', val)}
-              onPdfDownloaded={() => handleDownloadAndSync(4)}
-              onNextSection={handleNext}
-              pdfDownloaded={downloadedPdfs.wireframe}
-              isValid={sectionValidation.wireframe}
-            />
-            {renderCompletionStatus(4)}
-          </>
-        );
       default:
         return null;
     }
+  }
+
+  // We'll do 3 sections total. So total steps = 3 => each is 33% or 100/3
+  // If you want a simpler approach, just do 3 steps: 1/3, 2/3, 3/3.
+  function overallCompletionPercent() {
+    // how many are "true"
+    const completedCount = Object.values(sectionValidation).filter(Boolean).length;
+    const totalSections = 3;
+    return (completedCount / totalSections) * 100;
   }
 
   return (
@@ -243,12 +236,12 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
           <div
             className="h-full bg-blue-500 rounded transition-all duration-300"
             style={{
-              width: `${Object.values(sectionValidation).filter(Boolean).length * 25}%`
+              width: `${overallCompletionPercent()}%`
             }}
           />
         </div>
         <div className="mt-2 text-sm text-gray-600 text-right">
-          {Object.values(sectionValidation).filter(Boolean).length * 25}% Complete
+          {Math.round(overallCompletionPercent())}% Complete
         </div>
       </div>
     </div>

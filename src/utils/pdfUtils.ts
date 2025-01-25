@@ -8,8 +8,173 @@ import {
   WireframeData,
   VisionData
 } from '@/types/pillar1';
-import { VisionWorksheetPDF } from '@/components/vision/VisionWorksheet'; // must return <Page> from @react-pdf/renderer
+import { Pillar1Data } from '@/types/pillar1'; // same type import
+/***************************************************************
+  worksheetValidationAndPdf.ts
+  - Contains validation functions for Brand Identity, Vision, etc.
+  - Contains PDF generation functions for each worksheet.
+***************************************************************/
 
+// If you need VisionWorksheetPDF from react-pdf, you can import it here
+// import { VisionWorksheetPDF } from '@/components/vision/VisionWorksheet';
+
+
+/***********************************************************************
+  1) VALIDATION
+     Replaces brandIdentityValidation.ts code
+***********************************************************************/
+
+// Helper functions
+const isNonEmptyString = (str: string | undefined | null): boolean => {
+  return typeof str === 'string' && str.trim().length > 0;
+};
+const isNonEmptyArray = (arr: any[] | undefined | null): boolean => {
+  return Array.isArray(arr) && arr.length > 0 && arr.every(item => isNonEmptyString(item));
+};
+
+interface ValidationResult {
+  success: boolean;
+  errors: Record<string, string[]>;
+}
+
+// Brand Identity
+export const validateReflection = (data: Pillar1Data['brandIdentity']['reflection']): ValidationResult => {
+  const errors: Record<string, string[]> = {};
+  if (!data?.whoIAm || !isNonEmptyString(data.whoIAm) ||
+      !data?.whoIAmNot || !isNonEmptyString(data.whoIAmNot) ||
+      !data?.whyBuildBrand || !isNonEmptyString(data.whyBuildBrand)) {
+    errors['reflection'] = ['Please fill out all reflection fields'];
+  }
+  return { success: Object.keys(errors).length === 0, errors };
+};
+
+export const validatePersonality = (data: Pillar1Data['brandIdentity']['personality']): ValidationResult => {
+  const errors: Record<string, string[]> = {};
+  if (!data?.communicationStyle || !isNonEmptyString(data.communicationStyle) ||
+      !data?.toneAndVoice || !isNonEmptyString(data.toneAndVoice) ||
+      !data?.passionateExpression || !isNonEmptyString(data.passionateExpression) ||
+      !data?.brandPersonality || !isNonEmptyString(data.brandPersonality)) {
+    errors['personality'] = ['Please fill out all personality fields'];
+  }
+  return { success: Object.keys(errors).length === 0, errors };
+};
+
+export const validateStory = (data: Pillar1Data['brandIdentity']['story']): ValidationResult => {
+  const errors: Record<string, string[]> = {};
+  if (!data?.pivotalExperience || !isNonEmptyString(data.pivotalExperience) ||
+      !data?.definingMoment || !isNonEmptyString(data.definingMoment) ||
+      !data?.audienceRelevance || !isNonEmptyString(data.audienceRelevance)) {
+    errors['story'] = ['Please fill out all story fields'];
+  }
+  return { success: Object.keys(errors).length === 0, errors };
+};
+
+export const validateDifferentiation = (data: Pillar1Data['brandIdentity']['differentiation']): ValidationResult => {
+  const errors: Record<string, string[]> = {};
+  if (!data?.uniqueApproach || !isNonEmptyString(data.uniqueApproach) ||
+      !data?.uniqueResources || !isNonEmptyString(data.uniqueResources) ||
+      !data?.competitivePerception || !isNonEmptyString(data.competitivePerception)) {
+    errors['differentiation'] = ['Please fill out all differentiation fields'];
+  }
+  return { success: Object.keys(errors).length === 0, errors };
+};
+
+export const validateBrandIdentity = (data?: Pillar1Data['brandIdentity']): ValidationResult => {
+  if (!data) {
+    return { success: false, errors: { general: ['No brand identity data provided'] } };
+  }
+  const reflectionResult = validateReflection(data.reflection);
+  const personalityResult = validatePersonality(data.personality);
+  const storyResult = validateStory(data.story);
+  const differentiationResult = validateDifferentiation(data.differentiation);
+
+  const errors: Record<string, string[]> = {
+    ...(!reflectionResult.success ? reflectionResult.errors : {}),
+    ...(!personalityResult.success ? personalityResult.errors : {}),
+    ...(!storyResult.success ? storyResult.errors : {}),
+    ...(!differentiationResult.success ? differentiationResult.errors : {})
+  };
+  return { success: Object.keys(errors).length === 0, errors };
+};
+
+// Vision Validation
+export const validateVision = (data?: Pillar1Data['vision']): ValidationResult => {
+  if (!data) {
+    return { success: false, errors: { general: ['No vision data provided'] } };
+  }
+  const errors: Record<string, string[]> = {};
+
+  // basic info
+  if (!isNonEmptyString(data.businessName) ||
+      !isNonEmptyString(data.tagline) ||
+      !isNonEmptyString(data.missionStatement) ||
+      !isNonEmptyArray(data.coreValues)) {
+    errors['basicInfo'] = ['Please complete all basic information fields'];
+  }
+  // business goals
+  if (!data.businessGoals?.shortTerm || !isNonEmptyString(data.businessGoals.shortTerm) ||
+      !data.businessGoals?.midTerm || !isNonEmptyString(data.businessGoals.midTerm) ||
+      !data.businessGoals?.longTerm || !isNonEmptyString(data.businessGoals.longTerm) ||
+      !data.businessGoals?.websiteGoals || !isNonEmptyString(data.businessGoals.websiteGoals) ||
+      !data.businessGoals?.successIndicators || !isNonEmptyString(data.businessGoals.successIndicators)) {
+    errors['businessGoals'] = ['Please complete all business goals'];
+  }
+  // swot
+  if (!data.swot?.strengths || !isNonEmptyArray(data.swot.strengths) ||
+      !data.swot?.weaknesses || !isNonEmptyArray(data.swot.weaknesses) ||
+      !data.swot?.opportunities || !isNonEmptyArray(data.swot.opportunities) ||
+      !data.swot?.threats || !isNonEmptyArray(data.swot.threats)) {
+    errors['swot'] = ['Please complete all SWOT analysis sections'];
+  }
+
+  return { success: Object.keys(errors).length === 0, errors };
+};
+
+// Execution Roadmap
+export const validateExecutionRoadmap = (data?: Pillar1Data['executionRoadmap']): ValidationResult => {
+  if (!data) {
+    return { success: false, errors: { general: ['No execution roadmap data provided'] } };
+  }
+  const errors: Record<string, string[]> = {};
+  if (!isNonEmptyString(data.thirtyDayGoal)) {
+    errors['thirtyDayGoal'] = ['Please set your 30-day goal'];
+  }
+  if (!isNonEmptyArray(data.weeklyMilestones)) {
+    errors['weeklyMilestones'] = ['Please set your weekly milestones'];
+  }
+  if (!isNonEmptyString(data.contentPlan)) {
+    errors['contentPlan'] = ['Please complete your content plan'];
+  }
+  if (!isNonEmptyArray(data.immediateActions)) {
+    errors['immediateActions'] = ['Please list your immediate actions'];
+  }
+  return { success: Object.keys(errors).length === 0, errors };
+};
+
+// Wireframe
+export const validateWireframe = (data?: Pillar1Data['wireframe']): ValidationResult => {
+  if (!data) {
+    return { success: false, errors: { general: ['No wireframe data provided'] } };
+  }
+  const errors: Record<string, string[]> = {};
+  if (!data.layout?.header || !isNonEmptyString(data.layout.header) ||
+      !data.layout?.navigation || !isNonEmptyString(data.layout.navigation) ||
+      !data.layout?.mainContent || !isNonEmptyString(data.layout.mainContent) ||
+      !data.layout?.footer || !isNonEmptyString(data.layout.footer)) {
+    errors['layout'] = ['Please complete all layout sections'];
+  }
+  if (!data.components?.callToAction || !isNonEmptyString(data.components.callToAction) ||
+      !data.components?.featuredSections || !isNonEmptyArray(data.components.featuredSections) ||
+      !data.components?.contentBlocks || !isNonEmptyArray(data.components.contentBlocks)) {
+    errors['components'] = ['Please complete all component sections'];
+  }
+  if (!data.styling?.colorScheme || !isNonEmptyString(data.styling.colorScheme) ||
+      !data.styling?.typography || !isNonEmptyString(data.styling.typography) ||
+      !data.styling?.spacing || !isNonEmptyString(data.styling.spacing)) {
+    errors['styling'] = ['Please complete all styling sections'];
+  }
+  return { success: Object.keys(errors).length === 0, errors };
+};
 // Reuse existing helpers
 function addSectionTitle(doc: jsPDF, title: string, y: number) {
   doc.setFontSize(16);
@@ -569,28 +734,415 @@ export function generateWireframePDF(data?: WireframeData): jsPDF {
 }
 
 /************************************************************
- 4) VISION (react-pdf) [unchanged, no additional VPs requested]
+  ) VISION (jsPDF) - NEW detailed approach
 ************************************************************/
-export async function generateVisionWorksheetPDF(data?: VisionData): Promise<void> {
-  try {
-    const docElem = React.createElement(
-      Document,
-      {} as DocumentProps,
-      React.createElement(VisionWorksheetPDF, { data })
-    );
-    const blob = await pdf(docElem).toBlob();
+export function generateVisionPDF(data?: VisionData): jsPDF {
+  const doc = new jsPDF();
+  let y = 20;
 
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = data?.businessName ? `${data.businessName}-vision.pdf` : 'vision-worksheet.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  } catch (err) {
-    console.error('Error generating Vision PDF:', err);
-    toast.error('Failed to generate Vision PDF. Please try again.');
-    throw err;
+  // Title & Explanation
+  y = addSectionTitle(doc, 'Vision & Goals Worksheet', y);
+  y = addExplanation(
+    doc,
+    'A strong vision clarifies your purpose, sets meaningful goals, and outlines who you serve and how. Below is your strategic foundation.',
+    y
+  );
+
+  if (!data) {
+    y += 10;
+    doc.text('No Vision data provided.', 20, y);
+    return doc;
   }
+
+  /***************************
+   * SECTION 1: VISION CLARITY
+   ***************************/
+  y += 10;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('1) Vision Clarity', 20, y);
+  y += 6;
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(10);
+  const visionValueProp = `A concise mission, clear tagline, and well-defined vision statement guide 
+all aspects of your business strategy, ensuring consistent messaging and direction.`;
+  const visionVP = doc.splitTextToSize(visionValueProp, 170);
+  doc.text(visionVP, 20, (y += 6));
+  y += visionVP.length * 5 + 4;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+
+  // businessName
+  if (data.businessName) {
+    doc.text(`Business Name: ${data.businessName}`, 20, y);
+    y += 8;
+    y = maybeAddPage(doc, y);
+  }
+  // tagline
+  if (data.tagline) {
+    doc.text(`Tagline: ${data.tagline}`, 20, y);
+    y += 8;
+    y = maybeAddPage(doc, y);
+  }
+  // missionStatement
+  if (data.missionStatement) {
+    doc.text('Mission Statement:', 20, y);
+    y += 6;
+    const lines = doc.splitTextToSize(data.missionStatement, 170);
+    doc.text(lines, 30, y);
+    y += lines.length * 6 + 4;
+    y = maybeAddPage(doc, y);
+  }
+  // visionStatement
+  if (data.visionStatement) {
+    doc.text('Vision Statement:', 20, y);
+    y += 6;
+    const lines = doc.splitTextToSize(data.visionStatement, 170);
+    doc.text(lines, 30, y);
+    y += lines.length * 6 + 4;
+    y = maybeAddPage(doc, y);
+  }
+  // coreValues
+  if (data.coreValues && data.coreValues.length > 0) {
+    doc.text('Core Values:', 20, y);
+    y += 6;
+    data.coreValues.forEach((val) => {
+      doc.text(`• ${val}`, 30, y);
+      y += 6;
+      y = maybeAddPage(doc, y);
+    });
+    y += 4;
+  }
+
+  /***************************
+   * SECTION 2: GOALS
+   ***************************/
+  y += 10;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('2) Business Goals', 20, y);
+  y += 6;
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(10);
+  const goalsVP = `Defining short-term, mid-term, and long-term goals provides actionable 
+milestones to track growth and success.`;
+  const goalsVPLines = doc.splitTextToSize(goalsVP, 170);
+  doc.text(goalsVPLines, 20, (y += 6));
+  y += goalsVPLines.length * 5 + 4;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+
+  if (data.businessGoals) {
+    const { shortTerm, midTerm, longTerm, websiteGoals, successIndicators } = data.businessGoals;
+
+    if (shortTerm) {
+      doc.text('Short-Term (6-12 months):', 20, y);
+      y += 6;
+      const lines = doc.splitTextToSize(shortTerm, 170);
+      doc.text(lines, 30, y);
+      y += lines.length * 6 + 4;
+      y = maybeAddPage(doc, y);
+    }
+    if (midTerm) {
+      doc.text('Mid-Term (1-2 years):', 20, y);
+      y += 6;
+      const lines = doc.splitTextToSize(midTerm, 170);
+      doc.text(lines, 30, y);
+      y += lines.length * 6 + 4;
+      y = maybeAddPage(doc, y);
+    }
+    if (longTerm) {
+      doc.text('Long-Term (3-5 years):', 20, y);
+      y += 6;
+      const lines = doc.splitTextToSize(longTerm, 170);
+      doc.text(lines, 30, y);
+      y += lines.length * 6 + 4;
+      y = maybeAddPage(doc, y);
+    }
+    if (websiteGoals) {
+      doc.text('Website Goals:', 20, y);
+      y += 6;
+      const lines = doc.splitTextToSize(websiteGoals, 170);
+      doc.text(lines, 30, y);
+      y += lines.length * 6 + 4;
+      y = maybeAddPage(doc, y);
+    }
+    if (successIndicators) {
+      doc.text('Success Indicators:', 20, y);
+      y += 6;
+      const lines = doc.splitTextToSize(successIndicators, 170);
+      doc.text(lines, 30, y);
+      y += lines.length * 6 + 4;
+      y = maybeAddPage(doc, y);
+    }
+  }
+
+  /***************************
+   * SECTION 3: TARGET AUDIENCE
+   ***************************/
+  y += 10;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('3) Target Audience', 20, y);
+  y += 6;
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(10);
+  const taVP = `Pinpointing your audience's needs and desires ensures your offerings 
+speak directly to those you aim to serve, improving engagement and conversions.`;
+  const taVPArr = doc.splitTextToSize(taVP, 170);
+  doc.text(taVPArr, 20, (y += 6));
+  y += taVPArr.length * 5 + 4;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+
+  if (data.targetAudience) {
+    const { primaryProfile, secondaryAudiences, painPoints, idealCustomerProfile } = data.targetAudience;
+    
+    if (primaryProfile) {
+      doc.text('Primary Audience Profile:', 20, y);
+      y += 6;
+      const lines = doc.splitTextToSize(primaryProfile, 170);
+      doc.text(lines, 30, y);
+      y += lines.length * 6 + 4;
+      y = maybeAddPage(doc, y);
+    }
+    if (secondaryAudiences && secondaryAudiences.length) {
+      doc.text('Secondary Audiences:', 20, y);
+      y += 6;
+      secondaryAudiences.forEach((aud) => {
+        doc.text(`• ${aud}`, 30, y);
+        y += 6;
+        y = maybeAddPage(doc, y);
+      });
+      y += 4;
+    }
+    if (painPoints && painPoints.length) {
+      doc.text('Pain Points:', 20, y);
+      y += 6;
+      painPoints.forEach((pp) => {
+        doc.text(`• ${pp}`, 30, y);
+        y += 6;
+        y = maybeAddPage(doc, y);
+      });
+      y += 4;
+    }
+    if (idealCustomerProfile) {
+      y += 6;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Ideal Customer Profile', 20, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+      y += 8;
+      const {
+        problem,
+        journey,
+        desires,
+        desiredState,
+        gap,
+        uniqueSellingPoint,
+        benefits,
+        objections
+      } = idealCustomerProfile;
+
+      if (problem) {
+        doc.text('Problem:', 20, y);
+        y += 6;
+        const lines = doc.splitTextToSize(problem, 170);
+        doc.text(lines, 30, y);
+        y += lines.length * 6 + 4;
+        y = maybeAddPage(doc, y);
+      }
+      if (journey) {
+        doc.text('Journey:', 20, y);
+        y += 6;
+        const lines = doc.splitTextToSize(journey, 170);
+        doc.text(lines, 30, y);
+        y += lines.length * 6 + 4;
+        y = maybeAddPage(doc, y);
+      }
+      if (desires && desires.length) {
+        doc.text('Desires:', 20, y);
+        y += 6;
+        desires.forEach((ds) => {
+          doc.text(`• ${ds}`, 30, y);
+          y += 6;
+          y = maybeAddPage(doc, y);
+        });
+        y += 4;
+      }
+      if (desiredState) {
+        doc.text('Desired State:', 20, y);
+        y += 6;
+        const lines = doc.splitTextToSize(desiredState, 170);
+        doc.text(lines, 30, y);
+        y += lines.length * 6 + 4;
+        y = maybeAddPage(doc, y);
+      }
+      if (gap) {
+        doc.text('Gap:', 20, y);
+        y += 6;
+        const lines = doc.splitTextToSize(gap, 170);
+        doc.text(lines, 30, y);
+        y += lines.length * 6 + 4;
+        y = maybeAddPage(doc, y);
+      }
+      if (uniqueSellingPoint) {
+        doc.text('Unique Selling Point:', 20, y);
+        y += 6;
+        const lines = doc.splitTextToSize(uniqueSellingPoint, 170);
+        doc.text(lines, 30, y);
+        y += lines.length * 6 + 4;
+        y = maybeAddPage(doc, y);
+      }
+      if (benefits && benefits.length) {
+        doc.text('Benefits:', 20, y);
+        y += 6;
+        benefits.forEach((b) => {
+          doc.text(`• ${b}`, 30, y);
+          y += 6;
+          y = maybeAddPage(doc, y);
+        });
+        y += 4;
+      }
+      if (objections && objections.length) {
+        doc.text('Common Objections:', 20, y);
+        y += 6;
+        objections.forEach((obj) => {
+          doc.text(`• ${obj}`, 30, y);
+          y += 6;
+          y = maybeAddPage(doc, y);
+        });
+        y += 4;
+      }
+    }
+  }
+
+  /***************************
+   * SECTION 4: CUSTOMER JOURNEY
+   ***************************/
+  y += 10;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('4) Customer Journey', 20, y);
+  y += 6;
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(10);
+  const journeyVP = `Mapping each phase of the customer journey helps you create tailored 
+content and touchpoints that guide them from awareness to loyalty.`;
+  const journeyVPArr = doc.splitTextToSize(journeyVP, 170);
+  doc.text(journeyVPArr, 20, (y += 6));
+  y += journeyVPArr.length * 5 + 4;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+
+  if (data.customerJourney) {
+    const { awareness, consideration, decision, retention } = data.customerJourney;
+    // awareness
+    if (awareness && awareness.length) {
+      doc.text('Awareness Channels:', 20, y);
+      y += 6;
+      awareness.forEach((item) => {
+        doc.text(`• ${item}`, 30, y);
+        y += 6;
+        y = maybeAddPage(doc, y);
+      });
+      y += 4;
+    }
+    // consideration
+    if (consideration && consideration.length) {
+      doc.text('Consideration / Trust-Building:', 20, y);
+      y += 6;
+      consideration.forEach((item) => {
+        doc.text(`• ${item}`, 30, y);
+        y += 6;
+        y = maybeAddPage(doc, y);
+      });
+      y += 4;
+    }
+    // decision
+    if (decision) {
+      doc.text('Decision / Purchase Process:', 20, y);
+      y += 6;
+      const lines = doc.splitTextToSize(decision, 170);
+      doc.text(lines, 30, y);
+      y += lines.length * 6 + 4;
+      y = maybeAddPage(doc, y);
+    }
+    // retention
+    if (retention && retention.length) {
+      doc.text('Retention & Referral Strategies:', 20, y);
+      y += 6;
+      retention.forEach((item) => {
+        doc.text(`• ${item}`, 30, y);
+        y += 6;
+        y = maybeAddPage(doc, y);
+      });
+      y += 4;
+    }
+  }
+
+  /***************************
+   * SECTION 5: SWOT
+   ***************************/
+  y += 10;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('5) SWOT Analysis', 20, y);
+  y += 6;
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(10);
+  const swotVP = `Assessing strengths, weaknesses, opportunities, and threats 
+enables strategic planning that builds on advantages and mitigates risks.`;
+  const swotVPArr = doc.splitTextToSize(swotVP, 170);
+  doc.text(swotVPArr, 20, (y += 6));
+  y += swotVPArr.length * 5 + 4;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+
+  if (data.swot) {
+    const { strengths, weaknesses, opportunities, threats } = data.swot;
+    if (strengths && strengths.length) {
+      doc.text('Strengths:', 20, y);
+      y += 6;
+      strengths.forEach((s) => {
+        doc.text(`• ${s}`, 30, y);
+        y += 6;
+        y = maybeAddPage(doc, y);
+      });
+      y += 4;
+    }
+    if (weaknesses && weaknesses.length) {
+      doc.text('Weaknesses:', 20, y);
+      y += 6;
+      weaknesses.forEach((w) => {
+        doc.text(`• ${w}`, 30, y);
+        y += 6;
+        y = maybeAddPage(doc, y);
+      });
+      y += 4;
+    }
+    if (opportunities && opportunities.length) {
+      doc.text('Opportunities:', 20, y);
+      y += 6;
+      opportunities.forEach((opp) => {
+        doc.text(`• ${opp}`, 30, y);
+        y += 6;
+        y = maybeAddPage(doc, y);
+      });
+      y += 4;
+    }
+    if (threats && threats.length) {
+      doc.text('Threats:', 20, y);
+      y += 6;
+      threats.forEach((t) => {
+        doc.text(`• ${t}`, 30, y);
+        y += 6;
+        y = maybeAddPage(doc, y);
+      });
+      y += 4;
+    }
+  }
+
+  return doc;
 }
+

@@ -1,23 +1,19 @@
-
-/***************************************
- FILE 4: src/hooks/useSections.ts
-***************************************/
+// src/hooks/useSections.ts
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { Pillar1Data } from '@/types/pillar1';
 import {
+  generateBrandIdentityPDF,
+  generateVisionPDF,
+  generateExecutionRoadmapPDF,
+  // generateWireframePDF, <-- removed
   validateBrandIdentity,
   validateVision,
   validateExecutionRoadmap,
-  validateWireframe
-} from '@/utils/brandIdentityValidation';
-import {
-  generateBrandIdentityPDF,
-  generateVisionWorksheetPDF,
-  generateExecutionRoadmapPDF,
-  generateWireframePDF
-} from '@/utils/pdfUtils';
+  // validateWireframe <-- removed
+} from '@/utils/pdfUtils'
 
+// Now we define only 3 sections for Pillar 1:
 const sectionConfig = {
   1: {
     key: 'brandIdentity',
@@ -28,7 +24,7 @@ const sectionConfig = {
   2: {
     key: 'vision',
     validateFn: validateVision,
-    pdfFn: generateVisionWorksheetPDF,
+    pdfFn: generateVisionPDF,
     title: 'Vision & Goals'
   },
   3: {
@@ -36,20 +32,14 @@ const sectionConfig = {
     validateFn: validateExecutionRoadmap,
     pdfFn: generateExecutionRoadmapPDF,
     title: '30-Day Roadmap'
-  },
-  4: {
-    key: 'wireframe',
-    validateFn: validateWireframe,
-    pdfFn: generateWireframePDF,
-    title: 'Wireframe Template'
   }
+  // removed wireframe
 };
 
 interface SectionValidationState {
   brandIdentity: boolean;
   vision: boolean;
   executionRoadmap: boolean;
-  wireframe: boolean;
 }
 
 interface UseSectionsProps {
@@ -61,14 +51,12 @@ export function useSections({ data }: UseSectionsProps) {
   const [sectionValidation, setSectionValidation] = useState<SectionValidationState>({
     brandIdentity: false,
     vision: false,
-    executionRoadmap: false,
-    wireframe: false
+    executionRoadmap: false
   });
   const [downloadedPdfs, setDownloadedPdfs] = useState<SectionValidationState>({
     brandIdentity: false,
     vision: false,
-    executionRoadmap: false,
-    wireframe: false
+    executionRoadmap: false
   });
 
   // Re-validate each time data changes
@@ -76,8 +64,7 @@ export function useSections({ data }: UseSectionsProps) {
     setSectionValidation({
       brandIdentity: validateBrandIdentity(data?.brandIdentity).success,
       vision: validateVision(data?.vision).success,
-      executionRoadmap: validateExecutionRoadmap(data?.executionRoadmap).success,
-      wireframe: validateWireframe(data?.wireframe).success
+      executionRoadmap: validateExecutionRoadmap(data?.executionRoadmap).success
     });
   }, [data]);
 
@@ -102,12 +89,12 @@ export function useSections({ data }: UseSectionsProps) {
       return;
     }
     try {
-      // If pdfFn returns a Promise<void>, we await
       const outcome = cfg.pdfFn(data[cfg.key]);
+      // If it's Vision (react-pdf approach), we handle an async promise
       if (outcome instanceof Promise) {
-        await outcome; // Vision
+        await outcome; 
       } else {
-        // brandIdentity, roadmap, wireframe: returns jsPDF doc
+        // brandIdentity or roadmap returns a jsPDF doc
         outcome.save(`${cfg.title}.pdf`);
       }
       toast.success(`${cfg.title} PDF downloaded successfully!`);
@@ -120,7 +107,8 @@ export function useSections({ data }: UseSectionsProps) {
 
   function handleNext() {
     const nextSec = activeSection + 1;
-    if (nextSec > 4) return;
+    // Now that we have only 3 sections, if nextSec > 3, do nothing
+    if (nextSec > 3) return;
     if (!canAccessSection(nextSec)) {
       const { title } = sectionConfig[activeSection];
       toast.error(`Please complete and download the ${title} PDF first`);

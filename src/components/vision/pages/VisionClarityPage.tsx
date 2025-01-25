@@ -20,14 +20,17 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
 
   return (
     <div className="space-y-8">
+      {/* Intro Section */}
       <div>
         <h1 className="text-3xl font-bold mb-4">The Value of Clarity</h1>
         <p className="text-gray-300 mb-6">
           A clear vision is the foundation of any successful business. It guides your decisions,
-          attracts the right customers, and keeps your team aligned.
+          attracts the right customers, and keeps your team aligned. By defining each part 
+          of your vision, you set the stage for consistent growth and strong brand identity.
         </p>
       </div>
 
+      {/* Why Clarity Matters Box */}
       <div className="bg-[#2D3748] p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Why Clarity Matters</h2>
         <ul className="list-disc list-inside space-y-2 text-gray-300">
@@ -38,38 +41,54 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
         </ul>
       </div>
 
+      {/* Fields */}
       <div className="space-y-6">
         <h2 className="text-2xl font-semibold">Defining Your Identity</h2>
-        
+
+        {/* Business Name */}
         <FormField
           label="What's your business name?"
           required
           error={errors?.['businessName']?.[0]}
         >
-          <input
-            type="text"
-            value={data?.businessName || ''}
-            onChange={(e) => updateField('businessName', e.target.value)}
-            className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
-            placeholder="Enter your business name"
-          />
+          <>
+            <p className="text-sm text-gray-400 mb-2">
+              This anchors your entire brand. A clear, memorable name helps customers 
+              recognize and recall you in a crowded market.
+            </p>
+            <input
+              type="text"
+              value={data?.businessName || ''}
+              onChange={(e) => updateField('businessName', e.target.value)}
+              className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
+              placeholder="Enter your business name"
+            />
+          </>
         </FormField>
 
+        {/* Tagline */}
         <FormField
           label="What's your tagline?"
           required
           error={errors?.['tagline']?.[0]}
-          helper="A short, memorable phrase that captures your value proposition"
+          helper="A short, memorable phrase that captures your value proposition."
         >
-          <input
-            type="text"
-            value={data?.tagline || ''}
-            onChange={(e) => updateField('tagline', e.target.value)}
-            className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
-            placeholder="Enter your tagline"
-          />
+          <>
+            <p className="text-sm text-gray-400 mb-2">
+              A concise tagline instantly communicates your brand promise, making 
+              potential customers curious to learn more.
+            </p>
+            <input
+              type="text"
+              value={data?.tagline || ''}
+              onChange={(e) => updateField('tagline', e.target.value)}
+              className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2"
+              placeholder="Enter your tagline"
+            />
+          </>
         </FormField>
 
+        {/* Mission Statement Section */}
         <div className="bg-[#2D3748] p-6 rounded-lg mb-6">
           <h3 className="text-lg font-semibold mb-4">Mission Statement Formula</h3>
           <p className="text-gray-300 mb-4">
@@ -83,45 +102,80 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
           </div>
         </div>
 
+        {/* Mission Statement */}
         <FormField
           label="What's your mission statement?"
           required
           error={errors?.['missionStatement']?.[0]}
-          helper="Use the formula above to craft a clear, impactful mission statement"
+          helper="Use the formula above to craft a clear, impactful mission statement."
         >
-          <textarea
-            value={data?.missionStatement || ''}
-            onChange={(e) => updateField('missionStatement', e.target.value)}
-            className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
-            placeholder="We exist to... for... so they can..."
-          />
+          <>
+            <p className="text-sm text-gray-400 mb-2">
+              This defines your core purpose. A well-crafted mission 
+              keeps your team aligned and your audience engaged.
+            </p>
+            <textarea
+              value={data?.missionStatement || ''}
+              onChange={(e) => updateField('missionStatement', e.target.value)}
+              className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
+              placeholder="We exist to... for... so they can..."
+            />
+          </>
         </FormField>
 
+        {/* Vision Statement (newly inserted before core values) */}
+        <FormField
+          label="What's your vision statement?"
+          required
+          error={errors?.['visionStatement']?.[0]}
+          helper="Envision the future state of your business and the impact you want to make."
+        >
+          <>
+            <p className="text-sm text-gray-400 mb-2">
+              Your vision statement paints a bigger picture for the future—why your brand 
+              matters in the long run and how it helps shape your industry or community.
+            </p>
+            <textarea
+              value={data?.visionStatement || ''}
+              onChange={(e) => updateField('visionStatement', e.target.value)}
+              className="w-full bg-[#2D3748] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
+              placeholder="Describe the future you aim to create..."
+            />
+          </>
+        </FormField>
+
+        {/* Core Values */}
         <FormField
           label="What are your core values?"
           required
           error={errors?.['coreValues']?.[0]}
-          helper="Add 3-5 values that define your business culture and principles"
+          helper="Add 3-5 values that define your business culture and principles."
         >
-          <ArrayInput
-            label="Core Values"
-            values={data?.coreValues || []}
-            onChange={(values) => updateField('coreValues', values)}
-            required
-            placeholder="Add a core value..."
-          />
-          <div className="absolute right-2 top-2">
-            <Tooltip content="Core values are the fundamental beliefs that guide your business decisions. Choose 3-5 values that truly represent what your business stands for and how you operate." />
-          </div>
-          <div className="mt-4 bg-[#1A202C] p-4 rounded-md">
-            <p className="text-sm text-gray-400">Example core values:</p>
-            <ul className="list-disc list-inside text-gray-300">
-              <li>Customer Success First</li>
-              <li>Continuous Innovation</li>
-              <li>Radical Transparency</li>
-              <li>Sustainable Growth</li>
-            </ul>
-          </div>
+          <>
+            <p className="text-sm text-gray-400 mb-2">
+              Core values influence every aspect of your brand. They guide decisions, shape culture, 
+              and set the tone for how you interact with customers.
+            </p>
+            <ArrayInput
+              label="Core Values"
+              values={data?.coreValues || []}
+              onChange={(values) => updateField('coreValues', values)}
+              required
+              placeholder="Add a core value..."
+            />
+            <div className="absolute right-2 top-2">
+              <Tooltip content="Core values are the fundamental beliefs that guide your business decisions. Choose 3-5 values that truly represent what your business stands for and how you operate." />
+            </div>
+            <div className="mt-4 bg-[#1A202C] p-4 rounded-md">
+              <p className="text-sm text-gray-400">Example core values:</p>
+              <ul className="list-disc list-inside text-gray-300">
+                <li>Customer Success First</li>
+                <li>Continuous Innovation</li>
+                <li>Radical Transparency</li>
+                <li>Sustainable Growth</li>
+              </ul>
+            </div>
+          </>
         </FormField>
       </div>
     </div>

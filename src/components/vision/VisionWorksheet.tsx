@@ -1,22 +1,16 @@
-
-
-/***************************************
- FILE 2: src/components/vision/VisionWorksheet.tsx
-***************************************/
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 import { withWorksheetLogic, WithWorksheetLogicProps } from '@/components/common/withWorksheetLogic';
 import { VisionData } from '@/types/pillar1';
+import { generateVisionPDF } from '@/utils/pdfUtils';
 import VisionClarityPage from './pages/VisionClarityPage';
 import GoalsPage from './pages/GoalsPage';
 import TargetAudiencePage from './pages/TargetAudiencePage';
 import CustomerJourneyPage from './pages/CustomerJourneyPage';
 import SwotAnalysisPage from './pages/SwotAnalysisPage';
+import VisionConclusionPage from './pages/VisionConclusionPage'; // NEW
 
-/* 
-   The PDF component: must always return <Page>. 
-   If data is empty, show placeholder text.
-*/
+
 export function VisionWorksheetPDF({ data }: { data?: VisionData }) {
   return (
     <Page size="A4" style={{ padding: 24 }}>
@@ -30,7 +24,7 @@ export function VisionWorksheetPDF({ data }: { data?: VisionData }) {
             <Text>Business Name: {data.businessName || 'N/A'}</Text>
             <Text>Tagline: {data.tagline || 'N/A'}</Text>
             <Text>Mission: {data.missionStatement || 'N/A'}</Text>
-            {/* etc. for other fields if you like */}
+            {/* ... add more fields if needed */}
           </View>
         )
       }
@@ -38,10 +32,10 @@ export function VisionWorksheetPDF({ data }: { data?: VisionData }) {
   );
 }
 
-/* The main VisionWorksheet component for user input + multi-step UI. */
 interface VisionWorksheetProps extends WithWorksheetLogicProps {
   data?: VisionData;
 }
+
 function VisionWorksheet({
   data,
   onChange,
@@ -60,9 +54,7 @@ function VisionWorksheet({
     coreValues: [],
     businessGoals: { shortTerm: '', midTerm: '', longTerm: '' },
     swot: { strengths: [], weaknesses: [], opportunities: [], threats: [] },
-    customerJourney: {
-      awareness: [], consideration: [], decision: '', retention: []
-    },
+    customerJourney: { awareness: [], consideration: [], decision: '', retention: [] },
     targetAudience: {
       primaryProfile: '',
       secondaryAudiences: [],
@@ -74,7 +66,6 @@ function VisionWorksheet({
     }
   };
 
-  // Renders the sub-pages 1..5
   const renderPage = () => {
     switch (currentPage) {
       case 1: return <VisionClarityPage data={defaultVision} onChange={onChange} errors={errors} />;
@@ -82,6 +73,8 @@ function VisionWorksheet({
       case 3: return <TargetAudiencePage data={defaultVision} onChange={onChange} errors={errors} />;
       case 4: return <CustomerJourneyPage data={defaultVision} onChange={onChange} errors={errors} />;
       case 5: return <SwotAnalysisPage data={defaultVision} onChange={onChange} errors={errors} />;
+      // NEW: conclusion as final page
+      case 6: return <VisionConclusionPage />;
       default: return null;
     }
   };
@@ -94,63 +87,69 @@ function VisionWorksheet({
         {currentPage === 3 && "Target Audience"}
         {currentPage === 4 && "Customer Journey"}
         {currentPage === 5 && "SWOT Analysis"}
+        {currentPage === 6 && "Vision Conclusion"}
       </h2>
 
       {renderPage()}
 
-      {/* Download or Next button */}
-      {(onPdfDownloaded || onNextSection) && (
-        <div className="flex justify-end mt-6">
-          <button
-            onClick={pdfDownloaded ? onNextSection : onPdfDownloaded}
-            disabled={!isValid}
-            className={`px-4 py-2 rounded ${
-              !isValid
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}
-          >
-            {!isValid
-              ? 'Complete All Fields First'
-              : pdfDownloaded
-                ? 'Next Section'
-                : 'Download Vision PDF'
-            }
-          </button>
+      {/* If final page (6) => wrap-up CTA about needing PDF, if not downloaded yet */}
+      { !pdfDownloaded && (
+        <div className="mt-6 p-4 bg-gray-800 text-yellow-400 rounded">
+          You must download the PDF to proceed to the next pillar.
         </div>
       )}
+
+      <div className="flex flex-col sm:flex-row justify-end mt-6 gap-4">
+        <button
+          onClick={onPdfDownloaded}
+          disabled={!pdfDownloaded}
+          className={`px-4 py-2 rounded ${
+            !pdfDownloaded
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              : 'bg-blue-500 hover:bg-blue-600 text-white'
+          }`}
+        >
+          {pdfDownloaded ? 'Re-Download Vision PDF' : 'Download Vision PDF'}
+        </button>
+
+        <button
+          onClick={onNextSection}
+          disabled={!pdfDownloaded}
+          className={`px-4 py-2 rounded ${
+            !pdfDownloaded
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              : 'bg-green-500 hover:bg-green-600 text-white'
+          }`}
+        >
+          Next Section
+        </button>
+      </div>
     </div>
   );
 }
 
-/* Checks if all sub-pages are complete */
-function isDataComplete(data: VisionData | undefined): boolean {
+function isDataComplete(data?: VisionData) {
   if (!data) return false;
-  // Page 1
+  // same checks as before
   const clarityDone = Boolean(
     data.businessName && data.tagline && data.missionStatement &&
     data.visionStatement && data.coreValues?.length
   );
-  // Page 2
   const goalsDone = Boolean(
-    data.businessGoals?.shortTerm && data.businessGoals?.midTerm &&
-    data.businessGoals?.longTerm
+    data.businessGoals?.shortTerm && data.businessGoals?.midTerm && data.businessGoals?.longTerm
   );
-  // Page 3
   const audienceDone = Boolean(
     data.targetAudience?.primaryProfile &&
     data.targetAudience?.painPoints?.length &&
     data.targetAudience?.idealCustomerProfile?.problem &&
     data.targetAudience?.idealCustomerProfile?.journey
   );
-  // Page 4
   const journeyDone = Boolean(
     data.customerJourney?.awareness?.length &&
     data.customerJourney?.consideration?.length &&
     data.customerJourney?.decision &&
     data.customerJourney?.retention?.length
   );
-  // Page 5
   const swotDone = Boolean(
     data.swot?.strengths?.length && data.swot?.weaknesses?.length &&
     data.swot?.opportunities?.length && data.swot?.threats?.length
@@ -158,32 +157,14 @@ function isDataComplete(data: VisionData | undefined): boolean {
   return clarityDone && goalsDone && audienceDone && journeyDone && swotDone;
 }
 
-/* Tells withWorksheetLogic how to generate the PDF & check completeness */
+// changed maxPages from 5 to 6
 const config = {
-  generatePdf: async (data?: VisionData) => {
-    // We import @react-pdf/renderer, create a <Document><VisionWorksheetPDF/></Document> at runtime
-    const { pdf, Document } = await import('@react-pdf/renderer');
-    const docElem = (
-      <Document>
-        <VisionWorksheetPDF data={data} />
-      </Document>
-    );
-    const blob = await pdf(docElem).toBlob();
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = data?.businessName ? `${data.businessName}-vision.pdf` : 'vision-worksheet.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  },
+  generatePdf: generateVisionPDF,
   isDataComplete,
   pdfFileName: 'vision-worksheet.pdf',
   title: 'Vision & Strategy',
   description: 'Define your business vision, goals, target audience, and strategic analysis.',
-  maxPages: 5
+  maxPages: 6
 };
 
-/* Wrap in the withWorksheetLogic HOC */
 export default withWorksheetLogic<VisionWorksheetProps>(VisionWorksheet, config);

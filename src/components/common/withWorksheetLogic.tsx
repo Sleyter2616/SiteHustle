@@ -1,26 +1,23 @@
-
 /***********************************************************************
-  2) withWorksheetLogic.tsx
-     - Ensures we call `config.generatePdf(props.data)` and `doc.save(...)`
-     - Sets `pdfDownloaded` to true after a successful download so the 
-       button in VisionWorksheet toggles to "Next Section."
+  withWorksheetLogic.tsx
+  - Restored forward navigation logic and final PDF gating at the parent.
 ***********************************************************************/
 import React, { useState, ComponentType } from 'react';
 import { toast } from 'react-hot-toast';
 
 export interface WithWorksheetLogicProps {
-  data?: any;          // Make optional
+  data?: any;
   onChange?: (data: any) => void;
   isValid?: boolean;
   onPdfDownloaded?: () => void;
-  onNextSection?: () => void;
-  pdfDownloaded?: boolean;
+  onNextSection?: () => void; // Called when final step is complete
+  pdfDownloaded?: boolean;    // If parent's state indicates PDF is downloaded
   errors?: Record<string, string[]>;
   currentPage?: number;
 }
 
 interface WorksheetConfig {
-  generatePdf: (data: any) => any;         // Must return a jsPDF or similar doc
+  generatePdf: (data: any) => any;      // Must return a jsPDF doc or Promise
   isDataComplete: (data: any) => boolean;
   pdfFileName: string;
   title: string;
@@ -35,46 +32,59 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
   return function WithWorksheetLogicComponent(props: P) {
     const [currentPage, setCurrentPage] = useState(props.currentPage || 1);
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-    const [localPdfDownloaded, setLocalPdfDownloaded] = useState<boolean>(props.pdfDownloaded || false);
+    const [localPdfDownloaded, setLocalPdfDownloaded] = useState<boolean>(
+      props.pdfDownloaded || false
+    );
 
     const maxPages = config.maxPages || 4;
 
+    // Moves forward one page if not final, else handle final logic
     const handleNext = async () => {
-      if (currentPage === maxPages) {
-        // final page logic
-        if (!localPdfDownloaded) {
-          await handleDownloadPDF();
-        } else if (props.onNextSection) {
-          props.onNextSection();
-        }
+      // If we're not on the last page, just go to the next page
+      if (currentPage < maxPages) {
+        setCurrentPage((prev) => Math.min(prev + 1, maxPages));
         return;
       }
-      setCurrentPage(prev => Math.min(prev + 1, maxPages));
+
+      // If we ARE on the final page, do the final gating logic
+      // (e.g., PDF gating) if desired. Alternatively, you can leave
+      // next logic for the final button below.
+      if (!localPdfDownloaded) {
+        await handleDownloadPDF();
+      } else if (props.onNextSection) {
+        props.onNextSection();
+      }
     };
 
+    // Moves backward one page
     const handleBack = () => {
-      setCurrentPage(prev => Math.max(prev - 1, 1));
+      setCurrentPage((prev) => Math.max(prev - 1, 1));
     };
 
+    // Download PDF logic
     const handleDownloadPDF = async () => {
+      // Validate data completeness
       if (!config.isDataComplete(props.data)) {
         toast.error('Please complete all fields before downloading the PDF.');
         return;
       }
       try {
         setIsGeneratingPDF(true);
-        const doc = await config.generatePdf(props.data);
-        doc.save(config.pdfFileName);
+        // generatePdf may return a jsPDF doc or a Promise
+        const docOrPromise = await config.generatePdf(props.data);
+
+        // If docOrPromise is a jsPDF doc, we do docOrPromise.save(...)
+        // If it's async or the function already handled .save(), adjust as needed
+        if (docOrPromise && typeof docOrPromise.save === 'function') {
+          docOrPromise.save(config.pdfFileName);
+        }
+
         toast.success(`${config.title} PDF downloaded successfully!`);
+        setLocalPdfDownloaded(true); // Mark local PDF as downloaded
 
-        // Mark that we have downloaded the PDF
-        setLocalPdfDownloaded(true);
-
-        // Also call the parent's onPdfDownloaded if available
         if (props.onPdfDownloaded) {
           props.onPdfDownloaded();
         }
-
       } catch (error) {
         console.error('Error generating PDF:', error);
         toast.error('Failed to generate PDF. Please try again.');
@@ -83,19 +93,16 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
       }
     };
 
-    /*
-      We'll merge localPdfDownloaded with props.pdfDownloaded 
-      so the child sees the updated state (pdfDownloaded = true)
-    */
+    // This merges the parent's pdfDownloaded with our local state
     const finalProps = {
       ...props,
-      pdfDownloaded: localPdfDownloaded,  // override with local state
+      pdfDownloaded: localPdfDownloaded, // override with local state
       currentPage
     };
 
     return (
       <div className="space-y-8">
-        {/* Title */}
+        {/* Title & Description */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">{config.title}</h1>
           <p className="text-gray-300">{config.description}</p>
@@ -109,11 +116,12 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
           />
         </div>
 
-        {/* Child Page(s) */}
+        {/* Child Component (Worksheet) */}
         <WrappedComponent {...(finalProps as P)} />
 
-        {/* Navigation */}
+        {/* Bottom Navigation */}
         <div className="flex justify-between mt-8">
+          {/* Back button */}
           <button
             onClick={handleBack}
             disabled={currentPage === 1}
@@ -125,24 +133,57 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
           >
             Back
           </button>
-          <button
-            onClick={handleNext}
-            disabled={currentPage === maxPages && !config.isDataComplete(props.data)}
-            className={`px-4 py-2 rounded ${
-              currentPage === maxPages && !config.isDataComplete(props.data)
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-500'
-            }`}
-          >
-            {currentPage === maxPages
-              ? localPdfDownloaded
-                ? 'Next Section'
-                : isGeneratingPDF
+
+          {/* 
+            If NOT on last page, show a simple "Next" button.
+            If on the last page, show "Download PDF" and "Next Section" gating logic.
+          */}
+          {currentPage < maxPages ? (
+            <button
+              onClick={handleNext}
+              className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-500"
+            >
+              Next
+            </button>
+          ) : (
+            <div className="flex gap-4">
+              {/* Download PDF Button */}
+              <button
+                onClick={handleDownloadPDF}
+                disabled={localPdfDownloaded || isGeneratingPDF}
+                className={`px-4 py-2 rounded ${
+                  localPdfDownloaded
+                    ? 'bg-green-600 text-white cursor-not-allowed'
+                    : isGeneratingPDF
+                      ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-500 text-white'
+                }`}
+              >
+                {localPdfDownloaded
+                  ? 'PDF Downloaded'
+                  : isGeneratingPDF
                   ? 'Generating PDF...'
-                  : 'Download PDF'
-              : 'Next'
-            }
-          </button>
+                  : 'Download PDF'}
+              </button>
+
+              {/* Next Section Button - gated on PDF downloaded */}
+              <button
+                onClick={() => {
+                  if (localPdfDownloaded && props.onNextSection) {
+                    props.onNextSection();
+                  }
+                }}
+                disabled={!localPdfDownloaded}
+                className={`px-4 py-2 rounded ${
+                  !localPdfDownloaded
+                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    : 'bg-green-500 hover:bg-green-600 text-white'
+                }`}
+              >
+                Next Section
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Page Dots */}

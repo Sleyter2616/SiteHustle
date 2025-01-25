@@ -31,13 +31,13 @@ export default function ImmediateActionsPage({ data, onChange, errors }: Immedia
         <FormField
           key={num}
           label={`Action ${num}`}
-          type="textarea"
-          value={data.immediateActions?.[index] || ''}
-          onChange={(value) => handleActionChange(index, value)}
-          placeholder="What specific action will you take?"
-          error={errors?.immediateActions?.[index]}
-          tooltip="Focus on concrete, actionable steps that you can start working on immediately"
-        />
+          // type="textarea"
+          // value={data.immediateActions?.[index] || ''}
+          // onChange={(value) => handleActionChange(index, value)}
+          // placeholder="What specific action will you take?"
+          // error={errors?.immediateActions?.[index]}
+          // tooltip="Focus on concrete, actionable steps that you can start working on immediately"
+        > </FormField>
       ))}
     </div>
   );
