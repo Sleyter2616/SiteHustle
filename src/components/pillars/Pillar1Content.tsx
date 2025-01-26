@@ -1,12 +1,15 @@
-// src/components/pillars/Pillar1Content.tsx
+'use client'
+
 import React, { useEffect, useState } from 'react';
 import { Pillar1Data } from '@/types/pillar1';
 import { useSections } from '@/hooks/useSections';
 import { savePillar1Data, loadPillar1Data } from '@/utils/storage';
-import BrandIdentityWorksheet from '@/components/brand-identity/BrandIdentityWorksheet';
-import VisionWorksheet from '@/components/vision/VisionWorksheet';
-import ExecutionRoadmapWorksheet from '@/components/execution-roadmap/ExecutionRoadmapWorksheet';
-// Removed WireframeWorksheet import
+
+import BrandIdentityWorksheet from '../pillar1/brand-identity/BrandIdentityWorksheet';
+import VisionWorksheet from '../pillar1/vision/VisionWorksheet';
+import ExecutionRoadmapWorksheet from '../pillar1/execution-roadmap/ExecutionRoadmapWorksheet';
+import Pillar1IntroPage from '../pillar1/Pillar1IntroPage';
+import Pillar1ConclusionPage from '../pillar1/Pillar1ConclusionPage';
 
 import { toast } from 'react-hot-toast';
 
@@ -39,6 +42,10 @@ async function sendPillar1DataToServer(data: Pillar1Data) {
 interface Pillar1ContentProps {
   data: Pillar1Data | null;
   onDataChange: (updated: Pillar1Data) => void;
+  /** 
+   * Optionally pass down a handleComplete or something else 
+   * if parent wants to re-use it. But typically we do it here. 
+   */
 }
 
 export default function Pillar1Content({ data, onDataChange }: Pillar1ContentProps) {
@@ -82,7 +89,23 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
     }
   }, [data]);
 
-  // Sync with server after PDF
+  // We define handleComplete here to demonstrate how we might call a parent's function
+  // or do a local POST. But the “real” handleComplete might be in a parent like PillarContent.
+  const handleComplete = async () => {
+    try {
+      // Example local logic or could call parent's prop
+      console.log('Completing Pillar 1...');
+      // Possibly call a parent's handleComplete? 
+      // or do our own server logic:
+      // e.g. fetch('/api/pillar1/complete', { method: 'POST', ... })
+      // or we might call 'sendPillar1DataToServer(data!)'
+      toast.success('Pillar 1 completed!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Error completing Pillar 1.');
+    }
+  };
+
   const handleDownloadAndSync = async (sectionIndex: number) => {
     await handleDownloadPDF(sectionIndex);
     const sec = sectionConfig[sectionIndex];
@@ -100,6 +123,9 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
   }
 
   function renderCompletionStatus(sectionNum: number) {
+    if (sectionNum === 0 || sectionNum === 4) {
+      return null;
+    }
     const cfg = sectionConfig[sectionNum];
     const valid = sectionValidation[cfg.key];
     const hasPdf = downloadedPdfs[cfg.key];
@@ -138,10 +164,19 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
     if (loadingServerData) {
       return <div className="p-4 text-gray-400">Loading data from server...</div>;
     }
-    if (!canAccessSection(sectionNum)) {
+
+    if (sectionNum !== 0 && sectionNum !== 4 && !canAccessSection(sectionNum)) {
       return <div className="p-4 text-gray-500">Complete previous section first.</div>;
     }
+
     switch (sectionNum) {
+      case 0:
+        return (
+          <Pillar1IntroPage
+            onNextSection={handleNext}
+          />
+        );
+
       case 1:
         return (
           <>
@@ -156,6 +191,7 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
             {renderCompletionStatus(1)}
           </>
         );
+
       case 2:
         return (
           <>
@@ -170,6 +206,7 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
             {renderCompletionStatus(2)}
           </>
         );
+
       case 3:
         return (
           <>
@@ -184,18 +221,26 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
             {renderCompletionStatus(3)}
           </>
         );
+
+      case 4:
+        return (
+          <Pillar1ConclusionPage
+            data={data || {} as Pillar1Data}
+            onCompletePillar={handleComplete}
+          />
+        );
+
       default:
         return null;
     }
   }
 
-  // We'll do 3 sections total. So total steps = 3 => each is 33% or 100/3
-  // If you want a simpler approach, just do 3 steps: 1/3, 2/3, 3/3.
   function overallCompletionPercent() {
-    // how many are "true"
-    const completedCount = Object.values(sectionValidation).filter(Boolean).length;
-    const totalSections = 3;
-    return (completedCount / totalSections) * 100;
+    const completedCount = ['brandIdentity', 'vision', 'executionRoadmap'].filter(
+      (key) => sectionValidation[key]
+    ).length;
+    const totalMainSections = 3;
+    return (completedCount / totalMainSections) * 100;
   }
 
   return (
@@ -205,7 +250,7 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
         <nav className="-mb-px flex space-x-8 overflow-x-auto">
           {Object.entries(sectionConfig).map(([id, cfg]) => {
             const sectionId = parseInt(id);
-            const disabled = !canAccessSection(sectionId);
+            const disabled = (sectionId !== 0 && sectionId !== 4) && !canAccessSection(sectionId);
             return (
               <button
                 key={sectionId}
@@ -235,9 +280,7 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
         <div className="h-2 bg-gray-200 rounded">
           <div
             className="h-full bg-blue-500 rounded transition-all duration-300"
-            style={{
-              width: `${overallCompletionPercent()}%`
-            }}
+            style={{ width: `${overallCompletionPercent()}%` }}
           />
         </div>
         <div className="mt-2 text-sm text-gray-600 text-right">

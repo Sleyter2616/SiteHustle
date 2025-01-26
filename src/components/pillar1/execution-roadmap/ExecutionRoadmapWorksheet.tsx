@@ -10,21 +10,21 @@ import ImmediateActionsPage from './pages/ImmediateActionsPage';
 interface ExecutionRoadmapWorksheetProps extends WithWorksheetLogicProps {
   data?: ExecutionRoadmapData;
   onChange: (data: ExecutionRoadmapData) => void;
-  isValid?: boolean;
-  onPdfDownloaded?: () => void;
-  onNextSection?: () => void;
-  pdfDownloaded?: boolean;
+  isValid?: boolean;         // from withWorksheetLogic
+  onPdfDownloaded?: () => void;   // from withWorksheetLogic
+  onNextSection?: () => void;     // from withWorksheetLogic
+  pdfDownloaded?: boolean;        // from withWorksheetLogic
 }
 
 function ExecutionRoadmapWorksheet({
   data,
   onChange,
-  isValid,
+  isValid = false,
   onPdfDownloaded,
   onNextSection,
-  pdfDownloaded
+  pdfDownloaded = false
 }: ExecutionRoadmapWorksheetProps) {
-  // If no data provided, define defaults
+  // Provide defaults:
   const defaultData: ExecutionRoadmapData = {
     thirtyDayGoal: '',
     weeklyMilestones: [],
@@ -35,7 +35,7 @@ function ExecutionRoadmapWorksheet({
 
   return (
     <div className="space-y-6">
-      {/* Intro */}
+      {/* Intro Section */}
       <div className="space-y-3 bg-gray-800 p-4 rounded">
         <h1 className="text-2xl font-bold">Your Execution Roadmap</h1>
         <p className="text-gray-300">
@@ -51,45 +51,69 @@ function ExecutionRoadmapWorksheet({
         </p>
       </div>
 
-      {/* Pages */}
+      {/* Subsections */}
       <ThirtyDayGoalPage data={defaultData} onChange={onChange} />
       <WeeklyMilestonesPage data={defaultData} onChange={onChange} />
       <ContentPlanPage data={defaultData} onChange={onChange} />
       <ImmediateActionsPage data={defaultData} onChange={onChange} />
 
-      {/* CTA or PDF Download / Next Section */}
-      {(onPdfDownloaded || onNextSection) && (
-        <div className="flex justify-end mt-6">
-          <button
-            onClick={pdfDownloaded ? onNextSection : onPdfDownloaded}
-            disabled={!isValid}
-            className={`px-4 py-2 rounded ${
-              !isValid
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}
-          >
-            {!isValid
-              ? 'Complete All Fields First'
-              : pdfDownloaded
-                ? 'Next Section'
-                : 'Download Roadmap PDF'
-            }
-          </button>
+      {/* Gating Notice if PDF is not downloaded */}
+      {!pdfDownloaded && (
+        <div className="mt-6 p-4 bg-gray-800 text-yellow-400 rounded">
+          You must download the PDF to proceed to the next section.
         </div>
       )}
+
+      {/* Button Row: Download PDF + Next Section */}
+      <div className="mt-6 flex flex-col sm:flex-row sm:justify-end gap-4">
+        {/* Download PDF button => disabled if not valid */}
+        <button
+          onClick={onPdfDownloaded}
+          disabled={!pdfDownloaded}
+          className={`
+            px-4 py-2 rounded
+            ${!pdfDownloaded
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
+        >
+    Re-Download Roadmap PDF
+        </button>
+
+        {/* Next Section => disabled unless pdfDownloaded is true */}
+        <button
+          onClick={onNextSection}
+          disabled={!pdfDownloaded}
+          className={`
+            px-4 py-2 rounded
+            ${!pdfDownloaded
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              : 'bg-green-500 hover:bg-green-600 text-white'
+            }`}
+        >
+          Next Section
+        </button>
+      </div>
     </div>
   );
 }
 
+/**
+ * For the PDF gating & “Complete All Fields First” logic,
+ * we define isDataComplete as your min. required fields:
+ */
 function isDataComplete(data?: ExecutionRoadmapData) {
   if (!data) return false;
   const { thirtyDayGoal, weeklyMilestones, contentPlan, immediateActions } = data;
-  return Boolean(
-    thirtyDayGoal &&
-    (weeklyMilestones?.length || 0) >= 4 &&  // e.g. requiring 4 weekly milestones
-    contentPlan &&
-    (immediateActions?.length || 0) >= 3    // e.g. requiring 3 immediate actions
+  return (
+    // Must have a 30-day goal
+    !!thirtyDayGoal?.trim() &&
+    // e.g. require 4 weekly milestones
+    (weeklyMilestones?.length ?? 0) >= 4 &&
+    // Must have contentPlan
+    !!contentPlan?.trim() &&
+    // e.g. require 3 immediate actions
+    (immediateActions?.length ?? 0) >= 3
   );
 }
 
@@ -102,4 +126,7 @@ const config = {
   maxPages: 1
 };
 
-export default withWorksheetLogic<ExecutionRoadmapWorksheetProps>(ExecutionRoadmapWorksheet, config);
+export default withWorksheetLogic<ExecutionRoadmapWorksheetProps>(
+  ExecutionRoadmapWorksheet,
+  config
+);
