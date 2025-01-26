@@ -1,15 +1,15 @@
 import React from 'react';
-import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
+import { Page, Text, View } from '@react-pdf/renderer';
 import { withWorksheetLogic, WithWorksheetLogicProps } from '@/components/common/withWorksheetLogic';
 import { VisionData } from '@/types/pillar1';
 import { generateVisionPDF } from '@/utils/pdfUtils';
+
 import VisionClarityPage from './pages/VisionClarityPage';
 import GoalsPage from './pages/GoalsPage';
 import TargetAudiencePage from './pages/TargetAudiencePage';
 import CustomerJourneyPage from './pages/CustomerJourneyPage';
 import SwotAnalysisPage from './pages/SwotAnalysisPage';
-import VisionConclusionPage from './pages/VisionConclusionPage'; // NEW
-
+import VisionConclusionPage from './pages/VisionConclusionPage';
 
 export function VisionWorksheetPDF({ data }: { data?: VisionData }) {
   return (
@@ -24,7 +24,7 @@ export function VisionWorksheetPDF({ data }: { data?: VisionData }) {
             <Text>Business Name: {data.businessName || 'N/A'}</Text>
             <Text>Tagline: {data.tagline || 'N/A'}</Text>
             <Text>Mission: {data.missionStatement || 'N/A'}</Text>
-            {/* ... add more fields if needed */}
+            {/* Add more fields if needed */}
           </View>
         )
       }
@@ -46,13 +46,34 @@ function VisionWorksheet({
   onNextSection,
   currentPage = 1
 }: VisionWorksheetProps) {
-  const defaultVision: VisionData = data || {
+  /**
+   * Provide empty defaults for each new subfield in businessGoals
+   * so that TypeScript and the rest of your code handle them gracefully.
+   */
+  const defaultVision: VisionData = {
     businessName: '',
     tagline: '',
     missionStatement: '',
     visionStatement: '',
     coreValues: [],
-    businessGoals: { shortTerm: '', midTerm: '', longTerm: '' },
+    businessGoals: {
+      shortTerm: '',
+      midTerm: '',
+      longTerm: '',
+      websiteGoals: '',
+      successIndicators: '',
+      attendance: { specific: '', measurable: '', achievable: '', relevant: '', timeBound: '' },
+      engagement: { specific: '', measurable: '', achievable: '', relevant: '', timeBound: '' },
+      financial: { specific: '', measurable: '', achievable: '', relevant: '', timeBound: '' },
+      contentDelivery: { specific: '', measurable: '', achievable: '', relevant: '', timeBound: '' },
+      networking: { specific: '', measurable: '', achievable: '', relevant: '', timeBound: '' },
+      goalPriorities: '',
+      actionPlan: '',
+      challenges: '',
+      accountability: '',
+      summary: '',
+      nextSteps: '',
+    },
     swot: { strengths: [], weaknesses: [], opportunities: [], threats: [] },
     customerJourney: { awareness: [], consideration: [], decision: '', retention: [] },
     targetAudience: {
@@ -63,9 +84,11 @@ function VisionWorksheet({
         problem: '', journey: '', desires: [], desiredState: '',
         gap: '', uniqueSellingPoint: '', benefits: [], objections: []
       }
-    }
+    },
+    ...data // merges any existing data
   };
 
+  // Renders the appropriate page
   const renderPage = () => {
     switch (currentPage) {
       case 1: return <VisionClarityPage data={defaultVision} onChange={onChange} errors={errors} />;
@@ -73,7 +96,6 @@ function VisionWorksheet({
       case 3: return <TargetAudiencePage data={defaultVision} onChange={onChange} errors={errors} />;
       case 4: return <CustomerJourneyPage data={defaultVision} onChange={onChange} errors={errors} />;
       case 5: return <SwotAnalysisPage data={defaultVision} onChange={onChange} errors={errors} />;
-      // NEW: conclusion as final page
       case 6: return <VisionConclusionPage />;
       default: return null;
     }
@@ -92,10 +114,10 @@ function VisionWorksheet({
 
       {renderPage()}
 
-      {/* If final page (6) => wrap-up CTA about needing PDF, if not downloaded yet */}
-      { !pdfDownloaded && (
+      {/* If final page (6) => show a CTA for PDF if not downloaded */}
+      {!pdfDownloaded && (
         <div className="mt-6 p-4 bg-gray-800 text-yellow-400 rounded">
-          You must download the PDF to proceed to the next pillar.
+          You must download the PDF to proceed to the next section.
         </div>
       )}
 
@@ -128,15 +150,22 @@ function VisionWorksheet({
   );
 }
 
+/**
+ * If you want the *new fields* to be required, add them here.
+ * Currently, we only check the original required fields.
+ */
 function isDataComplete(data?: VisionData) {
   if (!data) return false;
-  // same checks as before
+
   const clarityDone = Boolean(
     data.businessName && data.tagline && data.missionStatement &&
     data.visionStatement && data.coreValues?.length
   );
   const goalsDone = Boolean(
-    data.businessGoals?.shortTerm && data.businessGoals?.midTerm && data.businessGoals?.longTerm
+    data.businessGoals?.shortTerm &&
+    data.businessGoals?.midTerm &&
+    data.businessGoals?.longTerm
+    // If you want these also required: data.businessGoals?.attendance?.specific etc.
   );
   const audienceDone = Boolean(
     data.targetAudience?.primaryProfile &&
@@ -154,10 +183,10 @@ function isDataComplete(data?: VisionData) {
     data.swot?.strengths?.length && data.swot?.weaknesses?.length &&
     data.swot?.opportunities?.length && data.swot?.threats?.length
   );
+
   return clarityDone && goalsDone && audienceDone && journeyDone && swotDone;
 }
 
-// changed maxPages from 5 to 6
 const config = {
   generatePdf: generateVisionPDF,
   isDataComplete,

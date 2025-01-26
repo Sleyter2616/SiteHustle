@@ -42,7 +42,7 @@ function WireframeWorksheet({
     <div className="space-y-8">
       {/* Example layout text fields, as you had before */}
       <TextArea
-        label="Header"
+        // label="Header"
         value={currentData.layout?.header || ''}
         onChange={(val) => handleLayoutChange('header', val)}
       />

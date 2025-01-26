@@ -1,6 +1,6 @@
 import React from 'react';
 import { ExecutionRoadmapData } from '@/types/pillar1';
-import { withWorksheetLogic, WithWorksheetLogicProps } from '../common/withWorksheetLogic';
+import { withWorksheetLogic, WithWorksheetLogicProps } from '@/components/common/withWorksheetLogic';
 import { generateExecutionRoadmapPDF } from '@/utils/pdfUtils';
 import ThirtyDayGoalPage from './pages/ThirtyDayGoalPage';
 import WeeklyMilestonesPage from './pages/WeeklyMilestonesPage';
@@ -24,21 +24,40 @@ function ExecutionRoadmapWorksheet({
   onNextSection,
   pdfDownloaded
 }: ExecutionRoadmapWorksheetProps) {
-  const defaultData: ExecutionRoadmapData = data || {
+  // If no data provided, define defaults
+  const defaultData: ExecutionRoadmapData = {
     thirtyDayGoal: '',
     weeklyMilestones: [],
     contentPlan: '',
-    immediateActions: []
+    immediateActions: [],
+    ...data
   };
 
   return (
     <div className="space-y-6">
+      {/* Intro */}
+      <div className="space-y-3 bg-gray-800 p-4 rounded">
+        <h1 className="text-2xl font-bold">Your Execution Roadmap</h1>
+        <p className="text-gray-300">
+          This worksheet outlines a clear, step-by-step plan 
+          to translate your ideas and goals into actionable next steps. 
+          By focusing on a <strong>30-day goal</strong>, weekly milestones, 
+          and immediate actions, you’ll gain momentum and confidence.
+        </p>
+        <p className="text-gray-300">
+          Think of this as your short-term sprint to test ideas quickly 
+          and validate or refine your approach. 
+          The more concrete your roadmap, the easier it is to stay focused and track progress.
+        </p>
+      </div>
+
+      {/* Pages */}
       <ThirtyDayGoalPage data={defaultData} onChange={onChange} />
       <WeeklyMilestonesPage data={defaultData} onChange={onChange} />
       <ContentPlanPage data={defaultData} onChange={onChange} />
       <ImmediateActionsPage data={defaultData} onChange={onChange} />
 
-      {/* Example PDF or Next Section button at bottom */}
+      {/* CTA or PDF Download / Next Section */}
       {(onPdfDownloaded || onNextSection) && (
         <div className="flex justify-end mt-6">
           <button
@@ -63,14 +82,14 @@ function ExecutionRoadmapWorksheet({
   );
 }
 
-function isDataComplete(data: ExecutionRoadmapData) {
+function isDataComplete(data?: ExecutionRoadmapData) {
   if (!data) return false;
   const { thirtyDayGoal, weeklyMilestones, contentPlan, immediateActions } = data;
   return Boolean(
     thirtyDayGoal &&
-    (weeklyMilestones?.length || 0) >= 4 &&
+    (weeklyMilestones?.length || 0) >= 4 &&  // e.g. requiring 4 weekly milestones
     contentPlan &&
-    (immediateActions?.length || 0) >= 3
+    (immediateActions?.length || 0) >= 3    // e.g. requiring 3 immediate actions
   );
 }
 
@@ -80,7 +99,7 @@ const config = {
   pdfFileName: 'execution-roadmap.pdf',
   title: 'Execution Roadmap',
   description: 'Create a clear plan to execute your vision and achieve your business goals.',
-  maxPages: 1 // or however many pages if you want multi-substeps
+  maxPages: 1
 };
 
-export default withWorksheetLogic(ExecutionRoadmapWorksheet, config);
+export default withWorksheetLogic<ExecutionRoadmapWorksheetProps>(ExecutionRoadmapWorksheet, config);

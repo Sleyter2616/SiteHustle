@@ -25,7 +25,7 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
         <h1 className="text-3xl font-bold mb-4">The Value of Clarity</h1>
         <p className="text-gray-300 mb-6">
           A clear vision is the foundation of any successful business. It guides your decisions,
-          attracts the right customers, and keeps your team aligned. By defining each part 
+          attracts the right customers, and keeps your team aligned. By defining each part
           of your vision, you set the stage for consistent growth and strong brand identity.
         </p>
       </div>
@@ -50,11 +50,12 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
           label="What's your business name?"
           required
           error={errors?.['businessName']?.[0]}
+          tooltip="This will be the 'front door' to your brand. Choose a name that resonates with your values and audience."
         >
           <>
             <p className="text-sm text-gray-400 mb-2">
-              This anchors your entire brand. A clear, memorable name helps customers 
-              recognize and recall you in a crowded market.
+              Your business name forms the first impression in a crowded market.
+              A clear, memorable name helps potential customers recall and share it with others.
             </p>
             <input
               type="text"
@@ -72,11 +73,12 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
           required
           error={errors?.['tagline']?.[0]}
           helper="A short, memorable phrase that captures your value proposition."
+          tooltip="Your tagline quickly conveys your unique promise or focus. Keep it concise and impactful."
         >
           <>
             <p className="text-sm text-gray-400 mb-2">
-              A concise tagline instantly communicates your brand promise, making 
-              potential customers curious to learn more.
+              A concise tagline instantly communicates the essence of your brand,
+              sparking curiosity and recognition.
             </p>
             <input
               type="text"
@@ -108,11 +110,11 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
           required
           error={errors?.['missionStatement']?.[0]}
           helper="Use the formula above to craft a clear, impactful mission statement."
+          tooltip="Your mission clarifies the immediate purpose of your business—who you serve and how you serve them."
         >
           <>
             <p className="text-sm text-gray-400 mb-2">
-              This defines your core purpose. A well-crafted mission 
-              keeps your team aligned and your audience engaged.
+              This defines your core purpose and keeps both your team and audience aligned around a shared goal.
             </p>
             <textarea
               value={data?.missionStatement || ''}
@@ -123,17 +125,18 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
           </>
         </FormField>
 
-        {/* Vision Statement (newly inserted before core values) */}
+        {/* Vision Statement */}
         <FormField
           label="What's your vision statement?"
           required
           error={errors?.['visionStatement']?.[0]}
           helper="Envision the future state of your business and the impact you want to make."
+          tooltip="Your vision statement outlines your broader aspiration—why your brand matters in the long run."
         >
           <>
             <p className="text-sm text-gray-400 mb-2">
-              Your vision statement paints a bigger picture for the future—why your brand 
-              matters in the long run and how it helps shape your industry or community.
+              Think about where you see your business heading in 3–5 years. 
+              This big-picture outlook inspires both your team and customers.
             </p>
             <textarea
               value={data?.visionStatement || ''}
@@ -150,11 +153,12 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
           required
           error={errors?.['coreValues']?.[0]}
           helper="Add 3-5 values that define your business culture and principles."
+          tooltip="Core values guide every decision you make, from hiring to marketing. They shape your brand's ethics and identity."
         >
           <>
             <p className="text-sm text-gray-400 mb-2">
-              Core values influence every aspect of your brand. They guide decisions, shape culture, 
-              and set the tone for how you interact with customers.
+              Values determine how you interact with customers, partners, and employees. They also
+              influence the tone and manner in which you grow your brand.
             </p>
             <ArrayInput
               label="Core Values"
@@ -163,9 +167,6 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
               required
               placeholder="Add a core value..."
             />
-            <div className="absolute right-2 top-2">
-              <Tooltip content="Core values are the fundamental beliefs that guide your business decisions. Choose 3-5 values that truly represent what your business stands for and how you operate." />
-            </div>
             <div className="mt-4 bg-[#1A202C] p-4 rounded-md">
               <p className="text-sm text-gray-400">Example core values:</p>
               <ul className="list-disc list-inside text-gray-300">

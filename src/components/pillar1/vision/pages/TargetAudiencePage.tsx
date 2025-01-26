@@ -39,8 +39,9 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
       <div>
         <h1 className="text-3xl font-bold mb-4">Target Audience Profile</h1>
         <p className="text-gray-300 mb-6">
-          Understanding your target audience is crucial for creating content and
-          offerings that resonate with their needs and desires.
+          Identifying exactly who you serve is central to creating products, services,
+          and content that truly resonate. The more precisely you define your audience,
+          the easier it is to speak their language and solve their problems.
         </p>
       </div>
 
@@ -49,7 +50,7 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
           label="Primary Audience Profile"
           required
           error={errors?.['targetAudience.primaryProfile']?.[0]}
-          tooltip={tooltips.worksheet.targetAudience.primaryProfile}
+          tooltip="Who is your ideal, primary customer? Consider demographics, psychographics, and the scenarios they face."
         >
           <textarea
             value={data?.targetAudience?.primaryProfile || ''}
@@ -63,7 +64,7 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
           label="Secondary Audiences"
           required
           error={errors?.['targetAudience.secondaryAudiences']?.[0]}
-          tooltip={tooltips.worksheet.targetAudience.secondaryAudiences}
+          tooltip="Sometimes there's a secondary or 'related' group that might benefit from your offerings. List them here."
         >
           <ArrayInput
             values={data?.targetAudience?.secondaryAudiences || []}
@@ -76,7 +77,7 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
           label="Pain Points"
           required
           error={errors?.['targetAudience.painPoints']?.[0]}
-          tooltip={tooltips.worksheet.targetAudience.painPoints}
+          tooltip="Pinpoint exactly what troubles your audience, so you can position your brand as the solution."
         >
           <ArrayInput
             values={data?.targetAudience?.painPoints || []}
@@ -87,12 +88,16 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
 
         <div className="bg-gray-800 p-6 rounded-lg space-y-6">
           <h2 className="text-xl font-semibold">Ideal Customer Profile</h2>
+          <p className="text-sm text-gray-400 mb-2">
+            Here, you define the ultimate persona you want to attract—someone who sees real value in what you offer.
+            The more specific you are, the better you can craft products, marketing, and messaging that truly click.
+          </p>
 
           <FormField
             label="Problem"
             required
             error={errors?.['targetAudience.idealCustomerProfile.problem']?.[0]}
-            tooltip={tooltips.worksheet.targetAudience.idealCustomerProfile.problem}
+            tooltip="What is the main problem or challenge this ideal customer faces, that you want to solve?"
           >
             <textarea
               value={data?.targetAudience?.idealCustomerProfile?.problem || ''}
@@ -106,7 +111,7 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
             label="Journey"
             required
             error={errors?.['targetAudience.idealCustomerProfile.journey']?.[0]}
-            tooltip={tooltips.worksheet.targetAudience.idealCustomerProfile.journey}
+            tooltip="What's the transformation they desire? Understand how they move from 'problem' to 'solution.'"
           >
             <textarea
               value={data?.targetAudience?.idealCustomerProfile?.journey || ''}
@@ -120,7 +125,7 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
             label="Desires"
             required
             error={errors?.['targetAudience.idealCustomerProfile.desires']?.[0]}
-            tooltip={tooltips.worksheet.targetAudience.idealCustomerProfile.desires}
+            tooltip="List specific aspirations—both tangible and intangible—that your offering helps them achieve."
           >
             <ArrayInput
               values={data?.targetAudience?.idealCustomerProfile?.desires || []}
@@ -133,7 +138,7 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
             label="Desired State"
             required
             error={errors?.['targetAudience.idealCustomerProfile.desiredState']?.[0]}
-            tooltip={tooltips.worksheet.targetAudience.idealCustomerProfile.desiredState}
+            tooltip="Where do they ultimately want to be after using your product or service?"
           >
             <textarea
               value={data?.targetAudience?.idealCustomerProfile?.desiredState || ''}
@@ -147,7 +152,7 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
             label="Gap Analysis"
             required
             error={errors?.['targetAudience.idealCustomerProfile.gap']?.[0]}
-            tooltip={tooltips.worksheet.targetAudience.idealCustomerProfile.gap}
+            tooltip="Pinpoint the differences between where they are now and where they want to be—this is what your brand can bridge."
           >
             <textarea
               value={data?.targetAudience?.idealCustomerProfile?.gap || ''}
@@ -161,7 +166,7 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
             label="Unique Selling Point"
             required
             error={errors?.['targetAudience.idealCustomerProfile.uniqueSellingPoint']?.[0]}
-            tooltip={tooltips.worksheet.targetAudience.idealCustomerProfile.uniqueSellingPoint}
+            tooltip="What differentiates you in the eyes of this ideal customer? Why should they choose you over competitors?"
           >
             <textarea
               value={data?.targetAudience?.idealCustomerProfile?.uniqueSellingPoint || ''}
@@ -175,7 +180,7 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
             label="Benefits"
             required
             error={errors?.['targetAudience.idealCustomerProfile.benefits']?.[0]}
-            tooltip={tooltips.worksheet.targetAudience.idealCustomerProfile.benefits}
+            tooltip="Practical advantages they gain—time saved, money earned, stress reduced, etc."
           >
             <ArrayInput
               values={data?.targetAudience?.idealCustomerProfile?.benefits || []}
@@ -188,7 +193,7 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
             label="Common Objections"
             required
             error={errors?.['targetAudience.idealCustomerProfile.objections']?.[0]}
-            tooltip={tooltips.worksheet.targetAudience.idealCustomerProfile.objections}
+            tooltip="What hesitations might stop them from buying? Listing these helps you address them upfront."
           >
             <ArrayInput
               values={data?.targetAudience?.idealCustomerProfile?.objections || []}
