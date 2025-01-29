@@ -57,42 +57,32 @@ function ExecutionRoadmapWorksheet({
       <ContentPlanPage data={defaultData} onChange={onChange} />
       <ImmediateActionsPage data={defaultData} onChange={onChange} />
 
-      {/* Gating Notice if PDF is not downloaded */}
-      {!pdfDownloaded && (
-        <div className="mt-6 p-4 bg-gray-800 text-yellow-400 rounded">
-          You must download the PDF to proceed to the next section.
-        </div>
-      )}
-
-      {/* Button Row: Download PDF + Next Section */}
-      <div className="mt-6 flex flex-col sm:flex-row sm:justify-end gap-4">
-        {/* Download PDF button => disabled if not valid */}
+      {/* PDF and Next Section buttons */}
+      <div className="flex justify-end gap-4 mt-6">
         <button
           onClick={onPdfDownloaded}
-          disabled={!pdfDownloaded}
-          className={`
-            px-4 py-2 rounded
-            ${!pdfDownloaded
+          disabled={!isValid}
+          className={`px-4 py-2 rounded ${
+            !isValid
               ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}
+              : 'bg-blue-600 hover:bg-blue-500 text-white'
+          }`}
         >
-    Re-Download Roadmap PDF
+          {pdfDownloaded ? 'Re-Download PDF' : 'Download PDF'}
         </button>
-
-        {/* Next Section => disabled unless pdfDownloaded is true */}
-        <button
-          onClick={onNextSection}
-          disabled={!pdfDownloaded}
-          className={`
-            px-4 py-2 rounded
-            ${!pdfDownloaded
-              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-green-500 hover:bg-green-600 text-white'
+        {onNextSection && (
+          <button
+            onClick={pdfDownloaded ? onNextSection : null}
+            disabled={!isValid || !pdfDownloaded}
+            className={`px-4 py-2 rounded ${
+              !isValid || !pdfDownloaded
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                : 'bg-green-500 hover:bg-green-600 text-white'
             }`}
-        >
-          Next Section
-        </button>
+          >
+            Next Section
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import { Pillar1Data } from '@/types/pillar1';
 import { useSections } from '@/hooks/useSections';
-import { savePillar1Data, loadPillar1Data } from '@/utils/storage';
+import { loadPillar1Data, savePillar1Data } from '@/utils/storage';
 
 import BrandIdentityWorksheet from '../pillar1/brand-identity/BrandIdentityWorksheet';
 import VisionWorksheet from '../pillar1/vision/VisionWorksheet';
@@ -13,119 +13,219 @@ import Pillar1ConclusionPage from '../pillar1/Pillar1ConclusionPage';
 
 import { toast } from 'react-hot-toast';
 
-// Example optional backend calls for persistent storage
-async function fetchPillar1DataFromServer(): Promise<Pillar1Data | null> {
-  try {
-    const res = await fetch('/api/pillar1');
-    if (!res.ok) throw new Error(`Server error: ${res.status}`);
-    const remote = await res.json();
-    return remote as Pillar1Data;
-  } catch (err) {
-    console.error('Error fetching Pillar1Data:', err);
-    return null;
-  }
-}
-
-async function sendPillar1DataToServer(data: Pillar1Data) {
-  try {
-    const res = await fetch('/api/pillar1', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!res.ok) throw new Error(`Server error: ${res.status}`);
-  } catch (err) {
-    console.error('Error saving Pillar1Data:', err);
-  }
-}
-
 interface Pillar1ContentProps {
-  data: Pillar1Data | null;
-  onDataChange: (updated: Pillar1Data) => void;
-  /** 
-   * Optionally pass down a handleComplete or something else 
-   * if parent wants to re-use it. But typically we do it here. 
-   */
+  // If you want to pass in existing data from props, or start with null
+  data?: Pillar1Data | null;
+  onDataChange?: (updated: Pillar1Data) => void;
 }
 
-export default function Pillar1Content({ data, onDataChange }: Pillar1ContentProps) {
+// Provide a function returning a 'blank' Pillar1Data to avoid field issues
+function getEmptyPillar1Data(): Pillar1Data {
+  return {
+    brandIdentity: {
+      reflection: {
+        whoIAm: '',
+        whoIAmNot: '',
+        whyBuildBrand: ''
+      },
+      personality: {
+        communicationStyle: '',
+        toneAndVoice: '',
+        passionateExpression: '',
+        brandPersonality: ''
+      },
+      story: {
+        pivotalExperience: '',
+        definingMoment: '',
+        audienceRelevance: ''
+      },
+      differentiation: {
+        uniqueApproach: '',
+        uniqueResources: '',
+        competitivePerception: ''
+      }
+    },
+    vision: {
+      businessName: '',
+      tagline: '',
+      missionStatement: '',
+      visionStatement: '',
+      coreValues: [],
+      businessGoals: {
+        shortTerm: '',
+        midTerm: '',
+        longTerm: '',
+        websiteGoals: '',
+        successIndicators: ''
+      },
+      swot: {
+        strengths: [],
+        weaknesses: [],
+        opportunities: [],
+        threats: []
+      },
+      customerJourney: {
+        awareness: [],
+        consideration: [],
+        decision: '',
+        retention: []
+      },
+      targetAudience: {
+        primaryProfile: '',
+        secondaryAudiences: [],
+        painPoints: [],
+        idealCustomerProfile: {
+          problem: '',
+          journey: '',
+          desires: [],
+          desiredState: '',
+          gap: '',
+          uniqueSellingPoint: '',
+          benefits: [],
+          objections: []
+        }
+      }
+    },
+    executionRoadmap: {
+      thirtyDayGoal: '',
+      weeklyMilestones: [],
+      contentPlan: '',
+      immediateActions: []
+    }
+  };
+}
+
+export default function Pillar1Content({
+  data: initialData = null,
+  onDataChange
+}: Pillar1ContentProps) {
+  // We store local data in a state so we can track typed changes w/o spamming server
+  const [pillar1Data, setPillar1Data] = useState<Pillar1Data | null>(initialData);
+  const [loading, setLoading] = useState(false);
+
   const {
     activeSection,
     sectionValidation,
     downloadedPdfs,
-    handleDownloadPDF,
+    handleDownloadPdf,
     goToSection,
     handleNext,
     canAccessSection,
     sectionConfig
-  } = useSections({ data });
+  } = useSections({
+    data: pillar1Data,
+    saveDataToServer: saveDataToServer
+  });
 
-  const [loadingServerData, setLoadingServerData] = useState(false);
-
-  // On mount, try local storage, then server
+  // On mount: if we have no data (null), load from server
   useEffect(() => {
-    (async () => {
-      if (!data) {
-        const local = loadPillar1Data();
-        if (local) {
-          onDataChange(local);
-        } else {
-          setLoadingServerData(true);
-          const fromServer = await fetchPillar1DataFromServer();
-          if (fromServer) {
-            onDataChange(fromServer);
-            savePillar1Data(fromServer);
+    if (!pillar1Data) {
+      setLoading(true);
+      loadPillar1Data()
+        .then((res) => {
+          if (res) {
+            setPillar1Data(res);
+            onDataChange?.(res);
+          } else {
+            // server returned null => create empty
+            const empty = getEmptyPillar1Data();
+            setPillar1Data(empty);
+            onDataChange?.(empty);
           }
-          setLoadingServerData(false);
-        }
-      }
-    })();
-  }, [data, onDataChange]);
-
-  // Whenever data updates, store locally
-  useEffect(() => {
-    if (data) {
-      savePillar1Data(data);
+        })
+        .catch((err) => {
+          console.error('Error loading Pillar1Data:', err);
+          toast.error('Failed to load Pillar 1 data from server.');
+        })
+        .finally(() => setLoading(false));
     }
-  }, [data]);
+    // if we do have data from props, do nothing
+  }, [pillar1Data, onDataChange]);
 
-  // We define handleComplete here to demonstrate how we might call a parent's function
-  // or do a local POST. But the “real” handleComplete might be in a parent like PillarContent.
-  const handleComplete = async () => {
+  // Save final to server
+  async function saveDataToServer(dataToSave: Pillar1Data) {
+    setLoading(true);
     try {
-      // Example local logic or could call parent's prop
-      console.log('Completing Pillar 1...');
-      // Possibly call a parent's handleComplete? 
-      // or do our own server logic:
-      // e.g. fetch('/api/pillar1/complete', { method: 'POST', ... })
-      // or we might call 'sendPillar1DataToServer(data!)'
-      toast.success('Pillar 1 completed!');
+      await savePillar1Data(dataToSave); // calls /api/pillar1
+      onDataChange?.(dataToSave);       // if parent wants to track changes
     } catch (err) {
       console.error(err);
-      toast.error('Error completing Pillar 1.');
+      toast.error('Failed to save your data');
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleDownloadAndSync = async (sectionIndex: number) => {
-    await handleDownloadPDF(sectionIndex);
-    const sec = sectionConfig[sectionIndex];
-    if (downloadedPdfs[sec.key] && data) {
-      await sendPillar1DataToServer(data);
-      toast.success(`Data synced for ${sec.title}`);
-    }
-  };
-
-  function handleSectionDataChange(sectionKey: keyof Pillar1Data, newValue: any) {
-    if (!data) return;
-    const updated = { ...data, [sectionKey]: newValue };
-    onDataChange(updated);
-    savePillar1Data(updated);
   }
 
-  function renderCompletionStatus(sectionNum: number) {
-    if (sectionNum === 0 || sectionNum === 4) {
-      return null;
+  // Called from sub-pages *only* for local merges
+  function handleLocalDataChange(sectionKey: keyof Pillar1Data, updatedVal: any) {
+    if (!pillar1Data) return;
+    const updated = { ...pillar1Data, [sectionKey]: updatedVal };
+    setPillar1Data(updated);
+    // No immediate server call => “type, type, type, local only”
+  }
+
+  // Called when user clicks “Next Section”
+  async function handleNextSection() {
+    if (!pillar1Data) return;
+    setLoading(true);
+    try {
+      // Save data before moving to next section
+      await saveDataToServer(pillar1Data);
+      handleNext();
+      toast.success('Progress saved');
+    } catch (error) {
+      console.error('Error saving progress:', error);
+      toast.error('Failed to save progress');
+    } finally {
+      setLoading(false);
     }
+  }
+
+  // Called when user downloads PDF => after success => sync
+  async function handleDownloadAndSync(sectionIndex: number) {
+    if (!pillar1Data) return;
+    setLoading(true);
+    try {
+      // First save the data
+      await saveDataToServer(pillar1Data);
+      // Then download PDF
+      await handleDownloadPdf(new MouseEvent('click') as any, sectionIndex);
+      const sec = sectionConfig[sectionIndex];
+      if (downloadedPdfs[sec.key]) {
+        toast.success(`PDF downloaded for ${sec.title}`);
+      }
+    } catch (error) {
+      console.error('Error during download and sync:', error);
+      toast.error('Failed to save progress or download PDF');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Called if they complete the entire pillar
+  const handleCompletePillar = async (sectionIndex: number) => {
+    if (!pillar1Data) return;
+    setLoading(true);
+    try {
+      // First save the data
+      await saveDataToServer(pillar1Data);
+      // Then download PDF
+      await handleDownloadPdf(new MouseEvent('click') as any, sectionIndex);
+      const sec = sectionConfig[sectionIndex];
+      if (downloadedPdfs[sec.key]) {
+        toast.success(`PDF downloaded for ${sec.title}`);
+      }
+    } catch (error) {
+      console.error('Error completing pillar:', error);
+      toast.error('Failed to complete pillar');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Renders a small completion hint
+  function renderCompletionStatus(sectionNum: number) {
+    if (sectionNum === 0 || sectionNum === 4) return null;
     const cfg = sectionConfig[sectionNum];
     const valid = sectionValidation[cfg.key];
     const hasPdf = downloadedPdfs[cfg.key];
@@ -161,10 +261,11 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
   }
 
   function renderSection(sectionNum: number) {
-    if (loadingServerData) {
-      return <div className="p-4 text-gray-400">Loading data from server...</div>;
+    if (loading) {
+      return <div>Loading or Saving Data...</div>;
     }
 
+    // if user tries to jump to locked section
     if (sectionNum !== 0 && sectionNum !== 4 && !canAccessSection(sectionNum)) {
       return <div className="p-4 text-gray-500">Complete previous section first.</div>;
     }
@@ -173,79 +274,72 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
       case 0:
         return (
           <Pillar1IntroPage
-            onNextSection={handleNext}
+            onNextSection={handleNextSection}
           />
         );
-
       case 1:
         return (
           <>
+            {renderCompletionStatus(1)}
             <BrandIdentityWorksheet
-              data={data?.brandIdentity}
-              onChange={(val) => handleSectionDataChange('brandIdentity', val)}
+              data={pillar1Data?.brandIdentity}
+              onChange={(val) => handleLocalDataChange('brandIdentity', val)}
               onPdfDownloaded={() => handleDownloadAndSync(1)}
-              onNextSection={handleNext}
+              onNextSection={handleNextSection}
               pdfDownloaded={downloadedPdfs.brandIdentity}
               isValid={sectionValidation.brandIdentity}
             />
-            {renderCompletionStatus(1)}
           </>
         );
-
       case 2:
         return (
           <>
             <VisionWorksheet
-              data={data?.vision}
-              onChange={(val) => handleSectionDataChange('vision', val)}
+              data={pillar1Data?.vision}
+              onChange={(val) => handleLocalDataChange('vision', val)}
               onPdfDownloaded={() => handleDownloadAndSync(2)}
-              onNextSection={handleNext}
+              onNextSection={handleNextSection}
               pdfDownloaded={downloadedPdfs.vision}
               isValid={sectionValidation.vision}
             />
             {renderCompletionStatus(2)}
           </>
         );
-
       case 3:
         return (
           <>
             <ExecutionRoadmapWorksheet
-              data={data?.executionRoadmap}
-              onChange={(val) => handleSectionDataChange('executionRoadmap', val)}
+              data={pillar1Data?.executionRoadmap}
+              onChange={(val) => handleLocalDataChange('executionRoadmap', val)}
               onPdfDownloaded={() => handleDownloadAndSync(3)}
-              onNextSection={handleNext}
+              onNextSection={handleNextSection}
               pdfDownloaded={downloadedPdfs.executionRoadmap}
               isValid={sectionValidation.executionRoadmap}
             />
             {renderCompletionStatus(3)}
           </>
         );
-
       case 4:
         return (
           <Pillar1ConclusionPage
-            data={data || {} as Pillar1Data}
-            onCompletePillar={handleComplete}
+            data={pillar1Data || getEmptyPillar1Data()}
+            onCompletePillar={() => handleCompletePillar(4)}
           />
         );
-
       default:
         return null;
     }
   }
 
   function overallCompletionPercent() {
-    const completedCount = ['brandIdentity', 'vision', 'executionRoadmap'].filter(
-      (key) => sectionValidation[key]
-    ).length;
-    const totalMainSections = 3;
-    return (completedCount / totalMainSections) * 100;
+    const validSections = ['brandIdentity', 'vision', 'executionRoadmap'];
+    const completedCount = validSections.filter((key) => sectionValidation[key]).length;
+    return (completedCount / validSections.length) * 100;
   }
 
   return (
     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      {/* Navigation Tabs */}
+      {/* Tabs for Intro => 0, brand =>1, vision =>2, roadmap =>3, conclusion =>4 */}
       <div className="border-b border-gray-700 mb-8">
         <nav className="-mb-px flex space-x-8 overflow-x-auto">
           {Object.entries(sectionConfig).map(([id, cfg]) => {
@@ -273,9 +367,10 @@ export default function Pillar1Content({ data, onDataChange }: Pillar1ContentPro
         </nav>
       </div>
 
+      {/* Render whichever sub-page is active */}
       {renderSection(activeSection)}
 
-      {/* Overall Progress */}
+      {/* Overall progress bar */}
       <div className="mt-8">
         <div className="h-2 bg-gray-200 rounded">
           <div

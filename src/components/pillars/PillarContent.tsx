@@ -129,21 +129,9 @@ export default function PillarContent({ pillar, progress, userId }: PillarConten
             onClick={handleSavePillar1}
             className="rounded-md px-6 py-3 text-base font-medium text-white shadow-sm bg-[#3B82F6] hover:bg-[#2563EB]"
           >
-            Save Data
+            Save Pillar 1 Data
           </button>
         )}
-
-        <button
-          onClick={handleComplete}
-          disabled={isUpdating || (progress?.completed)}
-          className={`rounded-md px-6 py-3 text-base font-medium text-white shadow-sm ${
-            progress?.completed
-              ? 'bg-[#10B981] cursor-not-allowed'
-              : 'bg-[#5865F2] hover:bg-[#4752C4]'
-          }`}
-        >
-          {progress?.completed ? 'Completed!' : 'Mark as Complete'}
-        </button>
       </div>
     </div>
   )

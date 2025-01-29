@@ -52,7 +52,7 @@ function WireframeWorksheet({
       {(onPdfDownloaded || onNextSection) && (
         <div className="flex justify-end mt-6">
           <button
-            onClick={pdfDownloaded ? onNextSection : onPdfDownloaded}
+            onClick={pdfDownloaded ? onNextSection: null }
             disabled={!isValid}
             className={`px-4 py-2 rounded ${
               !isValid
@@ -60,11 +60,9 @@ function WireframeWorksheet({
                 : 'bg-blue-500 hover:bg-blue-600 text-white'
             }`}
           >
-            {!isValid
+            {!isValid && !pdfDownloaded
               ? 'Complete All Fields First'
-              : pdfDownloaded
-                ? 'Next Section'
-                : 'Download Wireframe PDF'
+              : 'Next Section'
             }
           </button>
         </div>

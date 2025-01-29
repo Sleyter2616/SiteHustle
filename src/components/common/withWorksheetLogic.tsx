@@ -46,12 +46,8 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
         return;
       }
 
-      // If we ARE on the final page, do the final gating logic
-      // (e.g., PDF gating) if desired. Alternatively, you can leave
-      // next logic for the final button below.
-      if (!localPdfDownloaded) {
-        await handleDownloadPDF();
-      } else if (props.onNextSection) {
+      // If we're on the final page and PDF is downloaded, move to next section
+      if (localPdfDownloaded && props.onNextSection) {
         props.onNextSection();
       }
     };
@@ -62,7 +58,11 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
     };
 
     // Download PDF logic
-    const handleDownloadPDF = async () => {
+    const handleDownloadPDF = async (e?: React.MouseEvent) => {
+      // Prevent any form submission
+      e?.preventDefault();
+      e?.stopPropagation();
+      
       // Validate data completeness
       if (!config.isDataComplete(props.data)) {
         toast.error('Please complete all fields before downloading the PDF.');
@@ -76,9 +76,10 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
         // If docOrPromise is a jsPDF doc, we do docOrPromise.save(...)
         // If it's async or the function already handled .save(), adjust as needed
         if (docOrPromise && typeof docOrPromise.save === 'function') {
-          docOrPromise.save(config.pdfFileName);
+          // Use a timeout to prevent the save from triggering a page reload
+            docOrPromise.save(config.pdfFileName);
+         
         }
-
         toast.success(`${config.title} PDF downloaded successfully!`);
         setLocalPdfDownloaded(true); // Mark local PDF as downloaded
 
@@ -136,7 +137,7 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
 
           {/* 
             If NOT on last page, show a simple "Next" button.
-            If on the last page, show "Download PDF" and "Next Section" gating logic.
+            If on the last page, show "Next Section" gating logic.
           */}
           {currentPage < maxPages ? (
             <button
@@ -147,41 +148,24 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
             </button>
           ) : (
             <div className="flex gap-4">
-              {/* Download PDF Button */}
-              <button
-                onClick={handleDownloadPDF}
-                disabled={localPdfDownloaded || isGeneratingPDF}
-                className={`px-4 py-2 rounded ${
-                  localPdfDownloaded
-                    ? 'bg-green-600 text-white cursor-not-allowed'
-                    : isGeneratingPDF
+              {/* Next Section Button */}
+              {props.onNextSection && (
+                <button
+                  onClick={() => {
+                    if (localPdfDownloaded && props.onNextSection) {
+                      props.onNextSection();
+                    }
+                  }}
+                  disabled={!localPdfDownloaded}
+                  className={`px-4 py-2 rounded ${
+                    !localPdfDownloaded
                       ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-500 text-white'
-                }`}
-              >
-                {localPdfDownloaded
-                  ? 'PDF Downloaded'
-                  : isGeneratingPDF
-                  ? 'Generating PDF...'
-                  : 'Download PDF'}
-              </button>
-
-              {/* Next Section Button - gated on PDF downloaded */}
-              <button
-                onClick={() => {
-                  if (localPdfDownloaded && props.onNextSection) {
-                    props.onNextSection();
-                  }
-                }}
-                disabled={!localPdfDownloaded}
-                className={`px-4 py-2 rounded ${
-                  !localPdfDownloaded
-                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                    : 'bg-green-500 hover:bg-green-600 text-white'
-                }`}
-              >
-                Next Section
-              </button>
+                      : 'bg-green-500 hover:bg-green-600 text-white'
+                  }`}
+                >
+                  Next Section
+                </button>
+              )}
             </div>
           )}
         </div>

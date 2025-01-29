@@ -102,7 +102,7 @@ export const validateBrandIdentity = (data?: Pillar1Data['brandIdentity']): Vali
 /* ------------------------------------------------------------------
    VISION VALIDATION
 ------------------------------------------------------------------ */
-export const validateVision = (data?: Pillar1Data['vision']): ValidationResult => {
+export const validateVision = (data?: VisionData): ValidationResult => {
   if (!data) {
     return { success: false, errors: { general: ['No vision data provided'] } };
   }

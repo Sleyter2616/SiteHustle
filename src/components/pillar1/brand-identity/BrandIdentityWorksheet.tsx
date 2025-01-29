@@ -101,39 +101,32 @@ function BrandIdentityWorksheet({
 
       {renderPage()}
 
-      {/* CTA clarifying gating */}
-      {!pdfDownloaded && (
-        <div className="mt-6 p-4 bg-gray-800 text-yellow-400 rounded">
-          You must download the PDF to proceed to the next section.
-        </div>
-      )}
-
-      <div className="mt-6 flex flex-col sm:flex-row sm:justify-end gap-4">
-        {/* Download PDF Button */}
+      {/* PDF and Next Section buttons */}
+      <div className="flex justify-end gap-4 mt-6">
         <button
           onClick={onPdfDownloaded}
-          disabled={!pdfDownloaded}
+          disabled={!isValid}
           className={`px-4 py-2 rounded ${
-            !pdfDownloaded
+            !isValid
               ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-blue-500 hover:bg-blue-600 text-white'
+              : 'bg-blue-600 hover:bg-blue-500 text-white'
           }`}
         >
-       Re-Download Brand Identity PDF
+          {pdfDownloaded ? 'Re-Download PDF' : 'Download PDF'}
         </button>
-
-        {/* Next Section => gated by pdfDownloaded */}
-        <button
-          onClick={onNextSection}
-          disabled={!pdfDownloaded}
-          className={`px-4 py-2 rounded ${
-            !pdfDownloaded
-              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-green-500 hover:bg-green-600 text-white'
-          }`}
-        >
-          Next Section
-        </button>
+        {onNextSection && (
+          <button
+            onClick={pdfDownloaded ? onNextSection : null}
+            disabled={!isValid || !pdfDownloaded}
+            className={`px-4 py-2 rounded ${
+              !isValid || !pdfDownloaded
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                : 'bg-green-500 hover:bg-green-600 text-white'
+            }`}
+          >
+            Next Section
+          </button>
+        )}
       </div>
     </div>
   );

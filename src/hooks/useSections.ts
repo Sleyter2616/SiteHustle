@@ -1,4 +1,3 @@
-// src/hooks/useSections.ts
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { Pillar1Data } from '@/types/pillar1';
@@ -15,33 +14,38 @@ import {
 const sectionConfig = {
   0: {
     key: 'intro',
-    validateFn: () => true, // Intro is always valid
+    validateFn: () => true,
     pdfFn: null,
-    title: 'Introduction'
+    title: 'Introduction',
+    shouldSave: false
   },
   1: {
     key: 'brandIdentity',
     validateFn: validateBrandIdentity,
     pdfFn: generateBrandIdentityPDF,
-    title: 'Who You Are & Why'
+    title: 'Brand Identity',
+    shouldSave: true
   },
   2: {
     key: 'vision',
     validateFn: validateVision,
     pdfFn: generateVisionPDF,
-    title: 'Vision & Goals'
+    title: 'Vision & Goals',
+    shouldSave: true
   },
   3: {
     key: 'executionRoadmap',
     validateFn: validateExecutionRoadmap,
     pdfFn: generateExecutionRoadmapPDF,
-    title: 'Execution Plan'
+    title: 'Execution Plan',
+    shouldSave: true
   },
   4: {
     key: 'conclusion',
-    validateFn: () => true, // Conclusion is always valid
+    validateFn: () => true,
     pdfFn: null,
-    title: 'Completion'
+    title: 'Completion',
+    shouldSave: false
   }
 };
 
@@ -55,12 +59,14 @@ interface SectionValidationState {
 
 interface UseSectionsProps {
   data: Pillar1Data | null;
+  // Accept an optional function for saving data:
+  saveDataToServer?: (data: Pillar1Data) => Promise<void>;
 }
 
-export function useSections({ data }: UseSectionsProps) {
+export function useSections({ data, saveDataToServer }: UseSectionsProps) {
   const [activeSection, setActiveSection] = useState(0);
 
-  // This holds whether the user’s *data* for each worksheet is valid
+  // Whether each section is valid
   const [sectionValidation, setSectionValidation] = useState<SectionValidationState>({
     intro: true,
     brandIdentity: false,
@@ -69,7 +75,7 @@ export function useSections({ data }: UseSectionsProps) {
     conclusion: false
   });
 
-  // This holds whether they have *downloaded the PDF* for each section
+  // Whether each PDF has been downloaded
   const [downloadedPdfs, setDownloadedPdfs] = useState<SectionValidationState>({
     intro: false,
     brandIdentity: false,
@@ -78,7 +84,7 @@ export function useSections({ data }: UseSectionsProps) {
     conclusion: false
   });
 
-  // Re-validate each time data changes
+  // On data changes, re-validate
   useEffect(() => {
     setSectionValidation({
       intro: true,
@@ -89,51 +95,38 @@ export function useSections({ data }: UseSectionsProps) {
     });
   }, [data]);
 
-  /**
-   * Can the user open a particular section? By default:
-   * - Section 0 (intro) is always open
-   * - For others: previous section must be "valid" AND if the previous section has a PDF, it must be downloaded
-   */
+  // Checking if user can go to that section
   function canAccessSection(targetSection: number): boolean {
-    // 1) Always can access intro
     if (targetSection === 0) return true;
-
-    // 2) Identify previous
     const prevSection = targetSection - 1;
     const prevKey = sectionConfig[prevSection].key;
     const prevPdfFn = sectionConfig[prevSection].pdfFn;
 
-    // 3) Must have valid data for previous
     const isPrevValid = sectionValidation[prevKey];
-
-    // 4) If the previous section *has* a PDF function, we also require that PDF to be downloaded
-    //    If pdfFn is null (Intro/Conclusion), skip the PDF gating
     if (prevPdfFn) {
       const isPrevPdfDownloaded = downloadedPdfs[prevKey];
       return isPrevValid && isPrevPdfDownloaded;
     } else {
-      // If there's no PDF for the previous section, *only* check data validity (if needed).
       return isPrevValid;
     }
   }
 
-  /**
-   * Called when user tries to download the PDF for a given section
-   */
-  async function handleDownloadPDF(sectionNumber: number) {
+  // Download PDF for a section. No next-section logic here.
+  async function handleDownloadPdf(e: React.MouseEvent, sectionNumber: number) {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (!data) {
       toast.error('No data to generate PDF');
       return;
     }
     const cfg = sectionConfig[sectionNumber];
-
-    // If this section has no PDF function, skip
     if (!cfg.pdfFn) {
-      toast.error(`No PDF available for ${cfg.title}.`);
+      toast.error(`No PDF available for ${cfg.title}`);
       return;
     }
 
-    // Validate data for the section
+    // Validate the data
     const validationResult = cfg.validateFn(data[cfg.key]);
     if (!validationResult.success) {
       toast.error(`Please fill out all required fields for ${cfg.title} first.`);
@@ -141,18 +134,21 @@ export function useSections({ data }: UseSectionsProps) {
     }
 
     try {
-      // Generate and save PDF
+      // 1) Optionally save data if shouldSave is true
+      if (saveDataToServer && cfg.shouldSave) {
+        await saveDataToServer(data);
+        // We intentionally do NOT show a success toast here to avoid double toast
+      }
+
+      // 2) Generate PDF
       const docOrPromise = cfg.pdfFn(data[cfg.key]);
-      // Some PDF generators return a Promise, others just return doc
       if (docOrPromise instanceof Promise) {
-        // If using a react-pdf approach
         await docOrPromise;
       } else {
-        // If it’s just a jsPDF doc
         docOrPromise.save(`${cfg.title}.pdf`);
       }
 
-      toast.success(`${cfg.title} PDF downloaded successfully!`);
+      // 3) Show single success toast
       setDownloadedPdfs(prev => ({ ...prev, [cfg.key]: true }));
     } catch (err) {
       console.error('Error generating PDF:', err);
@@ -160,35 +156,31 @@ export function useSections({ data }: UseSectionsProps) {
     }
   }
 
-  /**
-   * Called when user tries to go forward to the next section
-   */
-  function handleNext() {
+  // When user moves to the next section
+  const handleNext = async () => {
+    const currentCfg = sectionConfig[activeSection];
+    if (saveDataToServer && data && currentCfg.shouldSave) {
+      try {
+        await saveDataToServer(data);
+        // Remove toast here since it's shown in Pillar1Content
+        // toast.success('Progress saved');
+      } catch (error) {
+        console.error('Error saving progress:', error);
+        toast.error('Failed to save progress');
+        return;
+      }
+    }
+
     const nextSec = activeSection + 1;
-    if (nextSec > 4) {
-      // We have only 5 sections (0..4). If we are at the final, do nothing or show a finish message
+    if (nextSec < Object.keys(sectionConfig).length) {
+      setActiveSection(nextSec);
+    } else {
       toast.success('You have reached the final section');
-      return;
     }
+  };
 
-    // If we can’t access the next section, block
-    if (!canAccessSection(nextSec)) {
-      const { title } = sectionConfig[activeSection];
-      // Maybe you skip the PDF gating for intro/conclusion
-      // But if the user is in brandIdentity => next is vision => we do gating
-      toast.error(`Please complete and download the ${title} PDF first, or ensure data is valid.`);
-      return;
-    }
-
-    setActiveSection(nextSec);
-  }
-
-  /**
-   * Called when the user tries to jump directly to a section
-   */
   function goToSection(targetSection: number) {
     if (!canAccessSection(targetSection)) {
-      // if not accessible, show error
       const { title } = sectionConfig[targetSection - 1];
       toast.error(`Please complete and download the ${title} PDF first.`);
       return;
@@ -200,7 +192,7 @@ export function useSections({ data }: UseSectionsProps) {
     activeSection,
     sectionValidation,
     downloadedPdfs,
-    handleDownloadPDF,
+    handleDownloadPdf,
     goToSection,
     handleNext,
     canAccessSection,

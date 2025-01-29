@@ -114,37 +114,32 @@ function VisionWorksheet({
 
       {renderPage()}
 
-      {/* If final page (6) => show a CTA for PDF if not downloaded */}
-      {!pdfDownloaded && (
-        <div className="mt-6 p-4 bg-gray-800 text-yellow-400 rounded">
-          You must download the PDF to proceed to the next section.
-        </div>
-      )}
-
-      <div className="flex flex-col sm:flex-row justify-end mt-6 gap-4">
+      {/* PDF and Next Section buttons */}
+      <div className="flex justify-end gap-4 mt-6">
         <button
           onClick={onPdfDownloaded}
-          disabled={!pdfDownloaded}
+          disabled={!isValid}
           className={`px-4 py-2 rounded ${
-            !pdfDownloaded
+            !isValid
               ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-blue-500 hover:bg-blue-600 text-white'
+              : 'bg-blue-600 hover:bg-blue-500 text-white'
           }`}
         >
-          {pdfDownloaded ? 'Re-Download Vision PDF' : 'Download Vision PDF'}
+          {pdfDownloaded ? 'Re-Download PDF' : 'Download PDF'}
         </button>
-
-        <button
-          onClick={onNextSection}
-          disabled={!pdfDownloaded}
-          className={`px-4 py-2 rounded ${
-            !pdfDownloaded
-              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-green-500 hover:bg-green-600 text-white'
-          }`}
-        >
-          Next Section
-        </button>
+        {onNextSection && (
+          <button
+            onClick={pdfDownloaded ? onNextSection : null}
+            disabled={!isValid || !pdfDownloaded}
+            className={`px-4 py-2 rounded ${
+              !isValid || !pdfDownloaded
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                : 'bg-green-500 hover:bg-green-600 text-white'
+            }`}
+          >
+            Next Section
+          </button>
+        )}
       </div>
     </div>
   );
@@ -191,7 +186,7 @@ const config = {
   generatePdf: generateVisionPDF,
   isDataComplete,
   pdfFileName: 'vision-worksheet.pdf',
-  title: 'Vision & Strategy',
+  title: 'Vision & Goals',
   description: 'Define your business vision, goals, target audience, and strategic analysis.',
   maxPages: 6
 };
