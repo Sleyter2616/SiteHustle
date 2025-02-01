@@ -1,5 +1,3 @@
-// src/types/pillar1.ts
-
 /** Utility type for SMART-based goals. */
 export interface SmartGoalFields {
   specific: string;

@@ -4,17 +4,20 @@ import FormField, { ArrayInput } from '@/components/common/FormField';
 import Tooltip from '@/components/common/Tooltip';
 import { tooltips } from '@/utils/pillar1Validation';
 
+// Define a type for the clarity portion of VisionData
+type VisionClarityData = Pick<VisionData, 'businessName' | 'tagline' | 'missionStatement' | 'visionStatement' | 'coreValues'>;
+
 interface VisionClarityPageProps {
-  data?: VisionData;
-  onChange: (data: VisionData) => void;
+  data?: VisionClarityData;
+  onChange: (data: VisionClarityData) => void;
   errors?: Record<string, string[]>;
 }
 
 export default function VisionClarityPage({ data, onChange, errors }: VisionClarityPageProps) {
-  const updateField = (field: string, value: any) => {
+  const updateField = (field: keyof VisionClarityData, value: any) => {
     onChange({
       ...data,
-      [field]: value
+      [field]: value,
     });
   };
 
@@ -135,7 +138,7 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
         >
           <>
             <p className="text-sm text-gray-400 mb-2">
-              Think about where you see your business heading in 3–5 years. 
+              Think about where you see your business heading in 3–5 years.
               This big-picture outlook inspires both your team and customers.
             </p>
             <textarea
@@ -157,8 +160,8 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
         >
           <>
             <p className="text-sm text-gray-400 mb-2">
-              Values determine how you interact with customers, partners, and employees. They also
-              influence the tone and manner in which you grow your brand.
+              Values determine how you interact with customers, partners, and employees.
+              They also influence the tone and manner in which you grow your brand.
             </p>
             <ArrayInput
               label="Core Values"

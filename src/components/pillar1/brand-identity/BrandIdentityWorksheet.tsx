@@ -1,5 +1,3 @@
-// src/components/brand-identity/BrandIdentityWorksheet.tsx
-
 import React from 'react';
 import { withWorksheetLogic, WithWorksheetLogicProps } from '@/components/common/withWorksheetLogic';
 import { BrandIdentityData } from '@/types/pillar1';
@@ -17,6 +15,38 @@ interface BrandIdentityWorksheetProps extends WithWorksheetLogicProps {
   onChange?: (updatedData: BrandIdentityData) => void;
 }
 
+// Per-page validation for Brand Identity
+function isBrandIdentityPageComplete(data?: BrandIdentityData, currentPage?: number): boolean {
+  if (!data || currentPage === undefined) return false;
+  switch (currentPage) {
+    case 1: // Reflection: Require at least "whoIAm" is non-empty.
+      return !!data.reflection?.whoIAm?.trim();
+    case 2: // Personality: Require all fields are non-empty.
+      return (
+        !!data.personality?.communicationStyle?.trim() &&
+        !!data.personality?.toneAndVoice?.trim() &&
+        !!data.personality?.passionateExpression?.trim() &&
+        !!data.personality?.brandPersonality?.trim()
+      );
+    case 3: // Story: Require pivotalExperience, definingMoment, and audienceRelevance.
+      return (
+        !!data.story?.pivotalExperience?.trim() &&
+        !!data.story?.definingMoment?.trim() &&
+        !!data.story?.audienceRelevance?.trim()
+      );
+    case 4: // Differentiation: Require uniqueApproach, uniqueResources, competitivePerception.
+      return (
+        !!data.differentiation?.uniqueApproach?.trim() &&
+        !!data.differentiation?.uniqueResources?.trim() &&
+        !!data.differentiation?.competitivePerception?.trim()
+      );
+    case 5: // Conclusion: We assume no data input is required, so valid.
+      return true;
+    default:
+      return false;
+  }
+}
+
 function BrandIdentityWorksheet({
   data,
   onChange,
@@ -32,7 +62,6 @@ function BrandIdentityWorksheet({
     personality: { communicationStyle: '', toneAndVoice: '', passionateExpression: '', brandPersonality: '' },
     story: { pivotalExperience: '', definingMoment: '', audienceRelevance: '' },
     differentiation: { uniqueApproach: '', uniqueResources: '', competitivePerception: '' },
-    // executionRoadmap REMOVED from this flow
     ...data
   };
 
@@ -132,19 +161,14 @@ function BrandIdentityWorksheet({
   );
 }
 
-function isDataComplete(data?: BrandIdentityData): boolean {
-  if (!data) return false;
-  // Additional checks can go here if needed
-  return true;
-}
-
 const config = {
   generatePdf: generateBrandIdentityPDF,
-  isDataComplete,
+  // Use our per-page validation function here.
+  isDataComplete: isBrandIdentityPageComplete,
   pdfFileName: 'brand-identity.pdf',
   title: 'Brand Identity',
   description: 'Define your brand identity across reflection, personality, story, differentiation, and conclusion.',
-  maxPages: 5 // only 5 pages now
+  maxPages: 5
 };
 
 export default withWorksheetLogic<BrandIdentityWorksheetProps>(BrandIdentityWorksheet, config);

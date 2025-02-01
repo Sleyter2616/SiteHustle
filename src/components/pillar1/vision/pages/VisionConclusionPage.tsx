@@ -9,13 +9,10 @@ export default function VisionConclusionPage({}: VisionConclusionPageProps) {
         <h2 className="text-2xl font-semibold mb-4">Wrapping Up Your Vision & Goals</h2>
         <div className="prose prose-invert max-w-none">
           <p>
-            You've built a detailed roadmap of your business vision. By clarifying your mission,
-            identifying tangible goals, pinpointing your ideal audience, crafting a supportive
-            customer journey, and analyzing your SWOT, you have the core framework to scale successfully.
+            Congratulations on developing a comprehensive roadmap for your business vision! By clearly defining your mission, setting tangible goals, pinpointing your ideal audience, mapping a customer journey, and analyzing your SWOT, you've established a robust foundation for growth.
           </p>
           <p className="mt-4">
-            Keep refining each section as you gather feedback and real-world insights.
-            A vision is never static—it evolves with your growth and changing market dynamics.
+            Remember, your vision is a living document. Regularly revisit and refine each section as you gather feedback and encounter new market dynamics. Embrace the evolution of your vision and use it as a catalyst for continuous improvement and innovation.
           </p>
         </div>
       </div>
@@ -24,11 +21,11 @@ export default function VisionConclusionPage({}: VisionConclusionPageProps) {
         <div>
           <h3 className="text-xl font-medium mb-3">Your Vision Journey Highlights</h3>
           <ul className="list-disc list-inside space-y-2 text-gray-300">
-            <li>Articulated your fundamental mission and guiding principles</li>
-            <li>Laid out meaningful, time-bound business goals</li>
-            <li>Profiled your ideal customers and their core challenges</li>
-            <li>Built a step-by-step customer journey from discovery to loyalty</li>
-            <li>Conducted a SWOT analysis to anticipate strengths, weaknesses, and market shifts</li>
+            <li>Clearly defined your mission and guiding principles</li>
+            <li>Set meaningful and time-bound business goals</li>
+            <li>Identified and understood your ideal customers and their challenges</li>
+            <li>Created a detailed customer journey from discovery to loyalty</li>
+            <li>Performed a thorough SWOT analysis to understand your market position</li>
           </ul>
         </div>
 
@@ -38,17 +35,14 @@ export default function VisionConclusionPage({}: VisionConclusionPageProps) {
             <div className="bg-gray-700 p-4 rounded">
               <h4 className="font-medium mb-2">Action Items</h4>
               <p className="text-gray-300">
-                Revisit your newly formed vision document with key stakeholders.
-                Schedule check-ins to track progress, adapt goals as needed, and maintain accountability.
+                Schedule a review session with your key stakeholders to discuss this vision document. Use their insights to refine your strategy, adjust your goals, and ensure that your vision remains aligned with your evolving business landscape.
               </p>
             </div>
 
             <div className="bg-gray-700 p-4 rounded">
               <h4 className="font-medium mb-2">Coming Up in the Next Pillar</h4>
               <p className="text-gray-300">
-                With your vision established, you’ll move into selecting the right no-code and
-                AI-based tools to streamline execution. You’ll see how each choice aligns with
-                your brand identity and the strategic goals outlined here.
+                With your vision solidified, you'll soon explore the optimal no-code and AI-based tools that can bring your strategy to life. Discover how these tools can streamline your execution and further align with your brand identity and strategic objectives.
               </p>
             </div>
           </div>

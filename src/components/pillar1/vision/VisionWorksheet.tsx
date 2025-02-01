@@ -1,8 +1,8 @@
-import React from 'react';
-import { Page, Text, View } from '@react-pdf/renderer';
+import React, { useMemo } from 'react';
 import { withWorksheetLogic, WithWorksheetLogicProps } from '@/components/common/withWorksheetLogic';
 import { VisionData } from '@/types/pillar1';
 import { generateVisionPDF } from '@/utils/pdfUtils';
+// We no longer need to check if vision data is complete on a per-page basis in the child components.
 
 import VisionClarityPage from './pages/VisionClarityPage';
 import GoalsPage from './pages/GoalsPage';
@@ -11,29 +11,9 @@ import CustomerJourneyPage from './pages/CustomerJourneyPage';
 import SwotAnalysisPage from './pages/SwotAnalysisPage';
 import VisionConclusionPage from './pages/VisionConclusionPage';
 
-export function VisionWorksheetPDF({ data }: { data?: VisionData }) {
-  return (
-    <Page size="A4" style={{ padding: 24 }}>
-      {!data 
-        ? <Text>No Vision data available.</Text>
-        : (
-          <View>
-            <Text style={{ fontSize: 18, marginBottom: 8 }}>
-              Vision & Goals Summary
-            </Text>
-            <Text>Business Name: {data.businessName || 'N/A'}</Text>
-            <Text>Tagline: {data.tagline || 'N/A'}</Text>
-            <Text>Mission: {data.missionStatement || 'N/A'}</Text>
-            {/* Add more fields if needed */}
-          </View>
-        )
-      }
-    </Page>
-  );
-}
-
 interface VisionWorksheetProps extends WithWorksheetLogicProps {
   data?: VisionData;
+  onChange?: (data: VisionData) => void;
 }
 
 function VisionWorksheet({
@@ -46,11 +26,7 @@ function VisionWorksheet({
   onNextSection,
   currentPage = 1
 }: VisionWorksheetProps) {
-  /**
-   * Provide empty defaults for each new subfield in businessGoals
-   * so that TypeScript and the rest of your code handle them gracefully.
-   */
-  const defaultVision: VisionData = {
+  const defaultData: VisionData = {
     businessName: '',
     tagline: '',
     missionStatement: '',
@@ -74,30 +50,93 @@ function VisionWorksheet({
       summary: '',
       nextSteps: '',
     },
-    swot: { strengths: [], weaknesses: [], opportunities: [], threats: [] },
+    swot: { strengths: [], weaknesses: [], opportunities: [], threats: [], matchingStrengthsToOpp: '', addressWeaknessesThreats: '', swotPriorities: '', actionSteps: '', responsibilities: '', swotSummary: '' },
     customerJourney: { awareness: [], consideration: [], decision: '', retention: [] },
     targetAudience: {
       primaryProfile: '',
       secondaryAudiences: [],
       painPoints: [],
       idealCustomerProfile: {
-        problem: '', journey: '', desires: [], desiredState: '',
-        gap: '', uniqueSellingPoint: '', benefits: [], objections: []
+        problem: '',
+        journey: '',
+        desires: [],
+        desiredState: '',
+        gap: '',
+        uniqueSellingPoint: '',
+        benefits: [],
+        objections: []
       }
-    },
-    ...data // merges any existing data
+    }
   };
 
-  // Renders the appropriate page
+  const mergedData: VisionData = useMemo(() => ({
+    ...defaultData,
+    ...data,
+  }), [data]);
+
+  // Render each page with its appropriate data and dedicated onChange handler.
   const renderPage = () => {
     switch (currentPage) {
-      case 1: return <VisionClarityPage data={defaultVision} onChange={onChange} errors={errors} />;
-      case 2: return <GoalsPage data={defaultVision} onChange={onChange} errors={errors} />;
-      case 3: return <TargetAudiencePage data={defaultVision} onChange={onChange} errors={errors} />;
-      case 4: return <CustomerJourneyPage data={defaultVision} onChange={onChange} errors={errors} />;
-      case 5: return <SwotAnalysisPage data={defaultVision} onChange={onChange} errors={errors} />;
-      case 6: return <VisionConclusionPage />;
-      default: return null;
+      case 1:
+        return (
+          <VisionClarityPage
+            data={{
+              businessName: mergedData.businessName,
+              tagline: mergedData.tagline,
+              missionStatement: mergedData.missionStatement,
+              visionStatement: mergedData.visionStatement,
+              coreValues: mergedData.coreValues,
+            }}
+            onChange={(updatedClarity) =>
+              onChange?.({ ...mergedData, ...updatedClarity })
+            }
+            errors={errors}
+          />
+        );
+      case 2:
+        return (
+          <GoalsPage
+            data={mergedData.businessGoals}
+            onChange={(updatedGoals) =>
+              onChange?.({ ...mergedData, businessGoals: updatedGoals })
+            }
+            errors={errors}
+          />
+        );
+      case 3:
+        return (
+          <TargetAudiencePage
+            data={mergedData.targetAudience}
+            onChange={(updatedTarget) =>
+              onChange?.({ ...mergedData, targetAudience: updatedTarget })
+            }
+            errors={errors}
+          />
+        );
+      case 4:
+        return (
+          <CustomerJourneyPage
+            data={mergedData.customerJourney}
+            onChange={(updatedJourney) =>
+              onChange?.({ ...mergedData, customerJourney: updatedJourney })
+            }
+            errors={errors}
+          />
+        );
+      case 5:
+        return (
+          <SwotAnalysisPage
+            data={mergedData.swot}
+            onChange={(updatedSwot) =>
+              onChange?.({ ...mergedData, swot: updatedSwot })
+            }
+            errors={errors}
+          />
+        );
+      case 6:
+        return <VisionConclusionPage />;
+      default:
+        return null;
     }
   };
 
@@ -114,7 +153,6 @@ function VisionWorksheet({
 
       {renderPage()}
 
-      {/* PDF and Next Section buttons */}
       <div className="flex justify-end gap-4 mt-6">
         <button
           onClick={onPdfDownloaded}
@@ -145,46 +183,10 @@ function VisionWorksheet({
   );
 }
 
-/**
- * If you want the *new fields* to be required, add them here.
- * Currently, we only check the original required fields.
- */
-function isDataComplete(data?: VisionData) {
-  if (!data) return false;
-
-  const clarityDone = Boolean(
-    data.businessName && data.tagline && data.missionStatement &&
-    data.visionStatement && data.coreValues?.length
-  );
-  const goalsDone = Boolean(
-    data.businessGoals?.shortTerm &&
-    data.businessGoals?.midTerm &&
-    data.businessGoals?.longTerm
-    // If you want these also required: data.businessGoals?.attendance?.specific etc.
-  );
-  const audienceDone = Boolean(
-    data.targetAudience?.primaryProfile &&
-    data.targetAudience?.painPoints?.length &&
-    data.targetAudience?.idealCustomerProfile?.problem &&
-    data.targetAudience?.idealCustomerProfile?.journey
-  );
-  const journeyDone = Boolean(
-    data.customerJourney?.awareness?.length &&
-    data.customerJourney?.consideration?.length &&
-    data.customerJourney?.decision &&
-    data.customerJourney?.retention?.length
-  );
-  const swotDone = Boolean(
-    data.swot?.strengths?.length && data.swot?.weaknesses?.length &&
-    data.swot?.opportunities?.length && data.swot?.threats?.length
-  );
-
-  return clarityDone && goalsDone && audienceDone && journeyDone && swotDone;
-}
-
 const config = {
   generatePdf: generateVisionPDF,
-  isDataComplete,
+  // We no longer use a completeness check here in the sub-pages.
+  isDataComplete: () => true,
   pdfFileName: 'vision-worksheet.pdf',
   title: 'Vision & Goals',
   description: 'Define your business vision, goals, target audience, and strategic analysis.',

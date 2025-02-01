@@ -2,36 +2,31 @@ import React from 'react';
 import { VisionData } from '@/types/pillar1';
 import FormField, { ArrayInput } from '@/components/common/FormField';
 import Tooltip from '@/components/common/Tooltip';
-import { tooltips } from '@/utils/pillar1Validation';
 
 interface TargetAudiencePageProps {
-  data?: VisionData;
-  onChange: (data: VisionData) => void;
+  data?: VisionData["targetAudience"];
+  onChange: (data: VisionData["targetAudience"]) => void;
   errors?: Record<string, string[]>;
 }
 
 export default function TargetAudiencePage({ data, onChange, errors }: TargetAudiencePageProps) {
   const updateTargetAudience = (field: string, value: any) => {
-    onChange({
+    const updated = {
       ...data,
-      targetAudience: {
-        ...data?.targetAudience,
-        [field]: value
-      }
-    });
+      [field]: value,
+    };
+    onChange(updated);
   };
 
   const updateIdealCustomerProfile = (field: string, value: any) => {
-    onChange({
+    const updated = {
       ...data,
-      targetAudience: {
-        ...data?.targetAudience,
-        idealCustomerProfile: {
-          ...data?.targetAudience?.idealCustomerProfile,
-          [field]: value
-        }
-      }
-    });
+      idealCustomerProfile: {
+        ...data?.idealCustomerProfile,
+        [field]: value,
+      },
+    };
+    onChange(updated);
   };
 
   return (
@@ -39,9 +34,7 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
       <div>
         <h1 className="text-3xl font-bold mb-4">Target Audience Profile</h1>
         <p className="text-gray-300 mb-6">
-          Identifying exactly who you serve is central to creating products, services,
-          and content that truly resonate. The more precisely you define your audience,
-          the easier it is to speak their language and solve their problems.
+          Define who you serve so you can tailor products, services, and content that truly resonate.
         </p>
       </div>
 
@@ -49,13 +42,13 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
         <FormField
           label="Primary Audience Profile"
           required
-          error={errors?.['targetAudience.primaryProfile']?.[0]}
-          tooltip="Who is your ideal, primary customer? Consider demographics, psychographics, and the scenarios they face."
+          error={errors?.['primaryProfile']?.[0]}
+          tooltip="Who is your ideal, primary customer? Consider demographics, psychographics, and typical scenarios."
         >
           <textarea
-            value={data?.targetAudience?.primaryProfile || ''}
+            value={data?.primaryProfile || ''}
             onChange={(e) => updateTargetAudience('primaryProfile', e.target.value)}
-            className="w-full bg-gray-700 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+            className="w-full bg-gray-700 rounded px-4 py-2 h-32"
             placeholder="Describe your primary target audience..."
           />
         </FormField>
@@ -63,11 +56,11 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
         <FormField
           label="Secondary Audiences"
           required
-          error={errors?.['targetAudience.secondaryAudiences']?.[0]}
-          tooltip="Sometimes there's a secondary or 'related' group that might benefit from your offerings. List them here."
+          error={errors?.['secondaryAudiences']?.[0]}
+          tooltip="List any additional audience segments that might benefit from your offerings."
         >
           <ArrayInput
-            values={data?.targetAudience?.secondaryAudiences || []}
+            values={data?.secondaryAudiences || []}
             onChange={(values) => updateTargetAudience('secondaryAudiences', values)}
             placeholder="Add a secondary audience..."
           />
@@ -76,11 +69,11 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
         <FormField
           label="Pain Points"
           required
-          error={errors?.['targetAudience.painPoints']?.[0]}
-          tooltip="Pinpoint exactly what troubles your audience, so you can position your brand as the solution."
+          error={errors?.['painPoints']?.[0]}
+          tooltip="List the key challenges your audience faces."
         >
           <ArrayInput
-            values={data?.targetAudience?.painPoints || []}
+            values={data?.painPoints || []}
             onChange={(values) => updateTargetAudience('painPoints', values)}
             placeholder="Add a pain point..."
           />
@@ -89,46 +82,45 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
         <div className="bg-gray-800 p-6 rounded-lg space-y-6">
           <h2 className="text-xl font-semibold">Ideal Customer Profile</h2>
           <p className="text-sm text-gray-400 mb-2">
-            Here, you define the ultimate persona you want to attract—someone who sees real value in what you offer.
-            The more specific you are, the better you can craft products, marketing, and messaging that truly click.
+            Define your ultimate customer persona to fine-tune your messaging and offerings.
           </p>
 
           <FormField
             label="Problem"
             required
-            error={errors?.['targetAudience.idealCustomerProfile.problem']?.[0]}
-            tooltip="What is the main problem or challenge this ideal customer faces, that you want to solve?"
+            error={errors?.['idealCustomerProfile.problem']?.[0]}
+            tooltip="What is the main problem this customer faces?"
           >
             <textarea
-              value={data?.targetAudience?.idealCustomerProfile?.problem || ''}
+              value={data?.idealCustomerProfile?.problem || ''}
               onChange={(e) => updateIdealCustomerProfile('problem', e.target.value)}
-              className="w-full bg-gray-700 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
-              placeholder="Describe the main problem your ideal customer faces..."
+              className="w-full bg-gray-700 rounded px-4 py-2 h-32"
+              placeholder="Describe the primary problem..."
             />
           </FormField>
 
           <FormField
             label="Journey"
             required
-            error={errors?.['targetAudience.idealCustomerProfile.journey']?.[0]}
-            tooltip="What's the transformation they desire? Understand how they move from 'problem' to 'solution.'"
+            error={errors?.['idealCustomerProfile.journey']?.[0]}
+            tooltip="Describe the transformation they seek."
           >
             <textarea
-              value={data?.targetAudience?.idealCustomerProfile?.journey || ''}
+              value={data?.idealCustomerProfile?.journey || ''}
               onChange={(e) => updateIdealCustomerProfile('journey', e.target.value)}
-              className="w-full bg-gray-700 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
-              placeholder="Describe their journey and transformation..."
+              className="w-full bg-gray-700 rounded px-4 py-2 h-32"
+              placeholder="Describe their journey..."
             />
           </FormField>
 
           <FormField
             label="Desires"
             required
-            error={errors?.['targetAudience.idealCustomerProfile.desires']?.[0]}
-            tooltip="List specific aspirations—both tangible and intangible—that your offering helps them achieve."
+            error={errors?.['idealCustomerProfile.desires']?.[0]}
+            tooltip="List the aspirations your ideal customer holds."
           >
             <ArrayInput
-              values={data?.targetAudience?.idealCustomerProfile?.desires || []}
+              values={data?.idealCustomerProfile?.desires || []}
               onChange={(values) => updateIdealCustomerProfile('desires', values)}
               placeholder="Add a desire..."
             />
@@ -137,53 +129,53 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
           <FormField
             label="Desired State"
             required
-            error={errors?.['targetAudience.idealCustomerProfile.desiredState']?.[0]}
-            tooltip="Where do they ultimately want to be after using your product or service?"
+            error={errors?.['idealCustomerProfile.desiredState']?.[0]}
+            tooltip="Describe where they want to be after using your solution."
           >
             <textarea
-              value={data?.targetAudience?.idealCustomerProfile?.desiredState || ''}
+              value={data?.idealCustomerProfile?.desiredState || ''}
               onChange={(e) => updateIdealCustomerProfile('desiredState', e.target.value)}
-              className="w-full bg-gray-700 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
-              placeholder="Describe their ideal end state..."
+              className="w-full bg-gray-700 rounded px-4 py-2 h-32"
+              placeholder="Describe the desired state..."
             />
           </FormField>
 
           <FormField
             label="Gap Analysis"
             required
-            error={errors?.['targetAudience.idealCustomerProfile.gap']?.[0]}
-            tooltip="Pinpoint the differences between where they are now and where they want to be—this is what your brand can bridge."
+            error={errors?.['idealCustomerProfile.gap']?.[0]}
+            tooltip="Identify the gap between their current state and desired state."
           >
             <textarea
-              value={data?.targetAudience?.idealCustomerProfile?.gap || ''}
+              value={data?.idealCustomerProfile?.gap || ''}
               onChange={(e) => updateIdealCustomerProfile('gap', e.target.value)}
-              className="w-full bg-gray-700 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
-              placeholder="Describe the gap between current and desired state..."
+              className="w-full bg-gray-700 rounded px-4 py-2 h-32"
+              placeholder="Describe the gap..."
             />
           </FormField>
 
           <FormField
             label="Unique Selling Point"
             required
-            error={errors?.['targetAudience.idealCustomerProfile.uniqueSellingPoint']?.[0]}
-            tooltip="What differentiates you in the eyes of this ideal customer? Why should they choose you over competitors?"
+            error={errors?.['idealCustomerProfile.uniqueSellingPoint']?.[0]}
+            tooltip="What makes your solution uniquely valuable?"
           >
             <textarea
-              value={data?.targetAudience?.idealCustomerProfile?.uniqueSellingPoint || ''}
+              value={data?.idealCustomerProfile?.uniqueSellingPoint || ''}
               onChange={(e) => updateIdealCustomerProfile('uniqueSellingPoint', e.target.value)}
-              className="w-full bg-gray-700 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
-              placeholder="What makes your solution unique for them..."
+              className="w-full bg-gray-700 rounded px-4 py-2 h-32"
+              placeholder="What is your unique selling point?"
             />
           </FormField>
 
           <FormField
             label="Benefits"
             required
-            error={errors?.['targetAudience.idealCustomerProfile.benefits']?.[0]}
-            tooltip="Practical advantages they gain—time saved, money earned, stress reduced, etc."
+            error={errors?.['idealCustomerProfile.benefits']?.[0]}
+            tooltip="List the practical advantages your solution provides."
           >
             <ArrayInput
-              values={data?.targetAudience?.idealCustomerProfile?.benefits || []}
+              values={data?.idealCustomerProfile?.benefits || []}
               onChange={(values) => updateIdealCustomerProfile('benefits', values)}
               placeholder="Add a benefit..."
             />
@@ -192,11 +184,11 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
           <FormField
             label="Common Objections"
             required
-            error={errors?.['targetAudience.idealCustomerProfile.objections']?.[0]}
-            tooltip="What hesitations might stop them from buying? Listing these helps you address them upfront."
+            error={errors?.['idealCustomerProfile.objections']?.[0]}
+            tooltip="List typical hesitations your customers may have."
           >
             <ArrayInput
-              values={data?.targetAudience?.idealCustomerProfile?.objections || []}
+              values={data?.idealCustomerProfile?.objections || []}
               onChange={(values) => updateIdealCustomerProfile('objections', values)}
               placeholder="Add an objection..."
             />
