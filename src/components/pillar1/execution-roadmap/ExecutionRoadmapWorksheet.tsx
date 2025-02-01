@@ -24,7 +24,7 @@ function ExecutionRoadmapWorksheet({
   onNextSection,
   pdfDownloaded = false
 }: ExecutionRoadmapWorksheetProps) {
-  // Provide defaults:
+  // Provide defaults and merge with any incoming data:
   const defaultData: ExecutionRoadmapData = {
     thirtyDayGoal: '',
     weeklyMilestones: [],
@@ -34,55 +34,89 @@ function ExecutionRoadmapWorksheet({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Intro Section */}
-      <div className="space-y-3 bg-gray-800 p-4 rounded">
-        <h1 className="text-2xl font-bold">Your Execution Roadmap</h1>
-        <p className="text-gray-300">
-          This worksheet outlines a clear, step-by-step plan 
-          to translate your ideas and goals into actionable next steps. 
-          By focusing on a <strong>30-day goal</strong>, weekly milestones, 
-          and immediate actions, you’ll gain momentum and confidence.
-        </p>
-        <p className="text-gray-300">
-          Think of this as your short-term sprint to test ideas quickly 
-          and validate or refine your approach. 
-          The more concrete your roadmap, the easier it is to stay focused and track progress.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Intro Section with additional context */}
+        <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-8">
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600 mb-6">
+            Your Execution Roadmap
+          </h1>
+          <div className="space-y-4 text-gray-300">
+            <p>
+              This worksheet outlines a clear, step-by-step plan to translate your ideas and goals into actionable next steps.
+              By focusing on a <strong>30-day goal</strong>, weekly milestones, a content plan, and immediate actions,
+              you'll gain momentum and confidence.
+            </p>
+            <p>
+              Think of this as your short-term sprint to test ideas quickly and validate or refine your approach.
+              Consider supplementing the SMART goal framework with methodologies like OKRs (Objectives and Key Results) or KPIs (Key Performance Indicators)
+              to better align your actions with measurable outcomes.
+            </p>
+            <p>
+              If you have any previous PDFs or strategic documents from earlier worksheets, please review them now.
+              They can provide valuable insights and help you answer these questions more effectively.
+            </p>
+          </div>
+        </div>
 
-      {/* Subsections */}
-      <ThirtyDayGoalPage data={defaultData} onChange={onChange} />
-      <WeeklyMilestonesPage data={defaultData} onChange={onChange} />
-      <ContentPlanPage data={defaultData} onChange={onChange} />
-      <ImmediateActionsPage data={defaultData} onChange={onChange} />
+        {/* Subsections */}
+        <div className="space-y-8">
+          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6">
+            <ThirtyDayGoalPage data={defaultData} onChange={onChange} />
+          </div>
+          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6">
+            <WeeklyMilestonesPage data={defaultData} onChange={onChange} />
+          </div>
+          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6">
+            <ContentPlanPage data={defaultData} onChange={onChange} />
+          </div>
+          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6">
+            <ImmediateActionsPage data={defaultData} onChange={onChange} />
+          </div>
+        </div>
 
-      {/* PDF and Next Section buttons */}
-      <div className="flex justify-end gap-4 mt-6">
-        <button
-          onClick={onPdfDownloaded}
-          disabled={!isValid}
-          className={`px-4 py-2 rounded ${
-            !isValid
-              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-500 text-white'
-          }`}
-        >
-          {pdfDownloaded ? 'Re-Download PDF' : 'Download PDF'}
-        </button>
-        {onNextSection && (
-          <button
-            onClick={pdfDownloaded ? onNextSection : null}
-            disabled={!isValid || !pdfDownloaded}
-            className={`px-4 py-2 rounded ${
-              !isValid || !pdfDownloaded
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-green-500 hover:bg-green-600 text-white'
-            }`}
-          >
-            Next Section
-          </button>
-        )}
+        {/* Navigation */}
+        <div className="flex justify-between max-w-4xl mx-auto mt-8">
+          {/* Left side - Previous button */}
+          <div></div> {/* Empty div for spacing */}
+
+          {/* Right side buttons */}
+          <div className="flex gap-4">
+            {/* PDF Download Button */}
+            <button
+              onClick={onPdfDownloaded}
+              disabled={!isValid}
+              className={`
+                px-6 py-2 rounded-lg font-medium
+                ${!isValid
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                }
+                transition-all duration-200
+              `}
+            >
+              {pdfDownloaded ? 'Re-Download PDF' : 'Download PDF'}
+            </button>
+
+            {/* Next Section Button */}
+            {onNextSection && (
+              <button
+                onClick={pdfDownloaded ? onNextSection : null}
+                disabled={!isValid || !pdfDownloaded}
+                className={`
+                  px-6 py-2 rounded-lg font-medium
+                  ${!isValid || !pdfDownloaded
+                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                  }
+                  transition-all duration-200
+                `}
+              >
+                Next Section
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -90,7 +124,7 @@ function ExecutionRoadmapWorksheet({
 
 /**
  * For the PDF gating & “Complete All Fields First” logic,
- * we define isDataComplete as your min. required fields:
+ * we define isDataComplete as the minimum required fields:
  */
 function isDataComplete(data?: ExecutionRoadmapData) {
   if (!data) return false;
@@ -98,11 +132,11 @@ function isDataComplete(data?: ExecutionRoadmapData) {
   return (
     // Must have a 30-day goal
     !!thirtyDayGoal?.trim() &&
-    // e.g. require 4 weekly milestones
+    // Require at least 4 weekly milestones
     (weeklyMilestones?.length ?? 0) >= 4 &&
-    // Must have contentPlan
+    // Must have a content plan
     !!contentPlan?.trim() &&
-    // e.g. require 3 immediate actions
+    // Require at least 3 immediate actions
     (immediateActions?.length ?? 0) >= 3
   );
 }

@@ -111,7 +111,7 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
 
         <WrappedComponent {...(finalProps as P)} />
 
-        <div className="flex justify-between mt-8">
+        {/* <div className="flex justify-between mt-8">
           <button
             onClick={handleBack}
             disabled={currentPage === 1}
@@ -122,8 +122,8 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
             }`}
           >
             Back
-          </button>
-
+          </button> */}
+{/* 
           {currentPage < maxPages ? (
             <button
               onClick={handleNext}
@@ -151,10 +151,10 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
                 </button>
               )}
             </div>
-          )}
-        </div>
+          )} */}
+        {/* </div> */}
 
-        <div className="mt-4 flex justify-center">
+        {/* <div className="mt-4 flex justify-center">
           {Array.from({ length: maxPages }).map((_, idx) => (
             <div
               key={idx}
@@ -162,8 +162,8 @@ export function withWorksheetLogic<P extends WithWorksheetLogicProps>(
                 currentPage === idx + 1 ? 'bg-blue-500' : 'bg-gray-600'
               }`}
             />
-          ))}
-        </div>
+          ))} */}
+        {/* </div> */}
       </div>
     );
   };

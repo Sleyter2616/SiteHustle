@@ -1,196 +1,244 @@
-import React, { useMemo } from 'react';
-import { withWorksheetLogic, WithWorksheetLogicProps } from '@/components/common/withWorksheetLogic';
+import React, { useState } from 'react';
 import { VisionData } from '@/types/pillar1';
-import { generateVisionPDF } from '@/utils/pdfUtils';
-// We no longer need to check if vision data is complete on a per-page basis in the child components.
 
 import VisionClarityPage from './pages/VisionClarityPage';
 import GoalsPage from './pages/GoalsPage';
 import TargetAudiencePage from './pages/TargetAudiencePage';
-import CustomerJourneyPage from './pages/CustomerJourneyPage';
 import SwotAnalysisPage from './pages/SwotAnalysisPage';
+import CustomerJourneyPage from './pages/CustomerJourneyPage';
 import VisionConclusionPage from './pages/VisionConclusionPage';
 
-interface VisionWorksheetProps extends WithWorksheetLogicProps {
+interface VisionWorksheetProps {
   data?: VisionData;
   onChange?: (data: VisionData) => void;
+  onNextSection?: () => void;
+  pdfDownloaded?: boolean;
+  onPdfDownloaded?: () => void;
+  isValid?: boolean;
 }
 
-function VisionWorksheet({
-  data,
+export default function VisionWorksheet({ 
+  data, 
   onChange,
-  errors,
-  isValid,
+  onNextSection,
   pdfDownloaded,
   onPdfDownloaded,
-  onNextSection,
-  currentPage = 1
+  isValid
 }: VisionWorksheetProps) {
-  const defaultData: VisionData = {
-    businessName: '',
-    tagline: '',
-    missionStatement: '',
-    visionStatement: '',
-    coreValues: [],
-    businessGoals: {
-      shortTerm: '',
-      midTerm: '',
-      longTerm: '',
-      websiteGoals: '',
-      successIndicators: '',
-      attendance: { specific: '', measurable: '', achievable: '', relevant: '', timeBound: '' },
-      engagement: { specific: '', measurable: '', achievable: '', relevant: '', timeBound: '' },
-      financial: { specific: '', measurable: '', achievable: '', relevant: '', timeBound: '' },
-      contentDelivery: { specific: '', measurable: '', achievable: '', relevant: '', timeBound: '' },
-      networking: { specific: '', measurable: '', achievable: '', relevant: '', timeBound: '' },
-      goalPriorities: '',
-      actionPlan: '',
-      challenges: '',
-      accountability: '',
-      summary: '',
-      nextSteps: '',
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const handleVisionChange = (updatedVision) => {
+    onChange?.({ 
+      ...data,
+      businessName: updatedVision.businessName,
+      tagline: updatedVision.tagline,
+      visionStatement: updatedVision.visionStatement,
+      missionStatement: updatedVision.missionStatement,
+      coreValues: updatedVision.coreValues
+    });
+  };
+
+  const handleGoalsChange = (updatedGoals) => {
+    onChange?.({ 
+      ...data,
+      businessGoals: updatedGoals
+    });
+  };
+
+  const handleTargetAudienceChange = (updatedTarget) => {
+    onChange?.({ 
+      ...data,
+      targetAudience: updatedTarget
+    });
+  };
+
+  const handleSwotChange = (updatedSwot) => {
+    onChange?.({ 
+      ...data,
+      swot: updatedSwot
+    });
+  };
+
+  const handleCustomerJourneyChange = (updatedJourney) => {
+    onChange?.({ 
+      ...data,
+      customerJourney: updatedJourney
+    });
+  };
+
+  const steps = [
+    { 
+      title: 'Vision Clarity', 
+      component: <VisionClarityPage 
+        data={{
+          businessName: data?.businessName,
+          tagline: data?.tagline,
+          visionStatement: data?.visionStatement,
+          missionStatement: data?.missionStatement,
+          coreValues: data?.coreValues
+        }} 
+        onChange={handleVisionChange} 
+      />
     },
-    swot: { strengths: [], weaknesses: [], opportunities: [], threats: [], matchingStrengthsToOpp: '', addressWeaknessesThreats: '', swotPriorities: '', actionSteps: '', responsibilities: '', swotSummary: '' },
-    customerJourney: { awareness: [], consideration: [], decision: '', retention: [] },
-    targetAudience: {
-      primaryProfile: '',
-      secondaryAudiences: [],
-      painPoints: [],
-      idealCustomerProfile: {
-        problem: '',
-        journey: '',
-        desires: [],
-        desiredState: '',
-        gap: '',
-        uniqueSellingPoint: '',
-        benefits: [],
-        objections: []
-      }
+    { 
+      title: 'Goals', 
+      component: <GoalsPage 
+        data={data?.businessGoals} 
+        onChange={handleGoalsChange} 
+      />
+    },
+    { 
+      title: 'Target Audience', 
+      component: <TargetAudiencePage 
+        data={data?.targetAudience} 
+        onChange={handleTargetAudienceChange} 
+      />
+    },
+    { 
+      title: 'SWOT Analysis', 
+      component: <SwotAnalysisPage 
+        data={data?.swot} 
+        onChange={handleSwotChange} 
+      />
+    },
+    { 
+      title: 'Customer Journey', 
+      component: <CustomerJourneyPage 
+        data={data?.customerJourney} 
+        onChange={handleCustomerJourneyChange} 
+      />
+    },
+    { 
+      title: 'Conclusion', 
+      component: <VisionConclusionPage /> 
     }
-  };
-
-  const mergedData: VisionData = useMemo(() => ({
-    ...defaultData,
-    ...data,
-  }), [data]);
-
-  // Render each page with its appropriate data and dedicated onChange handler.
-  const renderPage = () => {
-    switch (currentPage) {
-      case 1:
-        return (
-          <VisionClarityPage
-            data={{
-              businessName: mergedData.businessName,
-              tagline: mergedData.tagline,
-              missionStatement: mergedData.missionStatement,
-              visionStatement: mergedData.visionStatement,
-              coreValues: mergedData.coreValues,
-            }}
-            onChange={(updatedClarity) =>
-              onChange?.({ ...mergedData, ...updatedClarity })
-            }
-            errors={errors}
-          />
-        );
-      case 2:
-        return (
-          <GoalsPage
-            data={mergedData.businessGoals}
-            onChange={(updatedGoals) =>
-              onChange?.({ ...mergedData, businessGoals: updatedGoals })
-            }
-            errors={errors}
-          />
-        );
-      case 3:
-        return (
-          <TargetAudiencePage
-            data={mergedData.targetAudience}
-            onChange={(updatedTarget) =>
-              onChange?.({ ...mergedData, targetAudience: updatedTarget })
-            }
-            errors={errors}
-          />
-        );
-      case 4:
-        return (
-          <CustomerJourneyPage
-            data={mergedData.customerJourney}
-            onChange={(updatedJourney) =>
-              onChange?.({ ...mergedData, customerJourney: updatedJourney })
-            }
-            errors={errors}
-          />
-        );
-      case 5:
-        return (
-          <SwotAnalysisPage
-            data={mergedData.swot}
-            onChange={(updatedSwot) =>
-              onChange?.({ ...mergedData, swot: updatedSwot })
-            }
-            errors={errors}
-          />
-        );
-      case 6:
-        return <VisionConclusionPage />;
-      default:
-        return null;
-    }
-  };
+  ];
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">
-        {currentPage === 1 && "Vision Clarity"}
-        {currentPage === 2 && "Business Goals"}
-        {currentPage === 3 && "Target Audience"}
-        {currentPage === 4 && "Customer Journey"}
-        {currentPage === 5 && "SWOT Analysis"}
-        {currentPage === 6 && "Vision Conclusion"}
-      </h2>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Progress Steps */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between max-w-3xl mx-auto">
+            {steps.map((step, index) => (
+              <div key={step.title} className="flex items-center">
+                <div 
+                  className={`
+                    w-8 h-8 rounded-full flex items-center justify-center
+                    ${index === currentStep 
+                      ? 'bg-blue-500 text-white' 
+                      : index < currentStep 
+                        ? 'bg-green-500 text-white'
+                        : 'bg-gray-700 text-gray-300'
+                    }
+                    transition-all duration-200
+                  `}
+                >
+                  {index < currentStep ? '✓' : index + 1}
+                </div>
+                {index < steps.length - 1 && (
+                  <div 
+                    className={`
+                      h-0.5 w-16 mx-2
+                      ${index < currentStep ? 'bg-green-500' : 'bg-gray-700'}
+                      transition-all duration-200
+                    `}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between max-w-3xl mx-auto mt-2">
+            {steps.map((step, index) => (
+              <div 
+                key={step.title}
+                className={`
+                  text-sm font-medium
+                  ${index === currentStep ? 'text-blue-400' : 'text-gray-400'}
+                  transition-all duration-200
+                `}
+              >
+                {step.title}
+              </div>
+            ))}
+          </div>
+        </div>
 
-      {renderPage()}
+        {/* Main Content */}
+        <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-8">
+          {steps[currentStep].component}
+        </div>
 
-      <div className="flex justify-end gap-4 mt-6">
-        <button
-          onClick={onPdfDownloaded}
-          disabled={!isValid}
-          className={`px-4 py-2 rounded ${
-            !isValid
-              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-500 text-white'
-          }`}
-        >
-          {pdfDownloaded ? 'Re-Download PDF' : 'Download PDF'}
-        </button>
-        {onNextSection && (
+        {/* Navigation */}
+        <div className="flex justify-between max-w-4xl mx-auto">
+          {/* Left side - Previous button */}
           <button
-            onClick={pdfDownloaded ? onNextSection : null}
-            disabled={!isValid || !pdfDownloaded}
-            className={`px-4 py-2 rounded ${
-              !isValid || !pdfDownloaded
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-green-500 hover:bg-green-600 text-white'
-            }`}
+            onClick={() => setCurrentStep(prev => Math.max(0, prev - 1))}
+            disabled={currentStep === 0}
+            className={`
+              px-6 py-2 rounded-lg font-medium
+              ${currentStep === 0 
+                ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+              }
+              transition-all duration-200
+            `}
           >
-            Next Section
+            Previous
           </button>
-        )}
+
+          {/* Center and Right side buttons */}
+          <div className="flex gap-4">
+            {/* PDF Download Button */}
+            <button
+              onClick={onPdfDownloaded}
+              disabled={!isValid}
+              className={`
+                px-6 py-2 rounded-lg font-medium
+                ${!isValid
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                }
+                transition-all duration-200
+              `}
+            >
+              {pdfDownloaded ? 'Re-Download PDF' : 'Download PDF'}
+            </button>
+
+            {/* Next Section Button */}
+            <button
+              onClick={onNextSection}
+              disabled={!pdfDownloaded || !isValid}
+              className={`
+                px-6 py-2 rounded-lg font-medium
+                ${!pdfDownloaded || !isValid
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                }
+                transition-all duration-200
+              `}
+            >
+              Next Section
+            </button>
+
+            {/* Next Button */}
+            <button
+              onClick={() => setCurrentStep(prev => Math.min(steps.length - 1, prev + 1))}
+              disabled={currentStep === steps.length - 1}
+              className={`
+                px-6 py-2 rounded-lg font-medium
+                ${currentStep === steps.length - 1
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                }
+                transition-all duration-200
+              `}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-
-const config = {
-  generatePdf: generateVisionPDF,
-  // We no longer use a completeness check here in the sub-pages.
-  isDataComplete: () => true,
-  pdfFileName: 'vision-worksheet.pdf',
-  title: 'Vision & Goals',
-  description: 'Define your business vision, goals, target audience, and strategic analysis.',
-  maxPages: 6
-};
-
-export default withWorksheetLogic<VisionWorksheetProps>(VisionWorksheet, config);

@@ -4,6 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { Pillar1Data } from '@/types/pillar1';
 import { useSections } from '@/hooks/useSections';
 import { loadPillar1Data, savePillar1Data } from '@/utils/storage';
+import { useRouter } from 'next/navigation';
+import {
+  saveProgress,
+  getProgress,
+  markSectionComplete,
+  updateLastActiveSection,
+  markPillarComplete,
+  isPillarComplete,
+  getLastActiveSection
+} from '@/utils/progressStorage';
 
 import BrandIdentityWorksheet from '../pillar1/brand-identity/BrandIdentityWorksheet';
 import VisionWorksheet from '../pillar1/vision/VisionWorksheet';
@@ -114,8 +124,19 @@ export default function Pillar1Content({
     sectionConfig
   } = useSections({
     data: pillar1Data,
+    pillarNumber: 1,
     saveDataToServer: saveDataToServer
   });
+
+  const router = useRouter();
+
+  // Load initial active section from storage
+  useEffect(() => {
+    const lastSection = getLastActiveSection(1);
+    if (lastSection > 0) {
+      goToSection(lastSection);
+    }
+  }, []);
 
   // On mount: if we have no data (null), load from server
   useEffect(() => {
@@ -171,7 +192,12 @@ export default function Pillar1Content({
     try {
       // Save data before moving to next section
       await saveDataToServer(pillar1Data);
+      // Mark current section as complete
+      markSectionComplete(1, activeSection);
+      // Move to next section
       handleNext();
+      // Update last active section
+      updateLastActiveSection(1, activeSection + 1);
       toast.success('Progress saved');
     } catch (error) {
       console.error('Error saving progress:', error);
@@ -207,14 +233,13 @@ export default function Pillar1Content({
     if (!pillar1Data) return;
     setLoading(true);
     try {
-      // First save the data
+      // Save the data
       await saveDataToServer(pillar1Data);
-      // Then download PDF
-      await handleDownloadPdf(new MouseEvent('click') as any, sectionIndex);
-      const sec = sectionConfig[sectionIndex];
-      if (downloadedPdfs[sec.key]) {
-        toast.success(`PDF downloaded for ${sec.title}`);
-      }
+      // Mark pillar as complete
+      markPillarComplete(1);
+      toast.success('Pillar 1 completed! Moving to Pillar 2...');
+      // Navigate to pillar 2
+      router.push('/pillars/2');
     } catch (error) {
       console.error('Error completing pillar:', error);
       toast.error('Failed to complete pillar');
@@ -222,6 +247,11 @@ export default function Pillar1Content({
       setLoading(false);
     }
   };
+
+  // Update last active section whenever section changes
+  useEffect(() => {
+    updateLastActiveSection(1, activeSection);
+  }, [activeSection]);
 
   // Renders a small completion hint
   function renderCompletionStatus(sectionNum: number) {
@@ -265,11 +295,79 @@ export default function Pillar1Content({
       return <div>Loading or Saving Data...</div>;
     }
 
-    // if user tries to jump to locked section
+    // Allow access to any section if we have data
+    if (pillar1Data) {
+      const sectionKey = sectionConfig[sectionNum]?.key;
+      if (sectionKey && pillar1Data[sectionKey]) {
+        // Render the section if we have data for it
+        switch (sectionNum) {
+          case 0:
+            return (
+              <Pillar1IntroPage
+                onNextSection={handleNextSection}
+              />
+            );
+          case 1:
+            return (
+              <>
+                {renderCompletionStatus(1)}
+                <BrandIdentityWorksheet
+                  data={pillar1Data?.brandIdentity}
+                  onChange={(val) => handleLocalDataChange('brandIdentity', val)}
+                  onPdfDownloaded={() => handleDownloadAndSync(1)}
+                  onNextSection={handleNextSection}
+                  pdfDownloaded={downloadedPdfs.brandIdentity}
+                  isValid={sectionValidation.brandIdentity}
+                />
+              </>
+            );
+          case 2:
+            return (
+              <>
+                <VisionWorksheet
+                  data={pillar1Data?.vision}
+                  onChange={(val) => handleLocalDataChange('vision', val)}
+                  onPdfDownloaded={() => handleDownloadAndSync(2)}
+                  onNextSection={handleNextSection}
+                  pdfDownloaded={downloadedPdfs.vision}
+                  isValid={sectionValidation.vision}
+                />
+                {renderCompletionStatus(2)}
+              </>
+            );
+          case 3:
+            return (
+              <>
+                <ExecutionRoadmapWorksheet
+                  data={pillar1Data?.executionRoadmap}
+                  onChange={(val) => handleLocalDataChange('executionRoadmap', val)}
+                  onPdfDownloaded={() => handleDownloadAndSync(3)}
+                  onNextSection={handleNextSection}
+                  pdfDownloaded={downloadedPdfs.executionRoadmap}
+                  isValid={sectionValidation.executionRoadmap}
+                />
+                {renderCompletionStatus(3)}
+              </>
+            );
+          case 4:
+            return (
+              <Pillar1ConclusionPage
+                data={pillar1Data || getEmptyPillar1Data()}
+                onCompletePillar={() => handleCompletePillar(1)}
+              />
+            );
+          default:
+            return null;
+        }
+      }
+    }
+
+    // If we don't have data for this section and it's not accessible, show message
     if (sectionNum !== 0 && sectionNum !== 4 && !canAccessSection(sectionNum)) {
       return <div className="p-4 text-gray-500">Complete previous section first.</div>;
     }
 
+    // Default section rendering
     switch (sectionNum) {
       case 0:
         return (
@@ -323,7 +421,7 @@ export default function Pillar1Content({
         return (
           <Pillar1ConclusionPage
             data={pillar1Data || getEmptyPillar1Data()}
-            onCompletePillar={() => handleCompletePillar(4)}
+            onCompletePillar={() => handleCompletePillar(1)}
           />
         );
       default:

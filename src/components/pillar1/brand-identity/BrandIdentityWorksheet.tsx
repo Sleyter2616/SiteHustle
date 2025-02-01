@@ -1,174 +1,185 @@
-import React from 'react';
-import { withWorksheetLogic, WithWorksheetLogicProps } from '@/components/common/withWorksheetLogic';
+import React, { useState } from 'react';
 import { BrandIdentityData } from '@/types/pillar1';
-import { generateBrandIdentityPDF } from '@/utils/pdfUtils';
-
-import ReflectionPage from './pages/ReflectionPage';
 import PersonalityPage from './pages/PersonalityPage';
 import StoryPage from './pages/StoryPage';
 import DifferentiationPage from './pages/DifferentiationPage';
+import ExecutionRoadmapPage from './pages/ExecutionRoadmapPage';
+import ReflectionPage from './pages/ReflectionPage';
 import ConclusionPage from './pages/ConclusionPage';
-// ExecutionRoadmapPage REMOVED
 
-interface BrandIdentityWorksheetProps extends WithWorksheetLogicProps {
+interface BrandIdentityWorksheetProps {
   data?: BrandIdentityData;
-  onChange?: (updatedData: BrandIdentityData) => void;
+  onChange?: (data: BrandIdentityData) => void;
+  onNextSection?: () => void;
+  pdfDownloaded?: boolean;
+  onPdfDownloaded?: () => void;
+  isValid?: boolean;
 }
 
-// Per-page validation for Brand Identity
-function isBrandIdentityPageComplete(data?: BrandIdentityData, currentPage?: number): boolean {
-  if (!data || currentPage === undefined) return false;
-  switch (currentPage) {
-    case 1: // Reflection: Require at least "whoIAm" is non-empty.
-      return !!data.reflection?.whoIAm?.trim();
-    case 2: // Personality: Require all fields are non-empty.
-      return (
-        !!data.personality?.communicationStyle?.trim() &&
-        !!data.personality?.toneAndVoice?.trim() &&
-        !!data.personality?.passionateExpression?.trim() &&
-        !!data.personality?.brandPersonality?.trim()
-      );
-    case 3: // Story: Require pivotalExperience, definingMoment, and audienceRelevance.
-      return (
-        !!data.story?.pivotalExperience?.trim() &&
-        !!data.story?.definingMoment?.trim() &&
-        !!data.story?.audienceRelevance?.trim()
-      );
-    case 4: // Differentiation: Require uniqueApproach, uniqueResources, competitivePerception.
-      return (
-        !!data.differentiation?.uniqueApproach?.trim() &&
-        !!data.differentiation?.uniqueResources?.trim() &&
-        !!data.differentiation?.competitivePerception?.trim()
-      );
-    case 5: // Conclusion: We assume no data input is required, so valid.
-      return true;
-    default:
-      return false;
-  }
-}
-
-function BrandIdentityWorksheet({
-  data,
-  onChange,
-  currentPage = 1,
+export default function BrandIdentityWorksheet({ 
+  data, 
+  onChange, 
+  onNextSection,
   pdfDownloaded,
   onPdfDownloaded,
-  onNextSection,
-  isValid
+  isValid 
 }: BrandIdentityWorksheetProps) {
-  // Combine incoming data with defaults
-  const defaultData: BrandIdentityData = {
-    reflection: { whoIAm: '', whoIAmNot: '', whyBuildBrand: '' },
-    personality: { communicationStyle: '', toneAndVoice: '', passionateExpression: '', brandPersonality: '' },
-    story: { pivotalExperience: '', definingMoment: '', audienceRelevance: '' },
-    differentiation: { uniqueApproach: '', uniqueResources: '', competitivePerception: '' },
-    ...data
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const handlePersonalityChange = (updatedPersonality) => {
+    onChange?.({ ...data, personality: updatedPersonality });
   };
 
-  // Sub-page updaters
-  const handleReflectionChange = (reflection: BrandIdentityData['reflection']) => {
-    onChange?.({ ...defaultData, reflection });
-  };
-  const handlePersonalityChange = (personality: BrandIdentityData['personality']) => {
-    onChange?.({ ...defaultData, personality });
-  };
-  const handleStoryChange = (story: BrandIdentityData['story']) => {
-    onChange?.({ ...defaultData, story });
-  };
-  const handleDifferentiationChange = (differentiation: BrandIdentityData['differentiation']) => {
-    onChange?.({ ...defaultData, differentiation });
+  const handleStoryChange = (updatedStory) => {
+    onChange?.({ ...data, story: updatedStory });
   };
 
-  // Render the current page
-  function renderPage() {
-    switch (currentPage) {
-      case 1:
-        return (
-          <ReflectionPage
-            data={defaultData.reflection}
-            onChange={handleReflectionChange}
-          />
-        );
-      case 2:
-        return (
-          <PersonalityPage
-            data={defaultData.personality}
-            onChange={handlePersonalityChange}
-          />
-        );
-      case 3:
-        return (
-          <StoryPage
-            data={defaultData.story}
-            onChange={handleStoryChange}
-          />
-        );
-      case 4:
-        return (
-          <DifferentiationPage
-            data={defaultData.differentiation}
-            onChange={handleDifferentiationChange}
-          />
-        );
-      case 5:
-        return <ConclusionPage />;
-      default:
-        return null;
-    }
-  }
+  const handleDifferentiationChange = (updatedDifferentiation) => {
+    onChange?.({ ...data, differentiation: updatedDifferentiation });
+  };
+
+  const handleExecutionRoadmapChange = (updatedRoadmap) => {
+    onChange?.({ ...data, executionRoadmap: updatedRoadmap });
+  };
+
+  const handleReflectionChange = (updatedReflection) => {
+    onChange?.({ ...data, reflection: updatedReflection });
+  };
+
+  const steps = [
+    { title: 'Brand Personality', component: <PersonalityPage data={data?.personality} onChange={handlePersonalityChange} /> },
+    { title: 'Brand Story', component: <StoryPage data={data?.story} onChange={handleStoryChange} /> },
+    { title: 'Differentiation', component: <DifferentiationPage data={data?.differentiation} onChange={handleDifferentiationChange} /> },
+    { title: 'Execution Roadmap', component: <ExecutionRoadmapPage data={data?.executionRoadmap} onChange={handleExecutionRoadmapChange} /> },
+    { title: 'Reflection', component: <ReflectionPage data={data?.reflection} onChange={handleReflectionChange} /> },
+    { title: 'Conclusion', component: <ConclusionPage /> }
+  ];
 
   return (
-    <div className="space-y-6">
-      {/* Page Title */}
-      <h2 className="text-2xl font-bold mb-4">
-        {currentPage === 1 && 'Reflection'}
-        {currentPage === 2 && 'Personality'}
-        {currentPage === 3 && 'Story'}
-        {currentPage === 4 && 'Differentiation'}
-        {currentPage === 5 && 'Conclusion & Next Steps'}
-      </h2>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Progress Steps */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between max-w-3xl mx-auto">
+            {steps.map((step, index) => (
+              <div key={step.title} className="flex items-center">
+                <div 
+                  className={`
+                    w-8 h-8 rounded-full flex items-center justify-center
+                    ${index === currentStep 
+                      ? 'bg-blue-500 text-white' 
+                      : index < currentStep 
+                        ? 'bg-green-500 text-white'
+                        : 'bg-gray-700 text-gray-300'
+                    }
+                    transition-all duration-200
+                  `}
+                >
+                  {index < currentStep ? '✓' : index + 1}
+                </div>
+                {index < steps.length - 1 && (
+                  <div 
+                    className={`
+                      h-0.5 w-16 mx-2
+                      ${index < currentStep ? 'bg-green-500' : 'bg-gray-700'}
+                      transition-all duration-200
+                    `}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between max-w-3xl mx-auto mt-2">
+            {steps.map((step, index) => (
+              <div 
+                key={step.title}
+                className={`
+                  text-sm font-medium
+                  ${index === currentStep ? 'text-blue-400' : 'text-gray-400'}
+                  transition-all duration-200
+                `}
+              >
+                {step.title}
+              </div>
+            ))}
+          </div>
+        </div>
 
-      {renderPage()}
+        {/* Main Content */}
+        <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-8">
+          {steps[currentStep].component}
+        </div>
 
-      {/* PDF and Next Section buttons */}
-      <div className="flex justify-end gap-4 mt-6">
-        <button
-          onClick={onPdfDownloaded}
-          disabled={!isValid}
-          className={`px-4 py-2 rounded ${
-            !isValid
-              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-500 text-white'
-          }`}
-        >
-          {pdfDownloaded ? 'Re-Download PDF' : 'Download PDF'}
-        </button>
-        {onNextSection && (
+        {/* Navigation */}
+        <div className="flex justify-between max-w-4xl mx-auto">
+          {/* Left side - Previous button */}
           <button
-            onClick={pdfDownloaded ? onNextSection : null}
-            disabled={!isValid || !pdfDownloaded}
-            className={`px-4 py-2 rounded ${
-              !isValid || !pdfDownloaded
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-green-500 hover:bg-green-600 text-white'
-            }`}
+            onClick={() => setCurrentStep(prev => Math.max(0, prev - 1))}
+            disabled={currentStep === 0}
+            className={`
+              px-6 py-2 rounded-lg font-medium
+              ${currentStep === 0 
+                ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+              }
+              transition-all duration-200
+            `}
           >
-            Next Section
+            Previous
           </button>
-        )}
+
+          {/* Center and Right side buttons */}
+          <div className="flex gap-4">
+            {/* PDF Download Button */}
+            <button
+              onClick={onPdfDownloaded}
+              disabled={!isValid}
+              className={`
+                px-6 py-2 rounded-lg font-medium
+                ${!isValid
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                }
+                transition-all duration-200
+              `}
+            >
+              {pdfDownloaded ? 'Re-Download PDF' : 'Download PDF'}
+            </button>
+
+            {/* Next Section Button */}
+            <button
+              onClick={onNextSection}
+              disabled={!pdfDownloaded || !isValid}
+              className={`
+                px-6 py-2 rounded-lg font-medium
+                ${!pdfDownloaded || !isValid
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                }
+                transition-all duration-200
+              `}
+            >
+              Next Section
+            </button>
+
+            {/* Next Button */}
+            <button
+              onClick={() => setCurrentStep(prev => Math.min(steps.length - 1, prev + 1))}
+              disabled={currentStep === steps.length - 1}
+              className={`
+                px-6 py-2 rounded-lg font-medium
+                ${currentStep === steps.length - 1
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                }
+                transition-all duration-200
+              `}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-
-const config = {
-  generatePdf: generateBrandIdentityPDF,
-  // Use our per-page validation function here.
-  isDataComplete: isBrandIdentityPageComplete,
-  pdfFileName: 'brand-identity.pdf',
-  title: 'Brand Identity',
-  description: 'Define your brand identity across reflection, personality, story, differentiation, and conclusion.',
-  maxPages: 5
-};
-
-export default withWorksheetLogic<BrandIdentityWorksheetProps>(BrandIdentityWorksheet, config);
