@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pillar1Data } from '@/types/pillar1';
 import { useSections } from '@/hooks/useSections';
-import { loadPillar1Data, savePillar1Data } from '@/utils/storage';
+import { loadPillarData, savePillarData } from '@/utils/storage';
 import { useRouter } from 'next/navigation';
 import {
   saveProgress,
@@ -142,7 +142,7 @@ export default function Pillar1Content({
   useEffect(() => {
     if (!pillar1Data) {
       setLoading(true);
-      loadPillar1Data()
+      loadPillarData<Pillar1Data>(1)
         .then((res) => {
           if (res) {
             setPillar1Data(res);
@@ -167,8 +167,8 @@ export default function Pillar1Content({
   async function saveDataToServer(dataToSave: Pillar1Data) {
     setLoading(true);
     try {
-      await savePillar1Data(dataToSave); // calls /api/pillar1
-      onDataChange?.(dataToSave);       // if parent wants to track changes
+      await savePillarData(1, dataToSave);
+      onDataChange?.(dataToSave);
     } catch (err) {
       console.error(err);
       toast.error('Failed to save your data');
@@ -215,7 +215,7 @@ export default function Pillar1Content({
       // First save the data
       await saveDataToServer(pillar1Data);
       // Then download PDF
-      await handleDownloadPdf(new MouseEvent('click') as any, sectionIndex);
+      await handleDownloadPdf(new MouseEvent('click') as any,1, sectionIndex);
       const sec = sectionConfig[sectionIndex];
       if (downloadedPdfs[sec.key]) {
         toast.success(`PDF downloaded for ${sec.title}`);

@@ -60,6 +60,7 @@ interface SectionValidationState {
   vision: boolean;
   executionRoadmap: boolean;
   conclusion: boolean;
+  pillar2: boolean;
 }
 
 interface UseSectionsProps {
@@ -82,7 +83,8 @@ export function useSections({ data, pillarNumber, saveDataToServer }: UseSection
     brandIdentity: false,
     vision: false,
     executionRoadmap: false,
-    conclusion: false
+    conclusion: false,
+    pillar2: false
   });
 
   // Initialize downloaded PDFs from storage
@@ -91,7 +93,8 @@ export function useSections({ data, pillarNumber, saveDataToServer }: UseSection
     brandIdentity: isPdfDownloaded(pillarNumber, 1),
     vision: isPdfDownloaded(pillarNumber, 2),
     executionRoadmap: isPdfDownloaded(pillarNumber, 3),
-    conclusion: false
+    conclusion: false,
+    pillar2: false
   }));
 
   // On data changes, re-validate
@@ -101,7 +104,8 @@ export function useSections({ data, pillarNumber, saveDataToServer }: UseSection
       brandIdentity: validateBrandIdentity(data?.brandIdentity).success,
       vision: validateVision(data?.vision).success,
       executionRoadmap: validateExecutionRoadmap(data?.executionRoadmap).success,
-      conclusion: true
+      conclusion: true,
+      pillar2: true
     });
   }, [data]);
 
@@ -122,7 +126,7 @@ export function useSections({ data, pillarNumber, saveDataToServer }: UseSection
   }
 
   // Handle PDF download
-  async function handleDownloadPdf(e: React.MouseEvent, sectionIndex: number) {
+  async function handleDownloadPdf(e: React.MouseEvent,pillarNumber: number, sectionIndex: number) {
     e.preventDefault();
     const section = sectionConfig[sectionIndex];
     if (!section.pdfFn || !data) return;
