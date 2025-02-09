@@ -310,7 +310,7 @@ export default function Pillar1Content({
           case 1:
             return (
               <>
-                {renderCompletionStatus(1)}
+              
                 <BrandIdentityWorksheet
                   data={pillar1Data?.brandIdentity}
                   onChange={(val) => handleLocalDataChange('brandIdentity', val)}
@@ -319,6 +319,7 @@ export default function Pillar1Content({
                   pdfDownloaded={downloadedPdfs.brandIdentity}
                   isValid={sectionValidation.brandIdentity}
                 />
+                     {renderCompletionStatus(1)}
               </>
             );
           case 2:
@@ -332,7 +333,7 @@ export default function Pillar1Content({
                   pdfDownloaded={downloadedPdfs.vision}
                   isValid={sectionValidation.vision}
                 />
-                {renderCompletionStatus(2)}
+                      {renderCompletionStatus(2)}
               </>
             );
           case 3:
@@ -346,7 +347,7 @@ export default function Pillar1Content({
                   pdfDownloaded={downloadedPdfs.executionRoadmap}
                   isValid={sectionValidation.executionRoadmap}
                 />
-                {renderCompletionStatus(3)}
+                      {renderCompletionStatus(3)}
               </>
             );
           case 4:
@@ -378,7 +379,6 @@ export default function Pillar1Content({
       case 1:
         return (
           <>
-            {renderCompletionStatus(1)}
             <BrandIdentityWorksheet
               data={pillar1Data?.brandIdentity}
               onChange={(val) => handleLocalDataChange('brandIdentity', val)}
@@ -400,7 +400,6 @@ export default function Pillar1Content({
               pdfDownloaded={downloadedPdfs.vision}
               isValid={sectionValidation.vision}
             />
-            {renderCompletionStatus(2)}
           </>
         );
       case 3:
@@ -414,7 +413,6 @@ export default function Pillar1Content({
               pdfDownloaded={downloadedPdfs.executionRoadmap}
               isValid={sectionValidation.executionRoadmap}
             />
-            {renderCompletionStatus(3)}
           </>
         );
       case 4:
@@ -436,48 +434,63 @@ export default function Pillar1Content({
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      {/* Tabs for Intro => 0, brand =>1, vision =>2, roadmap =>3, conclusion =>4 */}
-      <div className="border-b border-gray-700 mb-8">
-        <nav className="-mb-px flex space-x-8 overflow-x-auto">
-          {Object.entries(sectionConfig).map(([id, cfg]) => {
-            const sectionId = parseInt(id);
-            const disabled = (sectionId !== 0 && sectionId !== 4) && !canAccessSection(sectionId);
-            return (
-              <button
-                key={sectionId}
-                onClick={() => !disabled && goToSection(sectionId)}
-                disabled={disabled}
-                className={`
-                  whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
-                  ${activeSection === sectionId
-                    ? 'border-blue-500 text-blue-500'
-                    : disabled
-                      ? 'border-transparent text-gray-400 cursor-not-allowed'
-                      : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                  }
-                `}
-              >
-                {cfg.title}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Render whichever sub-page is active */}
-      {renderSection(activeSection)}
-
-      {/* Overall progress bar */}
-      <div className="mt-8">
-        <div className="h-2 bg-gray-200 rounded">
-          <div
-            className="h-full bg-blue-500 rounded transition-all duration-300"
-            style={{ width: `${overallCompletionPercent()}%` }}
-          />
+    <div className="min-h-screen bg-[#0f1729]">
+      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {/* Title */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500 mb-2">
+            Vision & Brand Strategy
+          </h1>
+          <p className="text-gray-300">
+            Define your vision, brand identity, and execution roadmap.
+          </p>
         </div>
-        <div className="mt-2 text-sm text-gray-600 text-right">
-          {Math.round(overallCompletionPercent())}% Complete
+
+        {/* Progress bar */}
+        <div className="mb-8">
+          <div className="w-full bg-[#1a2236] h-2 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 rounded-full"
+              style={{ width: `${overallCompletionPercent()}%` }}
+            />
+          </div>
+          <p className="mt-2 text-sm text-gray-300 text-center">
+            Progress: {Math.round(overallCompletionPercent())}%
+          </p>
+        </div>
+
+        {/* Navigation */}
+        <div className="mb-8">
+          <nav className="flex justify-center space-x-4 overflow-x-auto pb-4">
+            {Object.entries(sectionConfig).map(([id, cfg]) => {
+              const sectionId = parseInt(id);
+              const disabled = (sectionId !== 0 && sectionId !== 4) && !canAccessSection(sectionId);
+              return (
+                <button
+                  key={sectionId}
+                  onClick={() => !disabled && goToSection(sectionId)}
+                  disabled={disabled}
+                  className={`
+                    py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200
+                    ${
+                      activeSection === sectionId
+                        ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                        : disabled
+                          ? "opacity-50 cursor-not-allowed bg-[#1a2236] text-gray-500"
+                          : "text-gray-200 hover:text-white hover:bg-white/10"
+                    }
+                  `}
+                >
+                  {cfg.title}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Content */}
+        <div className="bg-[#1a2236] rounded-xl shadow-xl p-6 mb-8 border border-gray-700">
+          {renderSection(activeSection)}
         </div>
       </div>
     </div>

@@ -25,27 +25,36 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
   return (
     <div className="space-y-8">
       {/* Header Section */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
-          Vision Clarity
-        </h1>
-        <p className="mt-4 text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-          Define the core elements of your business vision. These foundational pieces will guide your brand's direction and help maintain consistency across all touchpoints.
+      <h2 className="text-3xl font-semibold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+        Vision Clarity
+      </h2>
+      <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed">
+        <p>
+          Your vision is the north star that guides every decision in your business journey. It's more than just a statement—it's 
+          the embodiment of your aspirations, values, and the change you want to create in the world.
+        </p>
+        <p className="mt-4">
+          In this section, we'll craft a compelling vision that resonates with both you and your future audience. By defining your 
+          core purpose and values, you'll create a foundation that attracts the right opportunities and inspires others to join your mission.
         </p>
       </div>
 
       {/* Form Fields */}
       <div className="space-y-6">
         {/* Business Name */}
-        <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl p-6 shadow-lg transition-all duration-200 hover:shadow-xl">
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="text-xl font-semibold text-blue-400">Business Name</h3>
-              <p className="text-gray-400 mt-1">The official name of your business</p>
+              <h3 className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+                What is your business name?
+              </h3>
+              <p className="mt-2 text-gray-300">
+                The official name of your business
+              </p>
             </div>
             <Tooltip content="Choose a name that's memorable and reflects your brand identity">
               <div className="cursor-help">
-                <FiInfo className="w-5 h-5 text-gray-400" />
+                <FiInfo className="w-5 h-5 text-gray-400 hover:text-blue-400 transition-colors" />
               </div>
             </Tooltip>
           </div>
@@ -53,7 +62,7 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
             type="text"
             value={data?.businessName || ''}
             onChange={(e) => updateField('businessName', e.target.value)}
-            className="w-full bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
             placeholder="Enter your business name"
           />
           {errors?.businessName && (
@@ -62,15 +71,19 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
         </div>
 
         {/* Tagline */}
-        <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl p-6 shadow-lg transition-all duration-200 hover:shadow-xl">
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="text-xl font-semibold text-blue-400">Tagline</h3>
-              <p className="text-gray-400 mt-1">A memorable phrase that captures your brand's essence</p>
+              <h3 className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+                What is your tagline?
+              </h3>
+              <p className="mt-2 text-gray-300">
+                A memorable phrase that captures your brand's essence
+              </p>
             </div>
             <Tooltip content="Keep it short, memorable, and aligned with your brand values">
               <div className="cursor-help">
-                <FiInfo className="w-5 h-5 text-gray-400" />
+                <FiInfo className="w-5 h-5 text-gray-400 hover:text-blue-400 transition-colors" />
               </div>
             </Tooltip>
           </div>
@@ -78,7 +91,7 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
             type="text"
             value={data?.tagline || ''}
             onChange={(e) => updateField('tagline', e.target.value)}
-            className="w-full bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
             placeholder="Enter your tagline"
           />
           {errors?.tagline && (
@@ -87,23 +100,28 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
         </div>
 
         {/* Mission Statement */}
-        <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl p-6 shadow-lg transition-all duration-200 hover:shadow-xl">
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="text-xl font-semibold text-blue-400">Mission Statement</h3>
-              <p className="text-gray-400 mt-1">What your business aims to achieve</p>
+              <h3 className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+                How do you speak when you're most passionate?
+              </h3>
+              <p className="mt-2 text-gray-300">
+                Identifying your "peak enthusiasm style" helps capture the spark that makes your content unique and inspiring.
+              </p>
             </div>
-            <Tooltip content="Focus on your purpose and the value you provide to customers">
+            <Tooltip content="Your mission statement should reflect your core purpose and values">
               <div className="cursor-help">
-                <FiInfo className="w-5 h-5 text-gray-400" />
+                <FiInfo className="w-5 h-5 text-gray-400 hover:text-blue-400 transition-colors" />
               </div>
             </Tooltip>
           </div>
           <textarea
             value={data?.missionStatement || ''}
             onChange={(e) => updateField('missionStatement', e.target.value)}
-            className="w-full bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[100px]"
-            placeholder="Enter your mission statement"
+            className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200 min-h-[120px] resize-y"
+            placeholder="Write your mission statement..."
+            rows={4}
           />
           {errors?.missionStatement && (
             <p className="mt-2 text-red-400 text-sm">{errors.missionStatement}</p>
@@ -111,23 +129,28 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
         </div>
 
         {/* Vision Statement */}
-        <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl p-6 shadow-lg transition-all duration-200 hover:shadow-xl">
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="text-xl font-semibold text-blue-400">Vision Statement</h3>
-              <p className="text-gray-400 mt-1">Your long-term aspirations and goals</p>
+              <h3 className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+                What's your brand's overall personality?
+              </h3>
+              <p className="mt-2 text-gray-300">
+                Go beyond a single descriptor—are you bold, friendly, witty, or calm? This is how your audience will feel about your brand after repeated interactions.
+              </p>
             </div>
-            <Tooltip content="Describe where you want your business to be in the future">
+            <Tooltip content="Your vision statement should paint a picture of your desired future impact">
               <div className="cursor-help">
-                <FiInfo className="w-5 h-5 text-gray-400" />
+                <FiInfo className="w-5 h-5 text-gray-400 hover:text-blue-400 transition-colors" />
               </div>
             </Tooltip>
           </div>
           <textarea
             value={data?.visionStatement || ''}
             onChange={(e) => updateField('visionStatement', e.target.value)}
-            className="w-full bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[100px]"
-            placeholder="Enter your vision statement"
+            className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200 min-h-[120px] resize-y"
+            placeholder="Write your vision statement..."
+            rows={4}
           />
           {errors?.visionStatement && (
             <p className="mt-2 text-red-400 text-sm">{errors.visionStatement}</p>
@@ -135,15 +158,19 @@ export default function VisionClarityPage({ data, onChange, errors }: VisionClar
         </div>
 
         {/* Core Values */}
-        <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl p-6 shadow-lg transition-all duration-200 hover:shadow-xl">
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="text-xl font-semibold text-blue-400">Core Values</h3>
-              <p className="text-gray-400 mt-1">The principles that guide your business</p>
+              <h3 className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+                What are your core values?
+              </h3>
+              <p className="mt-2 text-gray-300">
+                Your core values guide decision-making and shape your brand's culture. They should resonate with both your team and your audience.
+              </p>
             </div>
-            <Tooltip content="List the fundamental beliefs that shape your business culture">
+            <Tooltip content="Core values are the fundamental beliefs that guide your business decisions">
               <div className="cursor-help">
-                <FiInfo className="w-5 h-5 text-gray-400" />
+                <FiInfo className="w-5 h-5 text-gray-400 hover:text-blue-400 transition-colors" />
               </div>
             </Tooltip>
           </div>

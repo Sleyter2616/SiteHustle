@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ExecutionRoadmapData } from '@/types/pillar1';
 import { withWorksheetLogic, WithWorksheetLogicProps } from '@/components/common/withWorksheetLogic';
 import { generateExecutionRoadmapPDF } from '@/utils/pdfUtils';
@@ -6,6 +6,7 @@ import ThirtyDayGoalPage from './pages/ThirtyDayGoalPage';
 import WeeklyMilestonesPage from './pages/WeeklyMilestonesPage';
 import ContentPlanPage from './pages/ContentPlanPage';
 import ImmediateActionsPage from './pages/ImmediateActionsPage';
+// import ExecutionConclusionPage from './pages/ExecutionConclusionPage';
 
 interface ExecutionRoadmapWorksheetProps extends WithWorksheetLogicProps {
   data?: ExecutionRoadmapData;
@@ -19,12 +20,13 @@ interface ExecutionRoadmapWorksheetProps extends WithWorksheetLogicProps {
 function ExecutionRoadmapWorksheet({
   data,
   onChange,
-  isValid = false,
-  onPdfDownloaded,
   onNextSection,
-  pdfDownloaded = false
+  pdfDownloaded,
+  onPdfDownloaded,
+  isValid
 }: ExecutionRoadmapWorksheetProps) {
-  // Provide defaults and merge with any incoming data:
+  const [currentStep, setCurrentStep] = useState(0);
+
   const defaultData: ExecutionRoadmapData = {
     thirtyDayGoal: '',
     weeklyMilestones: [],
@@ -33,88 +35,126 @@ function ExecutionRoadmapWorksheet({
     ...data
   };
 
+  const steps = [
+    { component: <ThirtyDayGoalPage data={defaultData} onChange={onChange} /> },
+    { component: <WeeklyMilestonesPage data={defaultData} onChange={onChange} /> },
+    { component: <ContentPlanPage data={defaultData} onChange={onChange} /> },
+    { component: <ImmediateActionsPage data={defaultData} onChange={onChange} /> },
+    // { component: <ExecutionConclusionPage /> }
+  ];
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else if (onNextSection) {
+      onNextSection();
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Intro Section with additional context */}
-        <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-8">
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600 mb-6">
-            Your Execution Roadmap
-          </h1>
-          <div className="space-y-4 text-gray-300">
-            <p>
-              This worksheet outlines a clear, step-by-step plan to translate your ideas and goals into actionable next steps.
-              By focusing on a <strong>30-day goal</strong>, weekly milestones, a content plan, and immediate actions,
-              you'll gain momentum and confidence.
-            </p>
-            <p>
-              Think of this as your short-term sprint to test ideas quickly and validate or refine your approach.
-              Consider supplementing the SMART goal framework with methodologies like OKRs (Objectives and Key Results) or KPIs (Key Performance Indicators)
-              to better align your actions with measurable outcomes.
-            </p>
-            <p>
-              If you have any previous PDFs or strategic documents from earlier worksheets, please review them now.
-              They can provide valuable insights and help you answer these questions more effectively.
-            </p>
+    <div className="space-y-8">
+      {/* Progress Steps */}
+      <div className="flex items-center justify-center max-w-3xl mx-auto mb-12">
+        {steps.map((_, index) => (
+          <div key={index} className="flex items-center">
+            <div 
+              className={`
+                w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
+                ${index === currentStep 
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' 
+                  : index < currentStep 
+                    ? 'bg-green-500 text-white'
+                    : 'bg-[#1a2236] text-gray-300 border border-gray-700'
+                }
+                transition-all duration-200
+              `}
+            >
+              {index < currentStep ? '✓' : index + 1}
+            </div>
+            {index < steps.length - 1 && (
+              <div 
+                className={`
+                  h-0.5 w-16 mx-2
+                  ${index < currentStep ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'bg-gray-700'}
+                  transition-all duration-200
+                `}
+              />
+            )}
           </div>
-        </div>
+        ))}
+      </div>
 
-        {/* Subsections */}
-        <div className="space-y-8">
-          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6">
-            <ThirtyDayGoalPage data={defaultData} onChange={onChange} />
-          </div>
-          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6">
-            <WeeklyMilestonesPage data={defaultData} onChange={onChange} />
-          </div>
-          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6">
-            <ContentPlanPage data={defaultData} onChange={onChange} />
-          </div>
-          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-xl p-6">
-            <ImmediateActionsPage data={defaultData} onChange={onChange} />
-          </div>
-        </div>
+      {/* Current Step Content */}
+      <div className="p-6">
+        {steps[currentStep].component}
+      </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between max-w-4xl mx-auto mt-8">
-          {/* Left side - Previous button */}
-          <div></div> {/* Empty div for spacing */}
+      {/* Navigation */}
+      <div className="text-center text-sm text-gray-400 mt-8">
+        {!isValid && "Complete all sections to unlock the final PDF."}
+        <div className="flex justify-between items-center mt-4">
+          <button
+            onClick={handleBack}
+            disabled={currentStep === 0}
+            className={`
+              px-6 py-2 rounded-lg font-medium transition-all duration-200
+              ${currentStep === 0
+                ? 'bg-[#1a2236] text-gray-400 cursor-not-allowed'
+                : 'bg-white/10 text-white hover:bg-white/20 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+              }
+            `}
+          >
+            Previous
+          </button>
 
-          {/* Right side buttons */}
           <div className="flex gap-4">
-            {/* PDF Download Button */}
             <button
               onClick={onPdfDownloaded}
               disabled={!isValid}
               className={`
-                px-6 py-2 rounded-lg font-medium
+                px-6 py-2 rounded-lg font-medium transition-all duration-200
                 ${!isValid
-                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                  ? 'bg-[#1a2236] text-gray-400 cursor-not-allowed'
+                  : 'bg-white/10 text-white hover:bg-white/20 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                 }
-                transition-all duration-200
               `}
             >
               {pdfDownloaded ? 'Re-Download PDF' : 'Download PDF'}
             </button>
 
-            {/* Next Section Button */}
-            {onNextSection && (
-              <button
-                onClick={pdfDownloaded ? onNextSection : null}
-                disabled={!isValid || !pdfDownloaded}
-                className={`
-                  px-6 py-2 rounded-lg font-medium
-                  ${!isValid || !pdfDownloaded
-                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
-                  }
-                  transition-all duration-200
-                `}
-              >
-                Next Section
-              </button>
-            )}
+            <button
+              onClick={onNextSection}
+              disabled={!pdfDownloaded || !isValid}
+              className={`
+                px-6 py-2 rounded-lg font-medium transition-all duration-200
+                ${!pdfDownloaded || !isValid
+                  ? 'bg-[#1a2236] text-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                }
+              `}
+            >
+              Next Section
+            </button>
+
+            <button
+              onClick={handleNext}
+              disabled={currentStep === steps.length - 1}
+              className={`
+                px-6 py-2 rounded-lg font-medium transition-all duration-200
+                ${currentStep === steps.length - 1
+                  ? 'bg-[#1a2236] text-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                }
+              `}
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { VisionData } from '@/types/pillar1';
 import FormField, { ArrayInput } from '@/components/common/FormField';
 import Tooltip from '@/components/common/Tooltip';
+import { FiInfo } from 'react-icons/fi';
 
 interface SwotAnalysisPageProps {
   data?: VisionData["swot"];
@@ -28,17 +29,25 @@ export default function SwotAnalysisPage({ data, onChange, errors }: SwotAnalysi
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold mb-4">SWOT Analysis & Next Steps</h1>
-        <p className="text-gray-300 mb-6">
-          A SWOT analysis helps you map out your strengths, weaknesses, opportunities, and threats to form a realistic roadmap.
+      <h2 className="text-3xl font-semibold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+        SWOT Analysis
+      </h2>
+      <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed">
+        <p>
+          A SWOT analysis isn't just a business school exercise—it's a powerful tool for understanding where you stand and where 
+          you can go. By honestly assessing your strengths and weaknesses while scanning for opportunities and threats, you'll 
+          make better strategic decisions.
+        </p>
+        <p className="mt-4">
+          This framework helps you leverage your advantages, shore up your weaknesses, seize opportunities, and prepare for 
+          potential challenges. It's about turning self-awareness into strategic advantage and creating a roadmap for sustainable success.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Strengths */}
-        <div className="bg-[#2D3748] p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">Strengths</h2>
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+          <h2 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Strengths</h2>
           <p className="text-gray-300 mb-4">
             What internal advantages does your business have?
           </p>
@@ -61,8 +70,8 @@ export default function SwotAnalysisPage({ data, onChange, errors }: SwotAnalysi
         </div>
 
         {/* Weaknesses */}
-        <div className="bg-[#2D3748] p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">Weaknesses</h2>
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+          <h2 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Weaknesses</h2>
           <p className="text-gray-300 mb-4">
             Which internal factors need improvement?
           </p>
@@ -85,8 +94,8 @@ export default function SwotAnalysisPage({ data, onChange, errors }: SwotAnalysi
         </div>
 
         {/* Opportunities */}
-        <div className="bg-[#2D3748] p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">Opportunities</h2>
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+          <h2 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Opportunities</h2>
           <p className="text-gray-300 mb-4">
             Which external trends or market gaps can you capitalize on?
           </p>
@@ -109,8 +118,8 @@ export default function SwotAnalysisPage({ data, onChange, errors }: SwotAnalysi
         </div>
 
         {/* Threats */}
-        <div className="bg-[#2D3748] p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">Threats</h2>
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+          <h2 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Threats</h2>
           <p className="text-gray-300 mb-4">
             What external factors could harm your business?
           </p>

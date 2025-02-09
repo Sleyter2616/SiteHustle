@@ -121,18 +121,6 @@ export default function PillarContent({ pillar, progress, userId }: PillarConten
       <p className="text-lg text-[#94A3B8] mb-8">{pillar.description}</p>
 
       {renderPillarContent()}
-
-      <div className="border-t border-[#1E293B] pt-8 flex gap-4">
-        {/* NEW: Add a Save button for Pillar 1 */}
-        {String(pillar.id) === '1' && (
-          <button
-            onClick={handleSavePillar1}
-            className="rounded-md px-6 py-3 text-base font-medium text-white shadow-sm bg-[#3B82F6] hover:bg-[#2563EB]"
-          >
-            Save Pillar 1 Data
-          </button>
-        )}
-      </div>
     </div>
   )
 }
