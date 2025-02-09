@@ -31,53 +31,73 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold mb-4">Target Audience Profile</h1>
-        <p className="text-gray-300 mb-6">
-          Define who you serve so you can tailor products, services, and content that truly resonate.
+      <h2 className="text-3xl font-semibold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+      Target Audience Profile
+      </h2>
+      <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed">
+        <p>
+          Understanding your target audience is about more than demographics—it's about connecting with real people who have real needs, 
+          desires, and challenges. The better you know them, the more effectively you can serve them.
+        </p>
+        <p className="mt-4">
+          This section helps you dive deep into your ideal customer's world. By exploring their motivations, pain points, and 
+          aspirations, you'll be better equipped to create solutions that truly resonate and build lasting relationships that 
+          drive your business forward.
         </p>
       </div>
 
       <div className="space-y-6">
-        <FormField
-          label="Primary Audience Profile"
-          required
-          error={errors?.['primaryProfile']?.[0]}
-          tooltip="Who is your ideal, primary customer? Consider demographics, psychographics, and typical scenarios."
-        >
-          <textarea
-            value={data?.primaryProfile || ''}
-            onChange={(e) => updateTargetAudience('primaryProfile', e.target.value)}
-            className="w-full bg-gray-700 rounded px-4 py-2 h-32"
-            placeholder="Describe your primary target audience..."
-          />
-        </FormField>
+        {/* Primary Audience Profile */}
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+          <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Who is your ideal, primary customer?</h3>
+          <FormField
+            label="Primary Audience Profile"
+            required
+            error={errors?.['primaryProfile']?.[0]}
+            tooltip="Who is your ideal, primary customer? Consider demographics, psychographics, and typical scenarios."
+          >
+            <textarea
+              value={data?.primaryProfile || ''}
+              onChange={(e) => updateTargetAudience('primaryProfile', e.target.value)}
+              className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+              placeholder="Describe your primary target audience..."
+            />
+          </FormField>
+        </div>
 
-        <FormField
-          label="Secondary Audiences"
-          required
-          error={errors?.['secondaryAudiences']?.[0]}
-          tooltip="List any additional audience segments that might benefit from your offerings."
-        >
-          <ArrayInput
-            values={data?.secondaryAudiences || []}
-            onChange={(values) => updateTargetAudience('secondaryAudiences', values)}
-            placeholder="Add a secondary audience..."
-          />
-        </FormField>
+        {/* Secondary Audiences */}
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+          <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">What are your secondary audiences?</h3>
+          <FormField
+            label="Secondary Audiences"
+            required
+            error={errors?.['secondaryAudiences']?.[0]}
+            tooltip="List any additional audience segments that might benefit from your offerings."
+          >
+            <ArrayInput
+              values={data?.secondaryAudiences || []}
+              onChange={(values) => updateTargetAudience('secondaryAudiences', values)}
+              placeholder="Add a secondary audience..."
+            />
+          </FormField>
+        </div>
 
-        <FormField
-          label="Pain Points"
-          required
-          error={errors?.['painPoints']?.[0]}
-          tooltip="List the key challenges your audience faces."
-        >
-          <ArrayInput
-            values={data?.painPoints || []}
-            onChange={(values) => updateTargetAudience('painPoints', values)}
-            placeholder="Add a pain point..."
-          />
-        </FormField>
+        {/* Pain Points */}
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+          <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">What are their pain points?</h3>
+          <FormField
+            label="Pain Points"
+            required
+            error={errors?.['painPoints']?.[0]}
+            tooltip="List the key challenges your audience faces."
+          >
+            <ArrayInput
+              values={data?.painPoints || []}
+              onChange={(values) => updateTargetAudience('painPoints', values)}
+              placeholder="Add a pain point..."
+            />
+          </FormField>
+        </div>
 
         <div className="bg-gray-800 p-6 rounded-lg space-y-6">
           <h2 className="text-xl font-semibold">Ideal Customer Profile</h2>
@@ -85,114 +105,146 @@ export default function TargetAudiencePage({ data, onChange, errors }: TargetAud
             Define your ultimate customer persona to fine-tune your messaging and offerings.
           </p>
 
-          <FormField
-            label="Problem"
-            required
-            error={errors?.['idealCustomerProfile.problem']?.[0]}
-            tooltip="What is the main problem this customer faces?"
-          >
-            <textarea
-              value={data?.idealCustomerProfile?.problem || ''}
-              onChange={(e) => updateIdealCustomerProfile('problem', e.target.value)}
-              className="w-full bg-gray-700 rounded px-4 py-2 h-32"
-              placeholder="Describe the primary problem..."
-            />
-          </FormField>
+          {/* Problem */}
+          <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+            <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">What is the main problem this customer faces?</h3>
+            <FormField
+              label="Problem"
+              required
+              error={errors?.['idealCustomerProfile.problem']?.[0]}
+              tooltip="Describe the primary problem your ideal customer faces."
+            >
+              <textarea
+                value={data?.idealCustomerProfile?.problem || ''}
+                onChange={(e) => updateIdealCustomerProfile('problem', e.target.value)}
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+                placeholder="Describe the primary problem..."
+              />
+            </FormField>
+          </div>
 
-          <FormField
-            label="Journey"
-            required
-            error={errors?.['idealCustomerProfile.journey']?.[0]}
-            tooltip="Describe the transformation they seek."
-          >
-            <textarea
-              value={data?.idealCustomerProfile?.journey || ''}
-              onChange={(e) => updateIdealCustomerProfile('journey', e.target.value)}
-              className="w-full bg-gray-700 rounded px-4 py-2 h-32"
-              placeholder="Describe their journey..."
-            />
-          </FormField>
+          {/* Journey */}
+          <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+            <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Describe their journey.</h3>
+            <FormField
+              label="Journey"
+              required
+              error={errors?.['idealCustomerProfile.journey']?.[0]}
+              tooltip="Describe the transformation they seek."
+            >
+              <textarea
+                value={data?.idealCustomerProfile?.journey || ''}
+                onChange={(e) => updateIdealCustomerProfile('journey', e.target.value)}
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+                placeholder="Describe their journey..."
+              />
+            </FormField>
+          </div>
 
-          <FormField
-            label="Desires"
-            required
-            error={errors?.['idealCustomerProfile.desires']?.[0]}
-            tooltip="List the aspirations your ideal customer holds."
-          >
-            <ArrayInput
-              values={data?.idealCustomerProfile?.desires || []}
-              onChange={(values) => updateIdealCustomerProfile('desires', values)}
-              placeholder="Add a desire..."
-            />
-          </FormField>
+          {/* Desires */}
+          <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+            <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">What are their desires?</h3>
+            <FormField
+              label="Desires"
+              required
+              error={errors?.['idealCustomerProfile.desires']?.[0]}
+              tooltip="List the aspirations your ideal customer holds."
+            >
+              <ArrayInput
+                values={data?.idealCustomerProfile?.desires || []}
+                onChange={(values) => updateIdealCustomerProfile('desires', values)}
+                placeholder="Add a desire..."
+              />
+            </FormField>
+          </div>
 
-          <FormField
-            label="Desired State"
-            required
-            error={errors?.['idealCustomerProfile.desiredState']?.[0]}
-            tooltip="Describe where they want to be after using your solution."
-          >
-            <textarea
-              value={data?.idealCustomerProfile?.desiredState || ''}
-              onChange={(e) => updateIdealCustomerProfile('desiredState', e.target.value)}
-              className="w-full bg-gray-700 rounded px-4 py-2 h-32"
-              placeholder="Describe the desired state..."
-            />
-          </FormField>
+          {/* Desired State */}
+          <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+            <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">What is their desired state?</h3>
+            <FormField
+              label="Desired State"
+              required
+              error={errors?.['idealCustomerProfile.desiredState']?.[0]}
+              tooltip="Describe where they want to be after using your solution."
+            >
+              <textarea
+                value={data?.idealCustomerProfile?.desiredState || ''}
+                onChange={(e) => updateIdealCustomerProfile('desiredState', e.target.value)}
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+                placeholder="Describe the desired state..."
+              />
+            </FormField>
+          </div>
 
-          <FormField
-            label="Gap Analysis"
-            required
-            error={errors?.['idealCustomerProfile.gap']?.[0]}
-            tooltip="Identify the gap between their current state and desired state."
-          >
-            <textarea
-              value={data?.idealCustomerProfile?.gap || ''}
-              onChange={(e) => updateIdealCustomerProfile('gap', e.target.value)}
-              className="w-full bg-gray-700 rounded px-4 py-2 h-32"
-              placeholder="Describe the gap..."
-            />
-          </FormField>
+          {/* Gap Analysis */}
+          <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+            <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">What is the gap between their current state and desired state?</h3>
+            <FormField
+              label="Gap Analysis"
+              required
+              error={errors?.['idealCustomerProfile.gap']?.[0]}
+              tooltip="Identify the gap between their current state and desired state."
+            >
+              <textarea
+                value={data?.idealCustomerProfile?.gap || ''}
+                onChange={(e) => updateIdealCustomerProfile('gap', e.target.value)}
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+                placeholder="Describe the gap..."
+              />
+            </FormField>
+          </div>
 
-          <FormField
-            label="Unique Selling Point"
-            required
-            error={errors?.['idealCustomerProfile.uniqueSellingPoint']?.[0]}
-            tooltip="What makes your solution uniquely valuable?"
-          >
-            <textarea
-              value={data?.idealCustomerProfile?.uniqueSellingPoint || ''}
-              onChange={(e) => updateIdealCustomerProfile('uniqueSellingPoint', e.target.value)}
-              className="w-full bg-gray-700 rounded px-4 py-2 h-32"
-              placeholder="What is your unique selling point?"
-            />
-          </FormField>
+          {/* Unique Selling Point */}
+          <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+            <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">What is your unique selling point?</h3>
+            <FormField
+              label="Unique Selling Point"
+              required
+              error={errors?.['idealCustomerProfile.uniqueSellingPoint']?.[0]}
+              tooltip="What makes your solution uniquely valuable?"
+            >
+              <textarea
+                value={data?.idealCustomerProfile?.uniqueSellingPoint || ''}
+                onChange={(e) => updateIdealCustomerProfile('uniqueSellingPoint', e.target.value)}
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+                placeholder="What is your unique selling point?"
+              />
+            </FormField>
+          </div>
 
-          <FormField
-            label="Benefits"
-            required
-            error={errors?.['idealCustomerProfile.benefits']?.[0]}
-            tooltip="List the practical advantages your solution provides."
-          >
-            <ArrayInput
-              values={data?.idealCustomerProfile?.benefits || []}
-              onChange={(values) => updateIdealCustomerProfile('benefits', values)}
-              placeholder="Add a benefit..."
-            />
-          </FormField>
+          {/* Benefits */}
+          <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+            <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">What are the benefits of your solution?</h3>
+            <FormField
+              label="Benefits"
+              required
+              error={errors?.['idealCustomerProfile.benefits']?.[0]}
+              tooltip="List the practical advantages your solution provides."
+            >
+              <ArrayInput
+                values={data?.idealCustomerProfile?.benefits || []}
+                onChange={(values) => updateIdealCustomerProfile('benefits', values)}
+                placeholder="Add a benefit..."
+              />
+            </FormField>
+          </div>
 
-          <FormField
-            label="Common Objections"
-            required
-            error={errors?.['idealCustomerProfile.objections']?.[0]}
-            tooltip="List typical hesitations your customers may have."
-          >
-            <ArrayInput
-              values={data?.idealCustomerProfile?.objections || []}
-              onChange={(values) => updateIdealCustomerProfile('objections', values)}
-              placeholder="Add an objection..."
-            />
-          </FormField>
+          {/* Common Objections */}
+          <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+            <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">What are the common objections?</h3>
+            <FormField
+              label="Common Objections"
+              required
+              error={errors?.['idealCustomerProfile.objections']?.[0]}
+              tooltip="List typical hesitations your customers may have."
+            >
+              <ArrayInput
+                values={data?.idealCustomerProfile?.objections || []}
+                onChange={(values) => updateIdealCustomerProfile('objections', values)}
+                placeholder="Add an objection..."
+              />
+            </FormField>
+          </div>
         </div>
       </div>
     </div>

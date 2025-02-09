@@ -92,31 +92,31 @@ export function ArrayInput({
           <Tooltip content={tooltip} />
         )}
       </div>
-      <div className="flex space-x-2">
+      <div className="flex gap-2 w-full">
         <input
           type="text"
           value={newItem}
           onChange={(e) => setNewItem(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={placeholder}
-          className="flex-1 bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5865F2]"
+          className="flex-1 min-w-0 bg-[#1a2236]/50 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
         />
         <button
           onClick={handleAdd}
           disabled={!newItem.trim()}
-          className="px-4 py-2 bg-[#5865F2] text-white rounded-md hover:bg-[#4752C4] disabled:opacity-50"
+          className="px-6 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 disabled:opacity-50 disabled:hover:from-purple-500 disabled:hover:to-purple-600 transition-all duration-200 whitespace-nowrap"
         >
           Add
         </button>
       </div>
       {error && <p className="text-sm text-red-400">{error}</p>}
-      <ul className="space-y-2">
+      <ul className="space-y-2 mt-2">
         {(values || []).map((item, index) => (
-          <li key={index} className="flex items-center justify-between bg-[#2D3748] rounded-md px-3 py-2">
-            <span className="text-[#E2E8F0]">{item}</span>
+          <li key={index} className="flex items-center justify-between bg-[#1a2236]/50 border border-gray-700 rounded-lg px-4 py-2 group hover:border-purple-500/50 transition-all duration-200">
+            <span className="text-white">{item}</span>
             <button
               onClick={() => handleRemove(index)}
-              className="text-[#94A3B8] hover:text-[#E2E8F0]"
+              className="text-gray-400 hover:text-white transition-colors duration-200 text-lg font-medium px-2"
             >
               ×
             </button>

@@ -2,6 +2,7 @@ import React from 'react';
 import { VisionData } from '@/types/pillar1';
 import FormField, { ArrayInput } from '@/components/common/FormField';
 import Tooltip from '@/components/common/Tooltip';
+import { FiInfo } from 'react-icons/fi';
 
 interface CustomerJourneyPageProps {
   data?: VisionData["customerJourney"];
@@ -21,113 +22,92 @@ export default function CustomerJourneyPage({ data, onChange, errors }: Customer
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold mb-4">Customer Journey Map</h1>
-        <p className="text-gray-300 mb-6">
-          Mapping your customer's journey reveals each touchpoint that moves them from “just discovering you”
-          to loyal advocate. By planning each stage thoughtfully, you can create an experience that fosters trust,
-          encourages repeat business, and inspires referrals.
+      <h2 className="text-3xl font-semibold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+        Customer Journey
+      </h2>
+      <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed">
+        <p>
+          The customer journey is the story of how someone transforms from a stranger into a loyal advocate for your brand. 
+          Each touchpoint is an opportunity to build trust, provide value, and strengthen the relationship.
+        </p>
+        <p className="mt-4">
+          Here, we'll map out every step of this journey—from first awareness to lasting loyalty. By understanding and 
+          optimizing each interaction, you'll create a seamless experience that turns casual interest into strong 
+          relationships and sustained growth.
         </p>
       </div>
 
-      {/* A. Awareness */}
-      <div className="bg-[#2D3748] p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">A. Awareness</h2>
-        <p className="text-gray-300 mb-6">
-          How will potential customers first discover your business? Pinpointing these channels helps you focus your marketing resources.
-        </p>
-        <div className="relative">
+      <div className="space-y-6">
+        {/* Awareness */}
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+          <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Awareness Stage</h3>
           <FormField
-            label="List your awareness channels and strategies"
+            label="How will customers discover your business?"
             required
             error={errors?.['awareness']?.[0]}
-            helper="Include both online and offline channels"
+            tooltip="Think about marketing channels, content strategy, and brand visibility."
           >
-            <ArrayInput
-              values={data?.awareness || []}
-              onChange={(values) => updateCustomerJourney('awareness', values)}
-              placeholder="Add an awareness channel..."
+            <textarea
+              value={data?.awareness || ''}
+              onChange={(e) => updateCustomerJourney('awareness', e.target.value)}
+              className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+              placeholder="Describe how customers will become aware of your business..."
             />
           </FormField>
-          <div className="absolute right-2 top-2">
-            <Tooltip content="Consider all ways customers might find you: Social media, SEO, Content marketing, Paid ads, Word of mouth, Events, Partnerships, PR, Industry directories." />
-          </div>
         </div>
-      </div>
 
-      {/* B. Consideration */}
-      <div className="bg-[#2D3748] p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">B. Consideration</h2>
-        <p className="text-gray-300 mb-6">
-          Once people know you exist, what convinces them you’re the right choice? Trust-building elements reduce doubts and highlight your credibility.
-        </p>
-        <div className="relative">
+        {/* Consideration */}
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+          <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Consideration Stage</h3>
           <FormField
-            label="List your trust-building elements"
+            label="How will you capture and maintain their interest?"
             required
             error={errors?.['consideration']?.[0]}
-            helper="What convinces customers to choose you?"
+            tooltip="Consider content strategy, value proposition, and engagement tactics."
           >
-            <ArrayInput
-              values={data?.consideration || []}
-              onChange={(values) => updateCustomerJourney('consideration', values)}
-              placeholder="Add a trust-building element..."
+            <textarea
+              value={data?.consideration || ''}
+              onChange={(e) => updateCustomerJourney('consideration', e.target.value)}
+              className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+              placeholder="Describe how you'll maintain customer interest..."
             />
           </FormField>
-          <div className="absolute right-2 top-2">
-            <Tooltip content="Examples: Case studies, Reviews, Testimonials, Portfolio, Free trials, Demos, Guarantees, Industry certifications, Expert content." />
-          </div>
         </div>
-      </div>
 
-      {/* C. Decision */}
-      <div className="bg-[#2D3748] p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">C. Decision / Purchase</h2>
-        <p className="text-gray-300 mb-6">
-          Streamlining your purchase or sign-up process removes barriers to conversion. Make it easy for someone who’s convinced to say “yes.”
-        </p>
-        <FormField
-          label="Describe your decision/purchase process"
-          required
-          error={errors?.['decision']?.[0]}
-          helper="Make it as simple as possible"
-        >
-          <div className="relative">
+        {/* Decision */}
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+          <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Decision Stage</h3>
+          <FormField
+            label="What will convince them to choose your business?"
+            required
+            error={errors?.['decision']?.[0]}
+            tooltip="Think about pricing, features, social proof, and competitive advantages."
+          >
             <textarea
               value={data?.decision || ''}
               onChange={(e) => updateCustomerJourney('decision', e.target.value)}
-              className="w-full bg-[#1A202C] text-[#E2E8F0] rounded-md px-3 py-2 min-h-[100px]"
-              placeholder="Describe your purchase process..."
-            />
-            <div className="absolute right-2 top-2">
-              <Tooltip content="Detail your process: Initial contact, Consultation, Proposal/Quote, Payment options, Onboarding. Focus on removing friction points." />
-            </div>
-          </div>
-        </FormField>
-      </div>
-
-      {/* D. Retention */}
-      <div className="bg-[#2D3748] p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">D. Retention & Referral</h2>
-        <p className="text-gray-300 mb-6">
-          Keeping current customers engaged costs far less than acquiring new ones. Satisfied clients often become brand advocates.
-        </p>
-        <div className="relative">
-          <FormField
-            label="List your retention strategies"
-            required
-            error={errors?.['retention']?.[0]}
-            helper="How will you maintain relationships?"
-          >
-            <ArrayInput
-              values={data?.retention || []}
-              onChange={(values) => updateCustomerJourney('retention', values)}
-              placeholder="Add a retention strategy..."
+              className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+              placeholder="Describe what will drive customer decisions..."
             />
           </FormField>
-          <div className="absolute right-2 top-2">
-            <Tooltip content="Think long-term: Follow-up systems, Support channels, Loyalty programs, Regular check-ins, Exclusive content, Community building, Referral incentives." />
-          </div>
+        </div>
+
+        {/* Retention */}
+        <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+          <h3 className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Retention Stage</h3>
+          <FormField
+            label="How will you retain and delight customers?"
+            required
+            error={errors?.['retention']?.[0]}
+            tooltip="Think about customer service, loyalty programs, and ongoing value delivery."
+          >
+            <textarea
+              value={data?.retention || ''}
+              onChange={(e) => updateCustomerJourney('retention', e.target.value)}
+              className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+              placeholder="Describe your customer retention strategy..."
+            />
+          </FormField>
         </div>
       </div>
     </div>
