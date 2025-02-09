@@ -126,21 +126,38 @@ export function useSections({ data, pillarNumber, saveDataToServer }: UseSection
   }
 
   // Handle PDF download
-  async function handleDownloadPdf(e: React.MouseEvent,pillarNumber: number, sectionIndex: number) {
+  async function handleDownloadPdf(e: React.MouseEvent, pillarNumber: number, sectionIndex: number) {
     e.preventDefault();
     const section = sectionConfig[sectionIndex];
     if (!section.pdfFn || !data) return;
 
     try {
-      await section.pdfFn(data);
+      // Generate PDF document
+      const doc = await section.pdfFn(data);
+
+      // Validate that we got a proper jsPDF document
+      if (!doc || typeof doc.save !== 'function') {
+        throw new Error('Invalid PDF document generated');
+      }
+
+      // Generate filename from section title (convert to lowercase, replace spaces with hyphens)
+      const filename = `${section.title.toLowerCase().replace(/\s+/g, '-')}.pdf`;
+
+      // Trigger immediate download
+      doc.save(filename);
+
+      // Update local and persistent state
       setDownloadedPdfs(prev => ({
         ...prev,
         [section.key]: true
       }));
       markPdfDownloaded(pillarNumber, sectionIndex);
+
+      // Show success message
+      toast.success('PDF downloaded successfully');
     } catch (error) {
       console.error('Error generating PDF:', error);
-      toast.error('Failed to generate PDF');
+      toast.error('Failed to generate PDF. Please try again.');
     }
   }
 
