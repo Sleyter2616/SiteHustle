@@ -18,7 +18,7 @@ export default function ImmediateActionsPage({ data, onChange, errors }: Immedia
   };
 
   // For example, require at least 3 immediate actions:
-  const totalActions = [0, 1, 2]; // three placeholders
+  const totalActions = 3; // three actions
 
   return (
     <div className="space-y-8">
