@@ -4,7 +4,7 @@ import GenericStep from '../GenericStep';
 import { executionMapping } from '@/mappings/pillar1Mapping';
 import { ExecutionRoadmapData } from '@/types/pillar1';
 
-const Step4: React.FC<StepComponentProps<ExecutionRoadmapData>> = ({ data, onDataChange, isActive }) => {
+const Step3: React.FC<StepComponentProps<ExecutionRoadmapData>> = ({ data, onDataChange, isActive }) => {
   return (
     <GenericStep<ExecutionRoadmapData>
       data={data}
@@ -15,4 +15,4 @@ const Step4: React.FC<StepComponentProps<ExecutionRoadmapData>> = ({ data, onDat
   );
 };
 
-export default Step4;
+export default Step3;

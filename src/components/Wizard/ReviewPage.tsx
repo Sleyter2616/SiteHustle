@@ -1,6 +1,7 @@
 // src/components/Wizard/ReviewPage.tsx
 import React from 'react';
-import { WizardData } from '@/types/wizard';
+import { WizardData, BrandingForm } from '@/types/wizard';
+import { VisionData, ExecutionRoadmapData } from '@/types/pillar1';
 import { FiEdit, FiCheck } from 'react-icons/fi';
 
 interface ReviewPageProps {
@@ -13,16 +14,18 @@ interface ReviewPageProps {
 const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isActive }) => {
   if (!isActive) return null;
 
-  // Helper function to safely render a field value
-  const renderField = (section: string, field: string) => {
-    return (data[section]?.userInput?.[field] as string) || '-';
-  };
+  console.log('ReviewPage received data:', data);
 
-  // For array fields, join them by comma if defined
-  const renderArrayField = (section: string, field: string) => {
-    const value = data[section]?.userInput?.[field];
-    return Array.isArray(value) ? value.join(', ') : (value as string) || '-';
-  };
+  // Extract data from each section
+  const brandingData = data.branding?.userInput as BrandingForm;
+  const visionData = data.idea_market?.userInput as VisionData;
+  const executionData = data.execution?.userInput as ExecutionRoadmapData;
+
+  console.log('Extracted data:', {
+    brandingData,
+    visionData,
+    executionData
+  });
 
   return (
     <div className="space-y-8 w-full max-w-3xl mx-auto">
@@ -30,16 +33,16 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
         Review Your Business Plan
       </h2>
 
-      {/* Vision & Mission Section */}
+      {/* Business Idea Section */}
       <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500 transition-all duration-300">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
-            Vision & Mission
+            Business Vision
           </h3>
           <button
             onClick={() => onEditStep('idea_market')}
             className="flex items-center gap-1 text-gray-400 hover:text-blue-400 transition-colors duration-200"
-            title="Edit Vision & Mission"
+            title="Edit Business Vision"
           >
             <FiEdit className="w-4 h-4" /> Edit
           </button>
@@ -47,23 +50,23 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
         <div className="text-gray-300 space-y-2">
           <p>
             <strong className="text-gray-400">Business Name:</strong>{' '}
-            {renderField('idea_market', 'businessName')}
+            {visionData?.businessName || '-'}
           </p>
           <p>
             <strong className="text-gray-400">Tagline:</strong>{' '}
-            {renderField('idea_market', 'tagline')}
+            {visionData?.tagline || '-'}
           </p>
           <p>
             <strong className="text-gray-400">Mission Statement:</strong>{' '}
-            {renderField('idea_market', 'missionStatement')}
+            {visionData?.missionStatement || '-'}
           </p>
           <p>
             <strong className="text-gray-400">Vision Statement:</strong>{' '}
-            {renderField('idea_market', 'visionStatement')}
+            {visionData?.visionStatement || '-'}
           </p>
           <p>
             <strong className="text-gray-400">Core Values:</strong>{' '}
-            {renderArrayField('idea_market', 'coreValues')}
+            {visionData?.coreValues?.join(', ') || '-'}
           </p>
         </div>
       </div>
@@ -82,27 +85,90 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
             <FiEdit className="w-4 h-4" /> Edit
           </button>
         </div>
-        <div className="text-gray-300 space-y-2">
-          <p>
-            <strong className="text-gray-400">Brand Name:</strong>{' '}
-            {renderField('branding', 'brandName')}
-          </p>
-          <p>
-            <strong className="text-gray-400">Brand Values:</strong>{' '}
-            {renderField('branding', 'brandValues')}
-          </p>
-          <p>
-            <strong className="text-gray-400">Visual Style:</strong>{' '}
-            {renderField('branding', 'visualStyle')}
-          </p>
-          <p>
-            <strong className="text-gray-400">Brand Voice:</strong>{' '}
-            {renderField('branding', 'brandVoice')}
-          </p>
+        <div className="text-gray-300 space-y-4">
+          {/* Reflection Section */}
+          <div>
+            <h4 className="text-lg font-medium text-gray-300 mb-2">Reflection</h4>
+            <div className="space-y-2">
+              <p>
+                <strong className="text-gray-400">Who I Am:</strong>{' '}
+                {brandingData?.reflection?.whoIAm || '-'}
+              </p>
+              <p>
+                <strong className="text-gray-400">Who I Am Not:</strong>{' '}
+                {brandingData?.reflection?.whoIAmNot || '-'}
+              </p>
+              <p>
+                <strong className="text-gray-400">Why Build Brand:</strong>{' '}
+                {brandingData?.reflection?.whyBuildBrand || '-'}
+              </p>
+            </div>
+          </div>
+
+          {/* Personality Section */}
+          <div>
+            <h4 className="text-lg font-medium text-gray-300 mb-2">Personality</h4>
+            <div className="space-y-2">
+              <p>
+                <strong className="text-gray-400">Communication Style:</strong>{' '}
+                {brandingData?.personality?.communicationStyle || '-'}
+              </p>
+              <p>
+                <strong className="text-gray-400">Tone and Voice:</strong>{' '}
+                {brandingData?.personality?.toneAndVoice || '-'}
+              </p>
+              <p>
+                <strong className="text-gray-400">Passionate Expression:</strong>{' '}
+                {brandingData?.personality?.passionateExpression || '-'}
+              </p>
+              <p>
+                <strong className="text-gray-400">Brand Personality:</strong>{' '}
+                {brandingData?.personality?.brandPersonality || '-'}
+              </p>
+            </div>
+          </div>
+
+          {/* Story Section */}
+          <div>
+            <h4 className="text-lg font-medium text-gray-300 mb-2">Story</h4>
+            <div className="space-y-2">
+              <p>
+                <strong className="text-gray-400">Pivotal Experience:</strong>{' '}
+                {brandingData?.story?.pivotalExperience || '-'}
+              </p>
+              <p>
+                <strong className="text-gray-400">Defining Moment:</strong>{' '}
+                {brandingData?.story?.definingMoment || '-'}
+              </p>
+              <p>
+                <strong className="text-gray-400">Audience Relevance:</strong>{' '}
+                {brandingData?.story?.audienceRelevance || '-'}
+              </p>
+            </div>
+          </div>
+
+          {/* Differentiation Section */}
+          <div>
+            <h4 className="text-lg font-medium text-gray-300 mb-2">Differentiation</h4>
+            <div className="space-y-2">
+              <p>
+                <strong className="text-gray-400">Unique Approach:</strong>{' '}
+                {brandingData?.differentiation?.uniqueApproach || '-'}
+              </p>
+              <p>
+                <strong className="text-gray-400">Unique Resources:</strong>{' '}
+                {brandingData?.differentiation?.uniqueResources || '-'}
+              </p>
+              <p>
+                <strong className="text-gray-400">Competitive Perception:</strong>{' '}
+                {brandingData?.differentiation?.competitivePerception || '-'}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Execution Plan Section */}
+      {/* Execution Section */}
       <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500 transition-all duration-300">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
@@ -119,19 +185,19 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
         <div className="text-gray-300 space-y-2">
           <p>
             <strong className="text-gray-400">30-Day Goal:</strong>{' '}
-            {renderField('execution', 'thirtyDayGoal')}
+            {executionData?.thirtyDayGoal || '-'}
           </p>
           <p>
             <strong className="text-gray-400">Weekly Milestones:</strong>{' '}
-            {renderArrayField('execution', 'weeklyMilestones')}
+            {executionData?.weeklyMilestones?.join(', ') || '-'}
           </p>
           <p>
             <strong className="text-gray-400">Content Plan:</strong>{' '}
-            {renderField('execution', 'contentPlan')}
+            {executionData?.contentPlan || '-'}
           </p>
           <p>
             <strong className="text-gray-400">Immediate Actions:</strong>{' '}
-            {renderArrayField('execution', 'immediateActions')}
+            {executionData?.immediateActions?.join(', ') || '-'}
           </p>
         </div>
       </div>

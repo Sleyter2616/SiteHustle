@@ -4,7 +4,7 @@ import GenericStep from '../GenericStep';
 import { visionMapping } from '@/mappings/pillar1Mapping';
 import { VisionData } from '@/types/pillar1';
 
-const Step1: React.FC<StepComponentProps<VisionData>> = ({ data, onDataChange, isActive }) => {
+const Step2: React.FC<StepComponentProps<VisionData>> = ({ data, onDataChange, isActive }) => {
   return (
     <GenericStep<VisionData>
       data={data}
@@ -15,4 +15,4 @@ const Step1: React.FC<StepComponentProps<VisionData>> = ({ data, onDataChange, i
   );
 };
 
-export default Step1;
+export default Step2;

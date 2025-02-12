@@ -6,10 +6,27 @@ export interface BusinessIdeaForm {
 }
 
 export interface BrandingForm {
-  brandName: string;
-  brandValues: string;
-  visualStyle: string;
-  brandVoice: string;
+  reflection: {
+    whoIAm: string;
+    whoIAmNot: string;
+    whyBuildBrand: string;
+  };
+  personality: {
+    communicationStyle: string;
+    toneAndVoice: string;
+    passionateExpression: string;
+    brandPersonality: string;
+  };
+  story: {
+    pivotalExperience: string;
+    definingMoment: string;
+    audienceRelevance: string;
+  };
+  differentiation: {
+    uniqueApproach: string;
+    uniqueResources: string;
+    competitivePerception: string;
+  };
 }
 
 export interface BusinessIdeaErrors {
@@ -38,7 +55,7 @@ export interface WizardData {
 export interface Step {
   id: string;
   title: string;
-  component: React.ComponentType<StepComponentProps<any>>;
+  component: React.ComponentType<StepComponentProps<any> & { onEditStep?: (stepId: string) => void; onSubmit?: () => void }>;
   description: string;
 }
 

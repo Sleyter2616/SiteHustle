@@ -3,7 +3,6 @@ import { BrandIdentityData } from '@/types/pillar1';
 import PersonalityPage from './pages/PersonalityPage';
 import StoryPage from './pages/StoryPage';
 import DifferentiationPage from './pages/DifferentiationPage';
-import ExecutionRoadmapPage from './pages/ExecutionRoadmapPage';
 import ReflectionPage from './pages/ReflectionPage';
 import ConclusionPage from './pages/ConclusionPage';
 
@@ -38,10 +37,6 @@ export default function BrandIdentityWorksheet({
     onChange?.({ ...data, differentiation: updatedDifferentiation });
   };
 
-  const handleExecutionRoadmapChange = (updatedRoadmap) => {
-    onChange?.({ ...data, executionRoadmap: updatedRoadmap });
-  };
-
   const handleReflectionChange = (updatedReflection) => {
     onChange?.({ ...data, reflection: updatedReflection });
   };
@@ -49,9 +44,8 @@ export default function BrandIdentityWorksheet({
   const steps = [
     { title: 'Reflection', component: <ReflectionPage data={data?.reflection} onChange={handleReflectionChange} /> },
     { title: 'Brand Personality', component: <PersonalityPage data={data?.personality} onChange={handlePersonalityChange} /> },
-    { title: 'Brand Story', component: <StoryPage data={data?.story} onChange={handleStoryChange} /> },
-    { title: 'Differentiation', component: <DifferentiationPage data={data?.differentiation} onChange={handleDifferentiationChange} /> },
-    { title: 'Execution Roadmap', component: <ExecutionRoadmapPage data={data?.executionRoadmap} onChange={handleExecutionRoadmapChange} /> },
+    { title: 'Brand Story Differentiation', component: <StoryPage data={data?.story} onChange={handleStoryChange} /> },
+    { title: 'Execution Roadmap', component: <DifferentiationPage data={data?.differentiation} onChange={handleDifferentiationChange} /> },
     { title: 'Conclusion', component: <ConclusionPage /> }
   ];
 

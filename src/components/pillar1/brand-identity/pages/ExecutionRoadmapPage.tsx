@@ -6,7 +6,7 @@ import TextArea from '@/components/common/TextArea';
 import Tooltip from '@/components/common/Tooltip';
 import { FiInfo } from 'react-icons/fi';
 
-type ExecutionRoadmapData = NonNullable<Pillar1Data['brandIdentity']['executionRoadmap']>;
+type ExecutionRoadmapData = NonNullable<Pillar1Data['executionRoadmap']>;
 
 interface ExecutionRoadmapPageProps {
   data: ExecutionRoadmapData;
