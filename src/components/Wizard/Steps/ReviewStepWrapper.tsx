@@ -1,26 +1,79 @@
 // src/components/Wizard/Steps/ReviewStepWrapper.tsx
-import React from 'react';
-import { StepComponentProps } from '@/types/wizard';
-import { WizardData } from '@/types/wizard';
+import React, { useEffect, useState } from 'react';
+import { StepComponentProps, WizardData, StepData } from '@/types/wizard';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import ReviewPage from '../ReviewPage';
+import toast from 'react-hot-toast';
 
 interface ReviewStepWrapperProps extends StepComponentProps<WizardData> {
-  // Additional props can be added if needed.
+  onEditStep: (stepId: string) => void;
+  onSubmit: () => void;
 }
 
-const ReviewStepWrapper: React.FC<ReviewStepWrapperProps> = ({ data, onDataChange, isActive }) => {
-  // For the review step, we don't modify data so onDataChange can be a no-op.
+const ReviewStepWrapper: React.FC<ReviewStepWrapperProps> = ({ isActive, onEditStep, onSubmit }) => {
+  const [wizardData, setWizardData] = useState<WizardData>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    const loadAllSteps = async () => {
+      try {
+        // Get the current user
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          toast.error('Please sign in to continue');
+          return;
+        }
+
+        // Fetch all wizard steps for this user
+        const { data, error } = await supabase
+          .from('wizard_steps')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .order('updated_at', { ascending: false });
+
+        if (error) {
+          throw error;
+        }
+
+        // Transform the data into WizardData format
+        const transformedData: WizardData = {};
+        data?.forEach(step => {
+          transformedData[step.step_id] = {
+            userInput: step.user_input,
+            aiOutput: step.ai_output
+          };
+        });
+
+        console.log('Loaded review data:', transformedData);
+        setWizardData(transformedData);
+      } catch (error) {
+        console.error('Error loading review data:', error);
+        toast.error('Failed to load review data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isActive) {
+      loadAllSteps();
+    }
+  }, [isActive, supabase]);
+
+  if (!isActive) return null;
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
     <ReviewPage 
-      data={data as unknown as WizardData}
-      onEditStep={(stepId: string) => {
-        // For now, we simply log the step that should be edited.
-        console.log(`Edit step: ${stepId}`);
-      }}
-      onSubmit={() => {
-        // Final submission logic goes here.
-        console.log('Submit wizard data');
-      }}
+      data={wizardData}
+      onEditStep={onEditStep}
+      onSubmit={onSubmit}
       isActive={isActive}
     />
   );

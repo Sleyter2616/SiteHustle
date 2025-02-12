@@ -30,7 +30,7 @@ export interface BrandIdentityData {
     competitivePerception: string;
   };
   /** Kept for backward compatibility if needed, or can be removed. */
-  executionRoadmap?: ExecutionRoadmapData;
+  // executionRoadmap?: ExecutionRoadmapData;
 }
 
 export interface VisionData {

@@ -1,16 +1,31 @@
+// src/components/Wizard/GenericStep.tsx
 import React, { ChangeEvent } from 'react';
 import { StepComponentProps } from '@/types/wizard';
-
-interface FieldMapping {
-  label: string;
-  tooltip: string;
-  placeholder: string;
-  minLength?: number;
-  isArray?: boolean;
-}
+import { FieldMapping } from '@/mappings/pillar1Mapping';
 
 interface GenericStepProps<T> extends StepComponentProps<T> {
   fieldMappings: Record<keyof T, FieldMapping>;
+}
+
+/**
+ * Helper function to set a nested value on an object using dot-notation.
+ * It mutates the provided object, so use it on a copy.
+ */
+function setNestedValue(obj: any, key: string, value: any): void {
+  const keys = key.split('.');
+  const lastKey = keys.pop();
+  let pointer = obj;
+  keys.forEach((k) => {
+    if (!pointer[k]) {
+      pointer[k] = {};
+    }
+    pointer = pointer[k];
+  });
+  pointer[lastKey!] = value;
+}
+
+function getValue(obj: any, key: string): any {
+  return key.split('.').reduce((acc, curr) => (acc ? acc[curr] : undefined), obj);
 }
 
 const GenericStep = <T extends Record<string, any>>({
@@ -21,23 +36,23 @@ const GenericStep = <T extends Record<string, any>>({
 }: GenericStepProps<T>) => {
   const handleChange = (field: keyof T) => (e: ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
-    
     // Handle array fields by splitting on newlines
     const finalValue = fieldMappings[field].isArray 
       ? newValue.split('\n').filter(line => line.trim() !== '')
       : newValue;
+      
+    // Create a new userInput object (shallow copy) and update the nested value using dot notation
+    const newUserInput = { ...data.userInput };
+    setNestedValue(newUserInput, field as string, finalValue);
 
     onDataChange({
       ...data,
-      userInput: {
-        ...data.userInput,
-        [field]: finalValue,
-      },
+      userInput: newUserInput,
     });
   };
 
   const getFieldValue = (field: keyof T): string => {
-    const value = data.userInput?.[field];
+    const value = getValue(data.userInput, field as string);
     if (Array.isArray(value)) {
       return value.join('\n');
     }
