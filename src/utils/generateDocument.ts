@@ -2,7 +2,7 @@
 import { WizardData } from '@/types/wizard';
 import { VisionData, BrandIdentityData, ExecutionRoadmapData } from '@/types/pillar1';
 import jsPDF from 'jspdf';
-import { buildFinalPrompt } from './buildFinalPrompt';
+import { buildFinalBusinessPlanPrompt, buildToolAutomationFinalPrompt } from './buildFinalPrompt';
 
 function addWrappedText(doc: jsPDF, text: string, x: number, y: number, maxWidth: number): number {
   const lines = doc.splitTextToSize(text, maxWidth);
@@ -10,7 +10,7 @@ function addWrappedText(doc: jsPDF, text: string, x: number, y: number, maxWidth
   return y + (lines.length * 7); // Return the new Y position
 }
 
-export function generatePlanDocument(data: WizardData): Blob {
+export function generateBusinessPlanDocument(data: WizardData): Blob {
   const doc = new jsPDF();
   let yPosition = 20;
   const margin = 20;
@@ -139,7 +139,87 @@ export function generatePlanDocument(data: WizardData): Blob {
 
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
-  const finalPrompt = buildFinalPrompt(data);
+  const finalPrompt = buildFinalBusinessPlanPrompt(data);
+  yPosition = addWrappedText(doc, finalPrompt, margin, yPosition, maxWidth);
+
+  // Return the PDF as a Blob
+  return doc.output('blob');
+}export function generateToolAutomationPlanDocument(data: WizardData): Blob {
+  const doc = new jsPDF();
+  let yPosition = 20;
+  const margin = 20;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const maxWidth = pageWidth - (margin * 2);
+
+  // Extract data for each section from the wizard data
+  const logic = data.logic?.userInput || {};
+  const lookFeel = data.lookFeel?.userInput || {};
+  const automation = data.automation?.userInput || {};
+
+  // Title
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  yPosition = addWrappedText(doc, "Tool & Automation Planning", margin, yPosition, maxWidth);
+  yPosition += 10;
+
+  // Section 1: Business Logic Refinement
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  yPosition = addWrappedText(doc, "1. Business Logic Refinement", margin, yPosition, maxWidth);
+  yPosition += 5;
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  yPosition = addWrappedText(doc, `Backend Architecture Requirements: ${logic.backendArchitecture || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `API Integration Needs: ${logic.apiIntegration || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Scalability Considerations: ${logic.scalability || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Security Requirements: ${logic.security || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Additional Technical Notes: ${logic.additionalNotes || '-'}`, margin, yPosition, maxWidth);
+  yPosition += 10;
+
+  // Section 2: Look & Feel and Customer Experience
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  yPosition = addWrappedText(doc, "2. Look & Feel and Customer Experience", margin, yPosition, maxWidth);
+  yPosition += 5;
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  yPosition = addWrappedText(doc, `Desired Design Style: ${lookFeel.designStyle || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Tone and Voice: ${lookFeel.toneAndVoice || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Key Visual Elements: ${lookFeel.visualElements || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Competitor Analysis Insights: ${lookFeel.competitorAnalysis || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Target Audience Description: ${lookFeel.targetAudience || '-'}`, margin, yPosition, maxWidth);
+  yPosition += 10;
+
+  // Section 3: Tool & Automation Preferences
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  yPosition = addWrappedText(doc, "3. Tool & Automation Preferences", margin, yPosition, maxWidth);
+  yPosition += 5;
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  yPosition = addWrappedText(doc, `Technical Expertise Level: ${automation.techExpertise || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Selected Automation Preferences: ${Array.isArray(automation.automationPreferences) ? automation.automationPreferences.join(', ') : '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Preferred Tools or Integrations: ${automation.preferredTools || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Integration Strategy: ${automation.integrationStrategy || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Additional Notes on Automations: ${automation.additionalNotes || '-'}`, margin, yPosition, maxWidth);
+  yPosition += 10;
+
+  // Add a new page for the AI Analysis / Final Recommendations
+  doc.addPage();
+  yPosition = 20;
+
+  // Section 4: AI Analysis & Final Recommendations
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  yPosition = addWrappedText(doc, "4. AI Analysis & Final Recommendations", margin, yPosition, maxWidth);
+  yPosition += 5;
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  const finalPrompt = buildToolAutomationFinalPrompt(data);
   yPosition = addWrappedText(doc, finalPrompt, margin, yPosition, maxWidth);
 
   // Return the PDF as a Blob

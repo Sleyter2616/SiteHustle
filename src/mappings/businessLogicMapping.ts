@@ -1,16 +1,5 @@
 // src/mappings/businessLogicMapping.ts
-import { FieldMapping } from './commonTypes'; // Adjust if you have a common types file
-
-export interface FieldMapping {
-  label: string;
-  tooltip: string;
-  placeholder: string;
-  minLength?: number;
-  isArray?: boolean;
-  errorMessage?: string;
-  inputType?: 'textarea' | 'dropdown' | 'checkboxGroup';
-  options?: string[];
-}
+import { FieldMapping } from './commonMappingTypes'; // Adjust if you have a common types file
 
 export const businessLogicMapping: Record<string, FieldMapping> = {
   backendRequirements: {
@@ -20,6 +9,14 @@ export const businessLogicMapping: Record<string, FieldMapping> = {
     minLength: 10,
     errorMessage: 'Please provide at least 10 characters for backend requirements.',
   },
+    apiNeeds: {
+      label: 'API Requirements',
+      tooltip: 'Describe any specific API needs or integrations required for your backend.',
+      placeholder: 'e.g., Payment gateways, third‑party integrations, custom endpoints',
+      inputType: 'textarea',
+      minLength: 10,
+      errorMessage: 'API requirements must be at least 10 characters.',
+    },
   monetizationStrategy: {
     label: 'Monetization Strategy',
     tooltip: 'How will your business earn revenue? (e.g., subscriptions, one-time sales, freemium, ads, affiliate)',
@@ -35,11 +32,30 @@ export const businessLogicMapping: Record<string, FieldMapping> = {
     minLength: 3,
     errorMessage: 'Each integration detail must be at least 3 characters.',
   },
-  scalabilityNeeds: {
-    label: 'Scalability Needs',
-    tooltip: 'Describe your expected traffic, load, or performance requirements.',
-    placeholder: 'Enter your scalability requirements...',
-    minLength: 5,
-    errorMessage: 'Scalability requirements must be at least 5 characters.',
+  scalability: {
+    label: 'Scalability Considerations',
+    tooltip: 'Explain your scalability needs, such as handling high traffic or multi‑region deployment.',
+    placeholder: 'Describe your scalability plans...',
+    inputType: 'textarea',
+    minLength: 10,
+    errorMessage: 'Scalability considerations must be at least 10 characters.',
+  },  // 4. Data Storage Preferences (Dropdown)
+  dataStorage: {
+    label: 'Data Storage Preferences',
+    tooltip: 'Select your preferred type of data storage solution.',
+    placeholder: 'Select a data storage option',
+    inputType: 'dropdown',
+    options: ['SQL', 'NoSQL', 'Hybrid'],
+    minLength: 0,
+    errorMessage: 'Please select a data storage option.',
+  },
+  // 5. Security Requirements (Textarea)
+  securityRequirements: {
+    label: 'Security Requirements',
+    tooltip: 'Describe any critical security features you need (e.g., encryption, multi‑factor authentication).',
+    placeholder: 'Enter your security requirements...',
+    inputType: 'textarea',
+    minLength: 10,
+    errorMessage: 'Security requirements must be at least 10 characters.',
   },
 };

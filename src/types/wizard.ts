@@ -63,6 +63,7 @@ export interface StepComponentProps<T = any> {
   data: StepData<T>;
   onDataChange: (data: StepData<T>) => void;
   isActive: boolean;
+  onNextModule?: () => void;
 }
 
 export interface NavigationControlsProps {
@@ -71,6 +72,7 @@ export interface NavigationControlsProps {
   onNext: () => void;
   onBack: () => void;
   isProcessing?: boolean;
+  onFinish?: () => void;
 }
 
 export interface ProgressBarProps {
@@ -80,8 +82,24 @@ export interface ProgressBarProps {
   onStepClick: (index: number) => void;
   currentStepId: string;
 }
+
 export interface ToolAutomationForm {
   techExpertise: string;
   automationPreferences: string[];
+  integrationNeeds: string[];
   additionalNotes: string;
+  preferredTool: string;
+}
+export interface LookAndFeelForm {
+  designStyle: string;
+  brandVoice: string;
+  uiUxPreferences: string;
+  competitorInspiration: string[];
+}
+
+export interface BusinessLogicForm {
+  backendRequirements: string;
+  monetizationStrategy: string;
+  thirdPartyIntegrations: string[]; // Expect an array of integration names or details
+  scalabilityNeeds: string;
 }
