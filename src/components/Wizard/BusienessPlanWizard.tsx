@@ -1,19 +1,21 @@
 'use client';
 import React, { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { WizardData, StepData, Step, StepComponentProps } from '@/types/wizard';
 import { VisionData, BrandIdentityData, ExecutionRoadmapData } from '@/types/pillar1';
 import ProgressBar from './ProgressBar';
 import NavigationControls from './NavigationControls';
 import OnboardingGuide from './OnboardingGuide';
-import Step1 from './Steps/Step1';
-import Step2 from './Steps/Step2';
-import Step3 from './Steps/Step3';
-import ReviewStepWrapper from './Steps/ReviewStepWrapper';
+import Step1 from './Steps/BusinessSteps/Step1';
+import Step2 from './Steps/BusinessSteps/Step2';
+import Step3 from './Steps/BusinessSteps/Step3';
+import ReviewStepWrapper from './Steps/BusinessSteps/ReviewStepWrapper';
+import ConclusionStep from './Steps/BusinessSteps/ConclusionStep';
 import { saveWithRetry, loadWizardData } from '@/lib/supabase';
 import { visionMapping, brandingMapping, executionMapping } from '@/mappings/pillar1Mapping';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import toast from 'react-hot-toast';
-
+import { buildFinalBusinessPlanPrompt } from '@/utils/buildFinalPrompt';
 
 const initialData: WizardData = {
   idea_market: { userInput: {} as VisionData, aiOutput: '' },
@@ -25,27 +27,33 @@ const initialData: WizardData = {
 const steps: Step[] = [
   {
     id: 'branding',
-    title: 'Brand Identity',
-    description: 'Create your authentic brand personality',
+    title: 'Brand Identity & Messaging',
+    description: 'Craft a unique and authentic brand identity along with a compelling message.',
     component: Step1,
   },
   {
     id: 'idea_market',
-    title: 'Vision & Mission',
-    description: 'Define your business vision, mission, and core values',
+    title: 'Business Vision & Mission',
+    description: 'Define your business vision, mission, and core values to guide your strategy.',
     component: Step2,
   },
   {
     id: 'execution',
-    title: 'Execution Plan',
-    description: 'Define your 30-day action plan',
+    title: 'Execution & Action Plan',
+    description: 'Outline your 30-day action plan, including key milestones and immediate tasks.',
     component: Step3,
   },
   {
     id: 'review',
-    title: 'Review & Submit',
-    description: 'Review all your inputs and submit your business plan',
+    title: 'Review & Finalize',
+    description: 'Review all your inputs and finalize your business plan for submission.',
     component: ReviewStepWrapper,
+  },
+  {
+    id: 'conclusion',
+    title: 'Conclusion & Final Output',
+    description: 'View the final AI-generated output and download your Business Plan PDF.',
+    component: ConclusionStep,
   },
 ];
 
@@ -86,7 +94,6 @@ function validateStepData(stepId: string, data: any): { isValid: boolean; errors
     });
   }
 
-  // Aggregate errors to a single message per step if there are any errors
   if (errors.length > 0) {
     const stepName = steps.find(s => s.id === stepId)?.title || stepId.replace('_', ' ');
     errors = [`Please complete all required fields in ${stepName} correctly.`];
@@ -95,14 +102,17 @@ function validateStepData(stepId: string, data: any): { isValid: boolean; errors
   return { isValid: errors.length === 0, errors };
 }
 
-const WizardContainer: React.FC = () => {
+const BuisinessPlanWizard: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [wizardData, setWizardData] = useState<WizardData>(initialData);
   const [isProcessing, setIsProcessing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const supabase = createClientComponentClient();
+  const router = useRouter();
 
+  // Get current user
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -116,6 +126,7 @@ const WizardContainer: React.FC = () => {
     getUser();
   }, [supabase.auth]);
 
+  // Load saved wizard data
   useEffect(() => {
     const loadSavedData = async () => {
       if (!userId) return;
@@ -197,10 +208,50 @@ const WizardContainer: React.FC = () => {
   const handleSubmit = async () => {
     setIsProcessing(true);
     try {
-      await saveWithRetry(userId, steps[currentStep]?.id || 'idea_market', wizardData[steps[currentStep]?.id || 'idea_market']);
+      // Build final prompt from aggregated wizardData
+      const finalPrompt = buildFinalBusinessPlanPrompt(wizardData);
+      
+      // Call the AI generation API endpoint
+      const response = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: finalPrompt, stepId: 'review' }),
+      });
+      
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'AI generation failed');
+      }
+      
+      // Create an updated review payload including AI output from each step.
+      const updatedReviewData = {
+        userInput: {
+          idea_market: wizardData.idea_market.userInput,
+          branding: wizardData.branding.userInput,
+          execution: wizardData.execution.userInput,
+        },
+        aiOutput: JSON.stringify({
+          idea_market: wizardData.idea_market.aiOutput || '',
+          branding: wizardData.branding.aiOutput || '',
+          execution: wizardData.execution.aiOutput || '',
+          review: result.output,
+        }),
+      };
+
+      console.log('Final submission payload:', updatedReviewData);
+      
+      // Save the updated review data
+      await saveWithRetry(userId, 'review', updatedReviewData);
+      console.log('Final business plan submitted:', wizardData);
       toast.success('Business plan submitted successfully!');
-      console.log('All data submitted:', wizardData);
+      
+      // Transition to the Conclusion step (instead of immediate redirection)
+      const conclusionStepIndex = steps.findIndex(step => step.id === 'conclusion');
+      if (conclusionStepIndex !== -1) {
+        setCurrentStep(conclusionStepIndex);
+      }
     } catch (error) {
+      console.error('Submission error:', error);
       toast.error('Failed to submit business plan. Please try again.');
     } finally {
       setIsProcessing(false);
@@ -218,7 +269,7 @@ const WizardContainer: React.FC = () => {
   const currentStepId = steps[currentStep]?.id || 'idea_market';
   const CurrentStepComponent = steps[currentStep]?.component;
 
-  // For non-review steps, only pass basic props.
+  // For non-review steps, pass basic props.
   const basicStepProps: StepComponentProps<any> = {
     data: wizardData[currentStepId],
     onDataChange: (newData: StepData) => handleDataChange(currentStepId, newData),
@@ -227,39 +278,59 @@ const WizardContainer: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-white py-8 px-4">
-    <div className="container-custom">
-      <ProgressBar
-        current={currentStep}
-        total={totalSteps}
-        steps={steps}
-        onStepClick={goToStep}
-        currentStepId={currentStepId}
-      />
-      
-      {currentStepId === 'review' ? (
-  <ReviewStepWrapper
-    data={wizardData[currentStepId]}
-    onDataChange={(newData: StepData) => handleDataChange(currentStepId, newData)}
-    isActive={!isProcessing}
-    onEditStep={handleEditStep}
-    onSubmit={handleSubmit}
-  />
-) : (
-  CurrentStepComponent && <CurrentStepComponent {...basicStepProps} />
-)}
+      <div className="container-custom">
+        <ProgressBar
+          current={currentStep}
+          total={totalSteps}
+          steps={steps}
+          onStepClick={goToStep}
+          currentStepId={currentStepId}
+        />
+        
+        {currentStepId === 'review' ? (
+          <ReviewStepWrapper
+            data={wizardData[currentStepId]}
+            onDataChange={(newData: StepData) => handleDataChange(currentStepId, newData)}
+            isActive={!isProcessing}
+            onEditStep={handleEditStep}
+            onSubmit={handleSubmit}
+          />
+        ) : currentStepId === 'conclusion' ? (
+          <CurrentStepComponent
+            data={{ userInput: wizardData, aiOutput: wizardData.review.aiOutput }}
+            onDataChange={(newData: StepData) => handleDataChange(currentStepId, newData)}
+            isActive={!isProcessing}
+            onNextModule={() => router.push('/tool-automation-planning')}
+          />
+        ) : (
+          CurrentStepComponent && <CurrentStepComponent {...basicStepProps} />
+        )}
 
-      <NavigationControls
-        currentStep={currentStep}
-        totalSteps={totalSteps}
-        onNext={handleNext}
-        onBack={handleBack}
-        isProcessing={isProcessing}
-      />
+        <NavigationControls
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+          onNext={currentStepId === 'review' ? handleSubmit : handleNext}
+          onBack={handleBack}
+          isProcessing={isProcessing}
+          onFinish={() => router.push('/tool-automation-planning')}
+        />
 
-      <OnboardingGuide currentStep={currentStep} />
+        {isSubmitted && (
+          <div className="mt-4 flex justify-center">
+            <button 
+              className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-200"
+              onClick={() => router.push('/tool-automation-planning')}
+              title="Continue to Tool & Automation Planning"
+            >
+              Continue to Tool & Automation Planning
+            </button>
+          </div>
+        )}
+
+        <OnboardingGuide currentStep={currentStep} />
+      </div>
     </div>
-  </div>
   );
 };
 
-export default WizardContainer;
+export default BuisinessPlanWizard;

@@ -1,16 +1,17 @@
-// src/components/Wizard/Steps/ReviewStepWrapper.tsx
+'use client';
 import React, { useEffect, useState } from 'react';
 import { StepComponentProps, WizardData, StepData } from '@/types/wizard';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import ReviewPage from '../ReviewPage';
 import toast from 'react-hot-toast';
+// Import your review page for tool planning (create this if needed)
+import ToolAutomationReviewPage from './ToolAutomationReviewPage'
 
-interface ReviewStepWrapperProps extends StepComponentProps<WizardData> {
+interface ToolAutomationReviewStepWrapperProps extends StepComponentProps<WizardData> {
   onEditStep: (stepId: string) => void;
   onSubmit: () => void;
 }
 
-const ReviewStepWrapper: React.FC<ReviewStepWrapperProps> = ({ isActive, onEditStep, onSubmit }) => {
+const ToolAutomationReviewStepWrapper: React.FC<ToolAutomationReviewStepWrapperProps> = ({ isActive, onEditStep, onSubmit }) => {
   const [wizardData, setWizardData] = useState<WizardData>({});
   const [isLoading, setIsLoading] = useState(true);
   const supabase = createClientComponentClient();
@@ -38,14 +39,14 @@ const ReviewStepWrapper: React.FC<ReviewStepWrapperProps> = ({ isActive, onEditS
 
         // Transform the data into WizardData format
         const transformedData: WizardData = {};
-        data?.forEach(step => {
+        data?.forEach((step) => {
           transformedData[step.step_id] = {
             userInput: step.user_input,
-            aiOutput: step.ai_output
+            aiOutput: step.ai_output,
           };
         });
 
-        console.log('Loaded review data:', transformedData);
+        console.log('Loaded tool automation review data:', transformedData);
         setWizardData(transformedData);
       } catch (error) {
         console.error('Error loading review data:', error);
@@ -70,7 +71,7 @@ const ReviewStepWrapper: React.FC<ReviewStepWrapperProps> = ({ isActive, onEditS
   }
 
   return (
-    <ReviewPage 
+    <ToolAutomationReviewPage
       data={wizardData}
       onEditStep={onEditStep}
       onSubmit={onSubmit}
@@ -79,4 +80,4 @@ const ReviewStepWrapper: React.FC<ReviewStepWrapperProps> = ({ isActive, onEditS
   );
 };
 
-export default ReviewStepWrapper;
+export default ToolAutomationReviewStepWrapper;

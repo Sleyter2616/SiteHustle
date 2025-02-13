@@ -69,6 +69,19 @@ export default async function DashboardPage() {
 
             {/* Sidebar */}
             <div className="space-y-8">
+              {/* Business Planning Wizard */}
+              <div>
+                <h2 className="text-xl font-semibold text-[#E2E8F0] mb-4">
+                  Business Planning
+                </h2>
+                <div className="card bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 hover:border-blue-400/30 transition-all">
+                  <a href="/business-planning-wizard" className="block p-4">
+                    <h3 className="text-lg font-semibold text-blue-400 mb-2">Business Plan Wizard</h3>
+                    <p className="text-[#94A3B8] text-sm">Create your AI-powered business plan with our step-by-step wizard.</p>
+                  </a>
+                </div>
+              </div>
+
               {/* Next Call */}
               <div>
                 <h2 className="text-xl font-semibold text-[#E2E8F0] mb-4">
