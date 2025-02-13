@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { WizardData, StepData, Step, StepComponentProps } from '@/types/wizard';
 import { VisionData, BrandIdentityData, ExecutionRoadmapData } from '@/types/pillar1';
 import ProgressBar from './ProgressBar';
@@ -197,9 +198,17 @@ const WizardContainer: React.FC = () => {
   const handleSubmit = async () => {
     setIsProcessing(true);
     try {
-      await saveWithRetry(userId, steps[currentStep]?.id || 'idea_market', wizardData[steps[currentStep]?.id || 'idea_market']);
+      // Use the current step's id, though at submission this should be 'review'
+      const submissionStepId = steps[currentStep]?.id || 'idea_market';
+      await saveWithRetry(userId, submissionStepId, wizardData[submissionStepId]);
+      
+      // Log the final submission event (for analytics)
+      console.log('Final business plan submitted:', wizardData);
+  
+      // Show success toast
       toast.success('Business plan submitted successfully!');
-      console.log('All data submitted:', wizardData);
+      const router = useRouter();
+      router.push('/thank-you');
     } catch (error) {
       toast.error('Failed to submit business plan. Please try again.');
     } finally {
@@ -227,38 +236,38 @@ const WizardContainer: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-white py-8 px-4">
-    <div className="container-custom">
-      <ProgressBar
-        current={currentStep}
-        total={totalSteps}
-        steps={steps}
-        onStepClick={goToStep}
-        currentStepId={currentStepId}
-      />
-      
-      {currentStepId === 'review' ? (
-  <ReviewStepWrapper
-    data={wizardData[currentStepId]}
-    onDataChange={(newData: StepData) => handleDataChange(currentStepId, newData)}
-    isActive={!isProcessing}
-    onEditStep={handleEditStep}
-    onSubmit={handleSubmit}
-  />
-) : (
-  CurrentStepComponent && <CurrentStepComponent {...basicStepProps} />
-)}
+      <div className="container-custom">
+        <ProgressBar
+          current={currentStep}
+          total={totalSteps}
+          steps={steps}
+          onStepClick={goToStep}
+          currentStepId={currentStepId}
+        />
+        
+        {currentStepId === 'review' ? (
+          <ReviewStepWrapper
+            data={wizardData[currentStepId]}
+            onDataChange={(newData: StepData) => handleDataChange(currentStepId, newData)}
+            isActive={!isProcessing}
+            onEditStep={handleEditStep}
+            onSubmit={handleSubmit}
+          />
+        ) : (
+          CurrentStepComponent && <CurrentStepComponent {...basicStepProps} />
+        )}
 
-      <NavigationControls
-        currentStep={currentStep}
-        totalSteps={totalSteps}
-        onNext={handleNext}
-        onBack={handleBack}
-        isProcessing={isProcessing}
-      />
+        <NavigationControls
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+          onNext={handleNext}
+          onBack={handleBack}
+          isProcessing={isProcessing}
+        />
 
-      <OnboardingGuide currentStep={currentStep} />
+        <OnboardingGuide currentStep={currentStep} />
+      </div>
     </div>
-  </div>
   );
 };
 
