@@ -3,12 +3,14 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { WizardData, StepData, Step, StepComponentProps } from '@/types/wizard';
 import { VisionData, BrandIdentityData, ExecutionRoadmapData } from '@/types/pillar1';
+import { ToolAutomationForm } from '@/types/toolAutomation';
 import ProgressBar from './ProgressBar';
 import NavigationControls from './NavigationControls';
 import OnboardingGuide from './OnboardingGuide';
 import Step1 from './Steps/Step1';
 import Step2 from './Steps/Step2';
 import Step3 from './Steps/Step3';
+import ToolAutomationStep from './Steps/ToolAutomationStep';
 import ReviewStepWrapper from './Steps/ReviewStepWrapper';
 import { saveWithRetry, loadWizardData } from '@/lib/supabase';
 import { visionMapping, brandingMapping, executionMapping } from '@/mappings/pillar1Mapping';
@@ -21,32 +23,39 @@ const initialData: WizardData = {
   idea_market: { userInput: {} as VisionData, aiOutput: '' },
   branding: { userInput: {} as BrandIdentityData, aiOutput: '' },
   execution: { userInput: {} as ExecutionRoadmapData, aiOutput: '' },
+  tool_automation: { userInput: {} as ToolAutomationForm, aiOutput: '' },
   review: { userInput: {} as WizardData, aiOutput: '' },
 };
 
 const steps: Step[] = [
   {
     id: 'branding',
-    title: 'Brand Identity',
-    description: 'Create your authentic brand personality',
+    title: 'Brand Identity & Messaging',
+    description: 'Craft a unique and authentic brand identity along with a compelling message.',
     component: Step1,
   },
   {
     id: 'idea_market',
-    title: 'Vision & Mission',
-    description: 'Define your business vision, mission, and core values',
+    title: 'Business Vision & Mission',
+    description: 'Define your business vision, mission, and core values to guide your strategy.',
     component: Step2,
   },
   {
     id: 'execution',
-    title: 'Execution Plan',
-    description: 'Define your 30-day action plan',
+    title: 'Execution & Action Plan',
+    description: 'Outline your 30-day action plan, including key milestones and immediate tasks.',
     component: Step3,
   },
   {
+    id: 'tool_automation',
+    title: 'Tool & Automation Planning',
+    description: 'Select the best tools and automation strategies for your business based on your expertise and needs.',
+    component: ToolAutomationStep,
+  },
+  {
     id: 'review',
-    title: 'Review & Submit',
-    description: 'Review all your inputs and submit your business plan',
+    title: 'Review & Finalize',
+    description: 'Review all your inputs, see the AI-refined plan, and submit your business plan.',
     component: ReviewStepWrapper,
   },
 ];
