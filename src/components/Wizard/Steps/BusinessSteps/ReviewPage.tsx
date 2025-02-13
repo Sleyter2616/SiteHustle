@@ -3,7 +3,7 @@ import { WizardData } from '@/types/wizard';
 import { VisionData, BrandIdentityData, ExecutionRoadmapData } from '@/types/pillar1';
 import { FiEdit, FiCheck } from 'react-icons/fi';
 import toast from 'react-hot-toast';
-import { buildFinalPrompt } from '@/utils/buildFinalPrompt';
+import { buildFinalBusinessPlanPrompt } from '@/utils/buildFinalPrompt';
 
 interface ReviewPageProps {
   data: WizardData;
@@ -22,7 +22,7 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
   const executionData = data.execution?.userInput as ExecutionRoadmapData;
 
   // Build the final prompt (generic example)
-  const finalPrompt = buildFinalPrompt(data);
+  const finalPrompt = buildFinalBusinessPlanPrompt(data);
 
   useEffect(() => {
     const fetchFinalPlan = async () => {
