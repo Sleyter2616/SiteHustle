@@ -1,7 +1,7 @@
 'use client';
 import React, { ChangeEvent } from 'react';
 import { StepComponentProps } from '@/types/wizard';
-import { FieldMapping } from '@/mappings/toolAutomationMapping'; // adjust if needed
+import { FieldMapping } from '@/mappings/commonMappingTypes';
 
 interface GenericStepProps<T> extends StepComponentProps<T> {
   fieldMappings: Record<keyof T, FieldMapping>;
