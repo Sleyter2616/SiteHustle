@@ -1,8 +1,9 @@
-// src/components/Wizard/ReviewPage.tsx
-import React from 'react';
-import { WizardData, BrandingForm } from '@/types/wizard';
-import { VisionData, ExecutionRoadmapData } from '@/types/pillar1';
+import React, { useEffect, useState } from 'react';
+import { WizardData } from '@/types/wizard';
+import { VisionData, BrandIdentityData, ExecutionRoadmapData } from '@/types/pillar1';
 import { FiEdit, FiCheck } from 'react-icons/fi';
+import toast from 'react-hot-toast';
+import { buildFinalPrompt } from '@/utils/buildFinalPrompt';
 
 interface ReviewPageProps {
   data: WizardData;
@@ -12,20 +13,43 @@ interface ReviewPageProps {
 }
 
 const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isActive }) => {
-  if (!isActive) return null;
-
-  console.log('ReviewPage received data:', data);
+  const [finalPlan, setFinalPlan] = useState<string>('');
+  const [isPlanLoading, setIsPlanLoading] = useState<boolean>(false);
 
   // Extract data from each section
-  const brandingData = data.branding?.userInput as BrandingForm;
   const visionData = data.idea_market?.userInput as VisionData;
+  const brandingData = data.branding?.userInput as BrandIdentityData;
   const executionData = data.execution?.userInput as ExecutionRoadmapData;
 
-  console.log('Extracted data:', {
-    brandingData,
-    visionData,
-    executionData
-  });
+  // Build the final prompt (generic example)
+  const finalPrompt = buildFinalPrompt(data);
+
+  useEffect(() => {
+    const fetchFinalPlan = async () => {
+      setIsPlanLoading(true);
+      try {
+        const res = await fetch('/api/ai/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: finalPrompt, stepId: 'review' }),
+        });
+        const json = await res.json();
+        if (json.success) {
+          setFinalPlan(json.output);
+        } else {
+          toast.error(json.error || 'Failed to generate final business plan.');
+        }
+      } catch (error: any) {
+        toast.error('Error generating final business plan.');
+      } finally {
+        setIsPlanLoading(false);
+      }
+    };
+
+    fetchFinalPlan();
+  }, [finalPrompt]);
+
+  if (!isActive) return null;
 
   return (
     <div className="space-y-8 w-full max-w-3xl mx-auto">
@@ -33,7 +57,7 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
         Review Your Business Plan
       </h2>
 
-      {/* Business Idea Section */}
+      {/* Business Vision Section */}
       <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500 transition-all duration-300">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
@@ -66,7 +90,7 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
           </p>
           <p>
             <strong className="text-gray-400">Core Values:</strong>{' '}
-            {visionData?.coreValues?.join(', ') || '-'}
+            {Array.isArray(visionData?.coreValues) ? visionData.coreValues.join(', ') : '-'}
           </p>
         </div>
       </div>
@@ -86,7 +110,6 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
           </button>
         </div>
         <div className="text-gray-300 space-y-4">
-          {/* Reflection Section */}
           <div>
             <h4 className="text-lg font-medium text-gray-300 mb-2">Reflection</h4>
             <div className="space-y-2">
@@ -104,8 +127,6 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
               </p>
             </div>
           </div>
-
-          {/* Personality Section */}
           <div>
             <h4 className="text-lg font-medium text-gray-300 mb-2">Personality</h4>
             <div className="space-y-2">
@@ -127,8 +148,6 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
               </p>
             </div>
           </div>
-
-          {/* Story Section */}
           <div>
             <h4 className="text-lg font-medium text-gray-300 mb-2">Story</h4>
             <div className="space-y-2">
@@ -146,8 +165,6 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
               </p>
             </div>
           </div>
-
-          {/* Differentiation Section */}
           <div>
             <h4 className="text-lg font-medium text-gray-300 mb-2">Differentiation</h4>
             <div className="space-y-2">
@@ -168,7 +185,7 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
         </div>
       </div>
 
-      {/* Execution Section */}
+      {/* Execution Plan Section */}
       <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 hover:border-purple-500 transition-all duration-300">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
@@ -189,7 +206,7 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
           </p>
           <p>
             <strong className="text-gray-400">Weekly Milestones:</strong>{' '}
-            {executionData?.weeklyMilestones?.join(', ') || '-'}
+            {Array.isArray(executionData?.weeklyMilestones) ? executionData.weeklyMilestones.join(', ') : '-'}
           </p>
           <p>
             <strong className="text-gray-400">Content Plan:</strong>{' '}
@@ -197,9 +214,25 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ data, onEditStep, onSubmit, isA
           </p>
           <p>
             <strong className="text-gray-400">Immediate Actions:</strong>{' '}
-            {executionData?.immediateActions?.join(', ') || '-'}
+            {Array.isArray(executionData?.immediateActions) ? executionData.immediateActions.join(', ') : '-'}
           </p>
         </div>
+      </div>
+
+      {/* Final AI Output Section */}
+      <div className="bg-[#1a2236] rounded-xl p-6 shadow-lg border border-gray-700 transition-all duration-300">
+        <h3 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 text-center">
+          Final AI-Refined Business Plan
+        </h3>
+        {isPlanLoading ? (
+          <div className="flex justify-center items-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <div className="text-gray-300 mt-4 whitespace-pre-wrap">
+            {finalPlan || 'No AI output generated yet.'}
+          </div>
+        )}
       </div>
 
       {/* Final Submission */}
