@@ -1,25 +1,4 @@
 'use client';
-/**
- * SiteHustle Wizard - Pillar 1: Clarity in Vision & Goals
- * 
- * This wizard module focuses on the foundational aspects of business planning:
- * - Brand Identity & Messaging
- * - Business Vision & Mission
- * - Execution & Action Plan
- * 
- * Future Enhancement:
- * After successful completion of this wizard (Pillar 1), users will be directed to a
- * separate "Tool & Automation Planning" wizard. This next module will:
- * 1. Query the stored data from this wizard via our API
- * 2. Use the existing business context to recommend appropriate tools and automation strategies
- * 3. Gather additional technical requirements and preferences
- * 
- * The separation of concerns allows us to:
- * - Focus on core business planning first
- * - Make technical decisions based on established business needs
- * - Maintain modularity for future enhancements
- */
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { WizardData, StepData, Step, StepComponentProps } from '@/types/wizard';
@@ -36,6 +15,7 @@ import { visionMapping, brandingMapping, executionMapping } from '@/mappings/pil
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import toast from 'react-hot-toast';
 import { generatePlanDocument } from '@/utils/generateDocument';
+import { buildFinalPrompt } from '@/utils/buildFinalPrompt';
 
 const initialData: WizardData = {
   idea_market: { userInput: {} as VisionData, aiOutput: '' },
@@ -108,7 +88,6 @@ function validateStepData(stepId: string, data: any): { isValid: boolean; errors
     });
   }
 
-  // Aggregate errors to a single message per step if there are any errors
   if (errors.length > 0) {
     const stepName = steps.find(s => s.id === stepId)?.title || stepId.replace('_', ' ');
     errors = [`Please complete all required fields in ${stepName} correctly.`];
@@ -123,7 +102,9 @@ const WizardContainer: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const supabase = createClientComponentClient();
+  const router = useRouter();
 
   useEffect(() => {
     const getUser = async () => {
@@ -216,33 +197,69 @@ const WizardContainer: React.FC = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    setIsProcessing(true);
-    try {
-      // Use the current step's id, though at submission this should be 'review'
-      const submissionStepId = steps[currentStep]?.id || 'idea_market';
-      await saveWithRetry(userId, submissionStepId, wizardData[submissionStepId]);
-      console.log('Final business plan submitted:', wizardData);
-      toast.success('Business plan submitted successfully!');
-
-      const pdfBlob = generatePlanDocument(wizardData);
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'Business_Plan.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      const router = useRouter();
-      router.push('/thank-you');
-    } catch (error) {
-      toast.error('Failed to submit business plan. Please try again.');
-    } finally {
-      setIsProcessing(false);
+  // Inside WizardContainer.tsx
+const handleSubmit = async () => {
+  setIsProcessing(true);
+  try {
+    // Build final prompt from the aggregated wizardData
+    const finalPrompt = buildFinalPrompt(wizardData);
+    
+    // Call the AI generation API endpoint
+    const response = await fetch('/api/ai/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: finalPrompt, stepId: 'review' }),
+    });
+    
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error || 'AI generation failed');
     }
-  };
+    
+    // Create an updated review payload including AI output from each step
+    const updatedReviewData = {
+      userInput: {
+        idea_market: wizardData.idea_market.userInput,
+        branding: wizardData.branding.userInput,
+        execution: wizardData.execution.userInput,
+      },
+      // Serialize the aiOutput object into a string
+      aiOutput: JSON.stringify({
+        idea_market: wizardData.idea_market.aiOutput || '',
+        branding: wizardData.branding.aiOutput || '',
+        execution: wizardData.execution.aiOutput || '',
+        review: result.output,
+      }),
+    };
+
+    // Log the final payload for debugging
+    console.log('Final submission payload:', updatedReviewData);
+    
+    // Save the updated review data
+    await saveWithRetry(userId, 'review', updatedReviewData);
+    console.log('Final business plan submitted:', wizardData);
+    toast.success('Business plan submitted successfully!');
+    
+    // Generate PDF document from the updated wizardData (including AI output)
+    const pdfBlob = generatePlanDocument({ ...wizardData, review: updatedReviewData });
+    const url = URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'Business_Plan.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    // Navigate to the conclusion page
+    router.push('/wizard-conclusion');
+  } catch (error) {
+    console.error('Submission error:', error);
+    toast.error('Failed to submit business plan. Please try again.');
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   if (isLoading) {
     return (
@@ -292,6 +309,18 @@ const WizardContainer: React.FC = () => {
           onBack={handleBack}
           isProcessing={isProcessing}
         />
+
+        {isSubmitted && (
+          <div className="mt-4 flex justify-center">
+            <button 
+              className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-200"
+              onClick={() => router.push('/tool-automation-planning')}
+              title="Continue to Tool & Automation Planning"
+            >
+              Continue to Tool & Automation Planning
+            </button>
+          </div>
+        )}
 
         <OnboardingGuide currentStep={currentStep} />
       </div>
