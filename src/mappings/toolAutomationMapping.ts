@@ -1,4 +1,3 @@
-import { FieldMapping } from './commonTypes'; // Adjust the import if you have a shared types file
 
 export interface FieldMapping {
   label: string;
@@ -7,6 +6,8 @@ export interface FieldMapping {
   minLength?: number;
   isArray?: boolean;
   errorMessage?: string;
+  inputType?: 'textarea' | 'dropdown' | 'checkboxGroup';
+  options?: string[];
 }
 
 export const toolAutomationMapping: Record<string, FieldMapping> = {
@@ -16,14 +17,17 @@ export const toolAutomationMapping: Record<string, FieldMapping> = {
     placeholder: 'Select your expertise',
     minLength: 1,
     errorMessage: 'Please select your technical expertise level.',
+    inputType: 'dropdown',
+    options: ['Beginner', 'Intermediate', 'Expert'],
   },
   automationPreferences: {
     label: 'Automation Preferences',
     tooltip: 'Select one or more automation areas you wish to implement.',
-    placeholder: 'Select automation options (e.g., Email Automation, CRM Integration, etc.)',
+    placeholder: 'Select automation options',
     minLength: 1,
-    isArray: true,
     errorMessage: 'Please select at least one automation preference.',
+    inputType: 'checkboxGroup',
+    options: ['Email Automation', 'Social Media Scheduling', 'CRM Integration', 'Inventory Management'],
   },
   additionalNotes: {
     label: 'Additional Notes',
@@ -31,5 +35,6 @@ export const toolAutomationMapping: Record<string, FieldMapping> = {
     placeholder: 'Enter any extra details...',
     minLength: 0,
     errorMessage: '',
+    inputType: 'textarea',
   }
 };
