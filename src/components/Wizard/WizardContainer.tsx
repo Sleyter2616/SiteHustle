@@ -14,6 +14,7 @@ import { saveWithRetry, loadWizardData } from '@/lib/supabase';
 import { visionMapping, brandingMapping, executionMapping } from '@/mappings/pillar1Mapping';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import toast from 'react-hot-toast';
+import { generatePlanDocument } from '@/utils/generateDocument';
 
 
 const initialData: WizardData = {
@@ -201,12 +202,19 @@ const WizardContainer: React.FC = () => {
       // Use the current step's id, though at submission this should be 'review'
       const submissionStepId = steps[currentStep]?.id || 'idea_market';
       await saveWithRetry(userId, submissionStepId, wizardData[submissionStepId]);
-      
-      // Log the final submission event (for analytics)
       console.log('Final business plan submitted:', wizardData);
-  
-      // Show success toast
       toast.success('Business plan submitted successfully!');
+
+      const pdfBlob = generatePlanDocument(wizardData);
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'Business_Plan.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
       const router = useRouter();
       router.push('/thank-you');
     } catch (error) {
