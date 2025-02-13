@@ -80,3 +80,8 @@ export interface ProgressBarProps {
   onStepClick: (index: number) => void;
   currentStepId: string;
 }
+export interface ToolAutomationForm {
+  techExpertise: string;
+  automationPreferences: string[];
+  additionalNotes: string;
+}
