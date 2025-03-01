@@ -2,7 +2,7 @@
 import { WizardData } from '@/types/wizard';
 import { VisionData, BrandIdentityData, ExecutionRoadmapData } from '@/types/pillar1';
 import jsPDF from 'jspdf';
-import { buildFinalBusinessPlanPrompt, buildToolAutomationFinalPrompt } from './buildFinalPrompt';
+import { buildFinalBusinessPlanPrompt, buildToolAutomationFinalPrompt, buildImplementationFinalPrompt } from './buildFinalPrompt';
 
 function addWrappedText(doc: jsPDF, text: string, x: number, y: number, maxWidth: number): number {
   const lines = doc.splitTextToSize(text, maxWidth);
@@ -144,7 +144,9 @@ export function generateBusinessPlanDocument(data: WizardData): Blob {
 
   // Return the PDF as a Blob
   return doc.output('blob');
-}export function generateToolAutomationPlanDocument(data: WizardData): Blob {
+}
+
+export function generateToolAutomationPlanDocument(data: WizardData): Blob {
   const doc = new jsPDF();
   let yPosition = 20;
   const margin = 20;
@@ -223,5 +225,80 @@ export function generateBusinessPlanDocument(data: WizardData): Blob {
   yPosition = addWrappedText(doc, finalPrompt, margin, yPosition, maxWidth);
 
   // Return the PDF as a Blob
+  return doc.output('blob');
+}
+
+export function generateImplementationPlanDocument(data: WizardData): Blob {
+  const doc = new jsPDF();
+  let yPosition = 20;
+  const margin = 20;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const maxWidth = pageWidth - (margin * 2);
+
+  // Extract data for each section
+  const logic = data.logic?.userInput || {};
+  const lookFeel = data.lookFeel?.userInput || {};
+  const deployment = data.deployment?.userInput || {};
+
+  // Title
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  yPosition = addWrappedText(doc, "Implementation Plan", margin, yPosition, maxWidth);
+  yPosition += 10;
+
+  // Section: Backend Architecture & Logic
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  yPosition = addWrappedText(doc, "1. Backend Architecture & Logic", margin, yPosition, maxWidth);
+  yPosition += 5;
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  yPosition = addWrappedText(doc, `Preferred Architecture: ${logic.backendArchitecture || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Programming Languages: ${logic.programmingLanguages || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `API Integration Needs: ${logic.apiIntegrationNeeds || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Data Storage Strategy: ${logic.dataStorageStrategy || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Security Requirements: ${logic.securityRequirements || '-'}`, margin, yPosition, maxWidth);
+  yPosition += 10;
+
+  // Section: Frontend & UI Integration
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  yPosition = addWrappedText(doc, "2. Frontend & UI Integration", margin, yPosition, maxWidth);
+  yPosition += 5;
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  yPosition = addWrappedText(doc, `Design Style: ${lookFeel.designStyle || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `User Experience: ${lookFeel.userExperience || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Key Content Priorities: ${lookFeel.keyContent || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Competitor Analysis: ${lookFeel.competitorAnalysis || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Target Audience: ${lookFeel.targetAudience || '-'}`, margin, yPosition, maxWidth);
+  yPosition += 10;
+
+  // Section: Deployment & Integration Strategy
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  yPosition = addWrappedText(doc, "3. Deployment & Integration Strategy", margin, yPosition, maxWidth);
+  yPosition += 5;
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  yPosition = addWrappedText(doc, `Hosting Environment: ${deployment.hostingEnvironment || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Containerization: ${deployment.containerization || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `CI/CD Tools: ${deployment.ciCdTools || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Monitoring Strategy: ${deployment.monitoringStrategy || '-'}`, margin, yPosition, maxWidth);
+  yPosition = addWrappedText(doc, `Scaling Plan: ${deployment.scalingPlan || '-'}`, margin, yPosition, maxWidth);
+  yPosition += 10;
+
+  // AI Analysis Section
+  doc.addPage();
+  yPosition = 20;
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  yPosition = addWrappedText(doc, "4. Final Implementation Analysis", margin, yPosition, maxWidth);
+  yPosition += 5;
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  const finalPrompt = buildImplementationFinalPrompt(data);
+  yPosition = addWrappedText(doc, finalPrompt, margin, yPosition, maxWidth);
+
   return doc.output('blob');
 }

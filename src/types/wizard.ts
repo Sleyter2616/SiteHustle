@@ -103,3 +103,27 @@ export interface BusinessLogicForm {
   thirdPartyIntegrations: string[]; // Expect an array of integration names or details
   scalabilityNeeds: string;
 }
+
+export interface BusinessLogicForm {
+  backendArchitecture: string;
+  programmingLanguages: string;
+  apiIntegrationNeeds: string;
+  dataStorageStrategy: string;
+  securityRequirements: string;
+}
+
+export interface FrontEndUIForm {
+  designStyle: string;
+  userExperience: string;
+  keyContent: string;
+  competitorAnalysis: string;
+  targetAudience: string;
+}
+
+export interface DeploymentIntegrationForm {
+  hostingEnvironment: string;
+  containerization: string;
+  ciCdTools: string;
+  monitoringStrategy: string;
+  scalingPlan: string;
+}

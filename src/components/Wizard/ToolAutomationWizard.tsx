@@ -306,7 +306,7 @@ const ToolAutomationWizard: React.FC = () => {
             data={{ userInput: wizardData, aiOutput: wizardData.review.aiOutput }}
             onDataChange={(newData: StepData) => handleDataChange(currentStepId, newData)}
             isActive={!isProcessing}
-            onNextModule={() => router.push('/tool-automation-implementation')}
+            onNextModule={() => router.push('/implementation-wizard')}
           />
         ) 
         : (

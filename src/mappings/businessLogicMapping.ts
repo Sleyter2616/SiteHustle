@@ -1,61 +1,46 @@
 // src/mappings/businessLogicMapping.ts
-import { FieldMapping } from './commonMappingTypes'; // Adjust if you have a common types file
+import { FieldMapping } from './commonMappingTypes';
 
 export const businessLogicMapping: Record<string, FieldMapping> = {
-  backendRequirements: {
-    label: 'Backend Requirements',
-    tooltip: 'Describe the essential backend features (e.g., user authentication, API endpoints, database structure).',
-    placeholder: 'Enter your backend requirements...',
-    minLength: 10,
-    errorMessage: 'Please provide at least 10 characters for backend requirements.',
-  },
-    apiNeeds: {
-      label: 'API Requirements',
-      tooltip: 'Describe any specific API needs or integrations required for your backend.',
-      placeholder: 'e.g., Payment gateways, third‑party integrations, custom endpoints',
-      inputType: 'textarea',
-      minLength: 10,
-      errorMessage: 'API requirements must be at least 10 characters.',
-    },
-  monetizationStrategy: {
-    label: 'Monetization Strategy',
-    tooltip: 'How will your business earn revenue? (e.g., subscriptions, one-time sales, freemium, ads, affiliate)',
-    placeholder: 'Describe your monetization strategy...',
-    minLength: 5,
-    errorMessage: 'Monetization strategy must be at least 5 characters.',
-  },
-  thirdPartyIntegrations: {
-    label: 'Third-Party Integrations',
-    tooltip: 'List any external services (e.g., payment processors, CRMs, analytics tools) you plan to integrate.',
-    placeholder: 'Enter integration details...',
-    isArray: true,
+  backendArchitecture: {
+    label: 'Preferred Backend Architecture',
+    tooltip: 'Select whether you prefer a monolithic system, microservices, or a serverless architecture.',
+    placeholder: 'Select one...',
     minLength: 3,
-    errorMessage: 'Each integration detail must be at least 3 characters.',
-  },
-  scalability: {
-    label: 'Scalability Considerations',
-    tooltip: 'Explain your scalability needs, such as handling high traffic or multi‑region deployment.',
-    placeholder: 'Describe your scalability plans...',
-    inputType: 'textarea',
-    minLength: 10,
-    errorMessage: 'Scalability considerations must be at least 10 characters.',
-  },  // 4. Data Storage Preferences (Dropdown)
-  dataStorage: {
-    label: 'Data Storage Preferences',
-    tooltip: 'Select your preferred type of data storage solution.',
-    placeholder: 'Select a data storage option',
     inputType: 'dropdown',
-    options: ['SQL', 'NoSQL', 'Hybrid'],
-    minLength: 0,
-    errorMessage: 'Please select a data storage option.',
+    options: ['Monolithic', 'Microservices', 'Serverless'],
+    errorMessage: 'Please select a backend architecture.',
   },
-  // 5. Security Requirements (Textarea)
+  programmingLanguages: {
+    label: 'Programming Languages/Technologies',
+    tooltip: 'List the languages or technologies you are comfortable with (e.g., JavaScript, Python).',
+    placeholder: 'e.g., JavaScript, Python',
+    minLength: 2,
+    inputType: 'textarea',
+    errorMessage: 'Please specify at least one programming language or technology.',
+  },
+  apiIntegrationNeeds: {
+    label: 'API Integration Needs',
+    tooltip: 'Describe the types of API integrations you require (e.g., payment processing, third-party services).',
+    placeholder: 'Describe your API integration needs...',
+    minLength: 10,
+    inputType: 'textarea',
+    errorMessage: 'API integration details must be at least 10 characters.',
+  },
+  dataStorageStrategy: {
+    label: 'Data Storage & Management',
+    tooltip: 'How do you plan to store and manage your data? (e.g., SQL, NoSQL, cloud databases)',
+    placeholder: 'e.g., SQL, NoSQL, cloud storage...',
+    minLength: 5,
+    inputType: 'textarea',
+    errorMessage: 'Please describe your data storage strategy.',
+  },
   securityRequirements: {
     label: 'Security Requirements',
-    tooltip: 'Describe any critical security features you need (e.g., encryption, multi‑factor authentication).',
-    placeholder: 'Enter your security requirements...',
+    tooltip: 'What security measures are critical for your system? (e.g., authentication, encryption)',
+    placeholder: 'Describe your security requirements...',
+    minLength: 5,
     inputType: 'textarea',
-    minLength: 10,
-    errorMessage: 'Security requirements must be at least 10 characters.',
+    errorMessage: 'Security requirements must be specified in at least 5 characters.',
   },
 };
