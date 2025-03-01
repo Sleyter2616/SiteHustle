@@ -2,59 +2,60 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { WizardData, StepData, Step, StepComponentProps } from '@/types/wizard';
-import { VisionData, BrandIdentityData, ExecutionRoadmapData } from '@/types/pillar1';
 import ProgressBar from './ProgressBar';
 import NavigationControls from './NavigationControls';
 import OnboardingGuide from './OnboardingGuide';
-import Step1 from './Steps/BusinessSteps/Step1';
-import Step2 from './Steps/BusinessSteps/Step2';
-import Step3 from './Steps/BusinessSteps/Step3';
-import ReviewStepWrapper from './Steps/BusinessSteps/ReviewStepWrapper';
-import ConclusionStep from './Steps/BusinessSteps/ConclusionStep';
+
+// Import step components
+import BusinessLogic from './Steps/ImplementationSteps/BusinessLogic';
+import FrontEndUI from './Steps/ImplementationSteps/FrontEndUI';
+import DeploymentIntegration from './Steps/ImplementationSteps/DeploymentIntegration';
+import Review from './Steps/ImplementationSteps/Review';
+import Conclusion from './Steps/ImplementationSteps/Conclusion';
+
 import { saveWithRetry, loadWizardData } from '@/lib/supabase';
-import { visionMapping, brandingMapping, executionMapping } from '@/mappings/pillar1Mapping';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import toast from 'react-hot-toast';
-import { buildFinalBusinessPlanPrompt } from '@/utils/buildFinalPrompt';
-import { FiArrowRight } from 'react-icons/fi';
+import { buildImplementationFinalPrompt } from '@/utils/buildFinalPrompt';
 
 const initialData: WizardData = {
-  idea_market: { userInput: {} as VisionData, aiOutput: '' },
-  branding: { userInput: {} as BrandIdentityData, aiOutput: '' },
-  execution: { userInput: {} as ExecutionRoadmapData, aiOutput: '' },
+  logic: { userInput: {} as any, aiOutput: '' },
+  lookFeel: { userInput: {} as any, aiOutput: '' },
+  deployment: { userInput: {} as any, aiOutput: '' },
   review: { userInput: {} as WizardData, aiOutput: '' },
+  conclusion: { userInput: {} as WizardData, aiOutput: '' },
 };
 
 const steps: Step[] = [
   {
-    id: 'branding',
-    title: 'Brand Identity & Messaging',
-    description: 'Craft a unique and authentic brand identity along with a compelling message.',
-    component: Step1,
+    id: 'logic',
+    title: 'Backend Architecture & Logic',
+    description: 'Detail your backend architecture, API integration needs, data management, and security requirements.',
+    component: BusinessLogic,
   },
   {
-    id: 'idea_market',
-    title: 'Business Vision & Mission',
-    description: 'Define your business vision, mission, and core values to guide your strategy.',
-    component: Step2,
+    id: 'lookFeel',
+    title: 'Frontend & UI Integration',
+    description: 'Define the design style, user experience, and content priorities for your site.',
+    component: FrontEndUI,
   },
   {
-    id: 'execution',
-    title: 'Execution & Action Plan',
-    description: 'Outline your 30-day action plan, including key milestones and immediate tasks.',
-    component: Step3,
+    id: 'deployment',
+    title: 'Deployment & Integration Strategy',
+    description: 'Outline your hosting environment, containerization, CI/CD tools, monitoring, and scaling plans.',
+    component: DeploymentIntegration,
   },
   {
     id: 'review',
-    title: 'Review & Finalize',
-    description: 'Review all your inputs and finalize your business plan for submission.',
-    component: ReviewStepWrapper,
+    title: 'Review & Finalize Implementation Plan',
+    description: 'Review all your inputs and confirm your implementation plan before generating the final output.',
+    component: Review,
   },
   {
     id: 'conclusion',
     title: 'Conclusion & Final Output',
-    description: 'View the final AI-generated output and download your Business Plan PDF.',
-    component: ConclusionStep,
+    description: 'View the final AI-generated implementation plan, download your PDF, and proceed to the next module.',
+    component: Conclusion,
   },
 ];
 
@@ -66,12 +67,12 @@ function validateStepData(stepId: string, data: any): { isValid: boolean; errors
   let errors: string[] = [];
   let mapping: Record<string, any> | undefined;
 
-  if (stepId === 'idea_market') {
-    mapping = visionMapping;
-  } else if (stepId === 'branding') {
-    mapping = brandingMapping;
-  } else if (stepId === 'execution') {
-    mapping = executionMapping;
+  if (stepId === 'logic') {
+    mapping = require('@/mappings/businessLogicMapping').businessLogicMapping;
+  } else if (stepId === 'lookFeel') {
+    mapping = require('@/mappings/frontEndUIMapping').frontEndUIMapping;
+  } else if (stepId === 'deployment') {
+    mapping = require('@/mappings/deploymentIntegrationMapping').deploymentIntegrationMapping;
   }
 
   if (mapping) {
@@ -103,13 +104,12 @@ function validateStepData(stepId: string, data: any): { isValid: boolean; errors
   return { isValid: errors.length === 0, errors };
 }
 
-const BuisinessPlanWizard: React.FC = () => {
+const ImplementationWizard: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [wizardData, setWizardData] = useState<WizardData>(initialData);
   const [isProcessing, setIsProcessing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const supabase = createClientComponentClient();
   const router = useRouter();
 
@@ -123,7 +123,6 @@ const BuisinessPlanWizard: React.FC = () => {
       }
       setUserId(session.user.id);
     };
-
     getUser();
   }, [supabase.auth]);
 
@@ -149,7 +148,6 @@ const BuisinessPlanWizard: React.FC = () => {
         setIsLoading(false);
       }
     };
-
     loadSavedData();
   }, [userId]);
 
@@ -173,7 +171,7 @@ const BuisinessPlanWizard: React.FC = () => {
       toast.error('Please sign in to continue');
       return;
     }
-    const currentStepId = steps[currentStep]?.id || 'idea_market';
+    const currentStepId = steps[currentStep]?.id || 'logic';
     if (currentStep < totalSteps - 1) {
       const { isValid, errors } = validateStepData(currentStepId, wizardData[currentStepId].userInput);
       if (!isValid) {
@@ -210,7 +208,7 @@ const BuisinessPlanWizard: React.FC = () => {
     setIsProcessing(true);
     try {
       // Build final prompt from aggregated wizardData
-      const finalPrompt = buildFinalBusinessPlanPrompt(wizardData);
+      const finalPrompt = buildImplementationFinalPrompt(wizardData);
       
       // Call the AI generation API endpoint
       const response = await fetch('/api/ai/generate', {
@@ -224,36 +222,35 @@ const BuisinessPlanWizard: React.FC = () => {
         throw new Error(result.error || 'AI generation failed');
       }
       
-      // Create an updated review payload including AI output from each step.
+      // Create updated review payload including AI output
       const updatedReviewData = {
         userInput: {
-          idea_market: wizardData.idea_market.userInput,
-          branding: wizardData.branding.userInput,
-          execution: wizardData.execution.userInput,
+          logic: wizardData.logic.userInput,
+          lookFeel: wizardData.lookFeel.userInput,
+          deployment: wizardData.deployment.userInput,
         },
         aiOutput: JSON.stringify({
-          idea_market: wizardData.idea_market.aiOutput || '',
-          branding: wizardData.branding.aiOutput || '',
-          execution: wizardData.execution.aiOutput || '',
+          logic: wizardData.logic.aiOutput || '',
+          lookFeel: wizardData.lookFeel.aiOutput || '',
+          deployment: wizardData.deployment.aiOutput || '',
           review: result.output,
         }),
       };
 
       console.log('Final submission payload:', updatedReviewData);
       
-      // Save the updated review data
+      // Save updated review data
       await saveWithRetry(userId, 'review', updatedReviewData);
-      console.log('Final business plan submitted:', wizardData);
-      toast.success('Business plan submitted successfully!');
+      toast.success('Implementation plan submitted successfully!');
       
-      // Transition to the Conclusion step (instead of immediate redirection)
+      // Transition to Conclusion step
       const conclusionStepIndex = steps.findIndex(step => step.id === 'conclusion');
       if (conclusionStepIndex !== -1) {
         setCurrentStep(conclusionStepIndex);
       }
     } catch (error) {
       console.error('Submission error:', error);
-      toast.error('Failed to submit business plan. Please try again.');
+      toast.error('Failed to submit implementation plan. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -267,10 +264,10 @@ const BuisinessPlanWizard: React.FC = () => {
     );
   }
 
-  const currentStepId = steps[currentStep]?.id || 'idea_market';
+  const currentStepId = steps[currentStep]?.id || 'logic';
   const CurrentStepComponent = steps[currentStep]?.component;
 
-  // For non-review steps, pass basic props.
+  // For non-review steps, pass basic props
   const basicStepProps: StepComponentProps<any> = {
     data: wizardData[currentStepId],
     onDataChange: (newData: StepData) => handleDataChange(currentStepId, newData),
@@ -289,7 +286,7 @@ const BuisinessPlanWizard: React.FC = () => {
         />
         
         {currentStepId === 'review' ? (
-          <ReviewStepWrapper
+          <Review
             data={wizardData[currentStepId]}
             onDataChange={(newData: StepData) => handleDataChange(currentStepId, newData)}
             isActive={!isProcessing}
@@ -297,11 +294,11 @@ const BuisinessPlanWizard: React.FC = () => {
             onSubmit={handleSubmit}
           />
         ) : currentStepId === 'conclusion' ? (
-          <CurrentStepComponent
+          <Conclusion
             data={{ userInput: wizardData, aiOutput: wizardData.review.aiOutput }}
             onDataChange={(newData: StepData) => handleDataChange(currentStepId, newData)}
             isActive={!isProcessing}
-            onNextModule={() => router.push('/tool-automation-planning-wizard')}
+            onNextModule={() => router.push('/business-planning-wizard')}
           />
         ) : (
           CurrentStepComponent && <CurrentStepComponent {...basicStepProps} />
@@ -313,20 +310,7 @@ const BuisinessPlanWizard: React.FC = () => {
           onNext={currentStepId === 'review' ? handleSubmit : handleNext}
           onBack={handleBack}
           isProcessing={isProcessing}
-          onFinish={() => router.push('/tool-automation-planning-wizard')}
         />
-
-        {isSubmitted && (
-          <div className="mt-4 flex justify-center">
-            <button 
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 flex items-center justify-center gap-2"
-              onClick={() => router.push('/tool-automation-planning-wizard')}
-            >
-              Continue to Tool & Automation Planning
-              <FiArrowRight className="w-5 h-5" />
-            </button>
-          </div>
-        )}
 
         <OnboardingGuide currentStep={currentStep} />
       </div>
@@ -334,4 +318,4 @@ const BuisinessPlanWizard: React.FC = () => {
   );
 };
 
-export default BuisinessPlanWizard;
+export default ImplementationWizard;

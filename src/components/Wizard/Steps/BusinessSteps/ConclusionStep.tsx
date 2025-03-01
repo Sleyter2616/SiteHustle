@@ -100,8 +100,8 @@ const ConclusionStep: React.FC<ConclusionStepProps> = ({ data, isActive, onNextM
         
         <button
           onClick={onNextModule}
-          className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-800 transition-all duration-200 flex items-center justify-center gap-2"
-          >
+          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 flex items-center justify-center gap-2"
+        >
           Continue to Tool & Automation Planning
           <FiArrowRight className="w-5 h-5" />
         </button>

@@ -99,7 +99,7 @@ const ToolAutomationConclusionStep: React.FC<ToolAutomationConclusionStepProps> 
         </button>
         
         <button
-          onClick={() => router.push('/implementation')}
+          onClick={() => router.push('/implementation-wizard')}
           className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 flex items-center justify-center gap-2"
            >
           Continue to Implementation

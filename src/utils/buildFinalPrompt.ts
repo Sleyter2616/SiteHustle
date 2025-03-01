@@ -86,3 +86,44 @@ Ensure your recommendations are actionable and include any relevant insights or 
   
   return prompt;
 }
+
+export function buildImplementationFinalPrompt(data: WizardData): string {
+  // Extract data for implementation sections with fallbacks
+  const logic = data.logic?.userInput || {};
+  const lookFeel = data.lookFeel?.userInput || {};
+  const deployment = data.deployment?.userInput || {};
+
+  const prompt = `
+Please generate a comprehensive, detailed implementation plan for the user's business based on the following information.
+
+Section 1: Backend Architecture & Logic
+- Preferred Architecture: ${logic.backendArchitecture || 'Not specified'}
+- Programming Languages/Technologies: ${logic.programmingLanguages || 'Not specified'}
+- API Integration Needs: ${logic.apiIntegrationNeeds || 'Not specified'}
+- Data Storage Strategy: ${logic.dataStorageStrategy || 'Not specified'}
+- Security Requirements: ${logic.securityRequirements || 'Not specified'}
+
+Section 2: Frontend & UI Integration
+- Desired Design Style: ${lookFeel.designStyle || 'Not specified'}
+- User Experience Goals: ${lookFeel.userExperience || 'Not specified'}
+- Key Content Priorities: ${lookFeel.keyContent || 'Not specified'}
+- Competitor Analysis: ${lookFeel.competitorAnalysis || 'Not specified'}
+- Target Audience Description: ${lookFeel.targetAudience || 'Not specified'}
+
+Section 3: Deployment & Integration Strategy
+- Hosting Environment: ${deployment.hostingEnvironment || 'Not specified'}
+- Containerization Strategy: ${deployment.containerization || 'Not specified'}
+- CI/CD Tools: ${deployment.ciCdTools || 'Not specified'}
+- Monitoring Strategy: ${deployment.monitoringStrategy || 'Not specified'}
+- Scaling & Redundancy Plan: ${deployment.scalingPlan || 'Not specified'}
+
+Based on the above details, please provide a detailed, step-by-step implementation plan that outlines:
+1. Specific technical recommendations for the backend and frontend
+2. Deployment and integration strategies, including tools and services
+3. Potential challenges and risk mitigation strategies
+4. Timeline estimates and resource requirements
+5. Best practices and industry standards to follow
+`;
+
+  return prompt;
+}
